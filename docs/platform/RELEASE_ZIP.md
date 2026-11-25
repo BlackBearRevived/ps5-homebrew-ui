@@ -1,7 +1,7 @@
 # The app folder and the release ZIP
 
-Every build creates and validates `dist/<TITLE_ID>/`, the complete title
-folder. It is the only build output:
+Every build creates and validates the complete `dist/<TITLE_ID>/` title folder
+and its `dist/<TITLE_ID>.zip`:
 
 ```bash
 make app
@@ -9,10 +9,25 @@ make app
 
 On Windows, `./build.ps1` runs the same build through WSL.
 
-Tagged GitHub Releases and every CI build attach a `.zip` containing that
-folder and its `SHA256SUMS`, and nothing else. To install a release, extract
-the ZIP and upload its `<TITLE_ID>/` folder to `/data/homebrew`; see
+The [Build workflow](https://github.com/BlackBearRedux/ps5-homebrew-ui/actions/workflows/tooling.yml)
+runs on pushes to `main`, pull requests, version tags, manual requests, and nightly.
+It stores the ZIP and `SHA256SUMS`. GitHub Releases are published by version
+tags that match `contentVersion` in `sce_sys/param.json`. The public release
+ZIP carries a GitHub Actions attestation. To verify a download, use:
+
+```bash
+sha256sum --check SHA256SUMS
+gh attestation verify PPSA99050.zip -R BlackBearRedux/ps5-homebrew-ui
+```
+
+To install a release, extract the ZIP and upload its `<TITLE_ID>/` folder to
+`/data/homebrew`; see
 [Deployment](DEPLOYMENT.md).
+
+The nightly build keeps GitHub's dependency cache and `ccache` warm. The
+workflow verifies the pinned OpenGL SDK and reports compiler cache hits and
+misses. The manual **snapshot** option on `main` saves a fallback compiler cache
+in the `build-cache` prerelease.
 
 No filesystem image is built. The `.ffpkg` (UFS2) and `.ffpfsc` (compressed)
 images of earlier versions are gone, with `make ffpkg`, `make ffpfsc`,

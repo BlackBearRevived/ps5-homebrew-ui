@@ -2,10 +2,10 @@
 
 How the app is built, packaged, deployed and tested as a native PS5 title.
 These pages come from
-[ps5-native-app-boilerplate](https://github.com/blackbearreloaded/ps5-native-app-boilerplate),
-the foundation this repository is built on. Where they say "the skeleton" or
-"the boilerplate", read "this app": the build, the runtime module and the
-packaging are the same.
+[PS5 Native App Boilerplate](https://github.com/BlackBearRedux/ps5-native-app-boilerplate),
+the foundation for this app. The native dependency setup, runtime build script,
+and ZIP packager come from [1.000.000](https://github.com/BlackBearRedux/ps5-native-app-boilerplate/tree/f5b6c9708351b35d1987e43c2ee8103daeadce57).
+The app keeps its OpenGL linker settings and audio asset indexing.
 
 | Page | Covers |
 | --- | --- |

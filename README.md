@@ -4,6 +4,8 @@
 
 **Console-grade user interfaces for PS5 homebrew, drawn with OpenGL.**
 
+[![Build](https://github.com/BlackBearRedux/ps5-homebrew-ui/actions/workflows/tooling.yml/badge.svg?branch=main)](https://github.com/BlackBearRedux/ps5-homebrew-ui/actions/workflows/tooling.yml)
+
 A small rendering, motion and sound kit, a themeable widget set, and one
 native app that holds a gallery of complete, working UI designs.
 Press **L1** / **R1** to switch between them.
@@ -49,7 +51,7 @@ documentation to learn the craft, enough working code to copy from.
 | **Components** | A library of reusable pieces that own their focus, motion and sound: lists, grids, carousels, tabs, menus, dialogs, sheets, toasts, forms, progress, badges, counters and more. Each is restyled by any theme, tuned through a style struct and extended through slots. |
 | **Designs** | Complete screens, each in one file: a home screen, a library, a storefront, a HUD with a pause menu, a radial menu, an on-screen keyboard, a settings screen that really works, and more. |
 | **A tour** | The app can drive itself. The same scripted run renders every picture in these docs on a PC, runs the unit tests, and validates a build on the console. |
-| **A PS5 build** | Reproducible native build and packaging, from [ps5-native-app-boilerplate](https://github.com/blackbearreloaded/ps5-native-app-boilerplate), rendering through [ps5-opengl](https://github.com/blackbearreloaded/ps5-opengl). |
+| **A PS5 build** | Native build and packaging based on [PS5 Native App Boilerplate 1.000.000](https://github.com/BlackBearRedux/ps5-native-app-boilerplate/releases/tag/1.000.000), with [PS5 OpenGL SDK 1.0.3](https://github.com/BlackBearRedux/ps5-opengl/releases/tag/v1.0.3). |
 
 ## The designs
 
@@ -169,8 +171,25 @@ app, open **Theme Lab** and press **L2** / **R2**.
 
 ## Quick start
 
-You need Linux or WSL with `clang-18`, `ninja`, `make` and `python3`. The
-build fetches and verifies everything else.
+### Install on PS5
+
+Download `PPSA99050.zip` and `SHA256SUMS` from the
+[latest release](https://github.com/BlackBearRedux/ps5-homebrew-ui/releases/latest).
+Verify the ZIP in Linux or WSL, then extract it:
+
+```bash
+sha256sum --check SHA256SUMS
+gh attestation verify PPSA99050.zip -R BlackBearRedux/ps5-homebrew-ui
+unzip PPSA99050.zip
+```
+
+Copy the extracted `PPSA99050` folder to `/data/homebrew/` on a PS5 configured
+for native homebrew and launch **Homebrew UI Lab**.
+
+### Build from source
+
+Build on Linux or WSL. See [host requirements](docs/platform/GETTING_STARTED.md)
+for the compiler, Ninja, Make, Python, and optional host preview dependencies.
 
 ```bash
 make deps              # one-time: toolchain pieces and the OpenGL SDK, pinned and verified
@@ -179,11 +198,8 @@ make host-snapshots    # run every design on this PC and write PNGs to build/sna
 make test              # unit tests (sanitizers on) and tooling tests
 ```
 
-To see it on a console, copy `dist/<TITLE_ID>` to `/data/homebrew/` (or
-`make deploy PS5_HOST=<address>`) and start **Homebrew UI Lab**. A release ZIP
-built by GitHub Actions can be checked with the GitHub CLI:
-`gh attestation verify <TITLE_ID>.zip -R blackbearreloaded/ps5-homebrew-ui`
-(releases built from now on, not earlier ones).
+See [release packaging](docs/platform/RELEASE_ZIP.md) for GitHub Actions,
+nightly caching and releases.
 
 | Button | Does |
 | --- | --- |

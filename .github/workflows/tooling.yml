@@ -5,11 +5,13 @@
 name: Build
 
 on:
-  # A build on main is started by hand (Run workflow): pushes to main build nothing.
   push:
+    branches: [main]
     tags:
       - "[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9]"
   pull_request:
+  schedule:
+    - cron: '17 6 * * *'
   workflow_dispatch:
     inputs:
       snapshot:
@@ -21,8 +23,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: build-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: build-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -40,10 +42,13 @@ jobs:
     env:
       CCACHE_DIR: ${{ github.workspace }}/.deps/ccache
       CCACHE_MAXSIZE: 500M
+      CCACHE_COMPILERCHECK: content
 
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -53,7 +58,7 @@ jobs:
       - name: Install native toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install --yes clang-18 clang-format-18 clang-tidy-18 lld-18 make ninja-build ccache pkg-config tar unzip wget
+          sudo apt-get install --yes clang-18 clang-format-18 clang-tidy-18 libclang-rt-18-dev lld-18 make ninja-build ccache pkg-config tar unzip wget
 
       - name: Restore dependencies
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -69,9 +74,9 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: .deps/ccache
-          key: ccache-${{ runner.os }}-${{ runner.arch }}-clang18-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: ccache-v2-${{ runner.os }}-${{ runner.arch }}-ubuntu24-clang18-${{ github.sha }}
           restore-keys: |
-            ccache-${{ runner.os }}-${{ runner.arch }}-clang18-
+            ccache-v2-${{ runner.os }}-${{ runner.arch }}-ubuntu24-clang18-
 
       # GitHub drops a cache nobody used for a week, and a pull request only sees main's. When
       # nothing was restored, start from the snapshot kept as a file of the build-cache release;
@@ -108,9 +113,9 @@ jobs:
           fi
           echo "TITLE_ID=$title_id" >> "$GITHUB_ENV"
           echo "CONTENT_VERSION=$content_version" >> "$GITHUB_ENV"
-          # Only a version tag publishes a release; a run started by hand just builds.
+          # Only a version tag push publishes a release.
           release=false
-          if [[ $GITHUB_REF_TYPE == tag ]]; then
+          if [[ $GITHUB_EVENT_NAME == push && $GITHUB_REF_TYPE == tag ]]; then
             release=true
           fi
           echo "version=$content_version" >> "$GITHUB_OUTPUT"
@@ -178,13 +183,21 @@ jobs:
       - name: Check every ZIP entry is stored as 0777
         run: |
           python3 - "dist/$TITLE_ID.zip" "$TITLE_ID" <<'PY'
-          import sys, zipfile
+          import json
+          import os
+          import sys
+          import zipfile
           archive, title = sys.argv[1:3]
           with zipfile.ZipFile(archive) as z:
               assert z.testzip() is None, "damaged entry"
               names = z.namelist()
               assert all(n.startswith(title + "/") for n in names), "entries outside the app folder"
-              assert title + "/eboot.bin" in names, "no eboot.bin"
+              for name in ("eboot.bin", "sce_module/libc.prx", "sce_sys/param.json",
+                           "sce_sys/icon0.png", "sce_sys/pic0.dds", "sce_sys/pic1.dds", "sce_sys/snd0.at9"):
+                  assert z.getinfo(f"{title}/{name}").file_size > 0, f"empty {name}"
+              metadata = json.loads(z.read(f"{title}/sce_sys/param.json"))
+              assert metadata["titleId"] == title
+              assert metadata["contentVersion"] == os.environ["CONTENT_VERSION"]
               wrong = [i.filename for i in z.infolist() if (i.external_attr >> 16) & 0o777 != 0o777]
               assert not wrong, f"entries not stored as 0777: {wrong[:3]}"
               print(f"{archive}: {len(names)} entries, all 0777")
@@ -276,10 +289,10 @@ jobs:
               gh release upload "$TAG" "${assets[@]}" --repo "$GITHUB_REPOSITORY"
             fi
           else
-            # Creates the version tag at the commit that was just built and tested.
+            # Publish the build from the existing version tag that triggered this run.
             gh release create "$VERSION" "${assets[@]}" \
               --repo "$GITHUB_REPOSITORY" \
-              --target "$GITHUB_SHA" \
+              --verify-tag --latest \
               --generate-notes \
               --title "ps5-homebrew-ui $VERSION"
           fi
