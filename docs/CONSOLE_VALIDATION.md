@@ -50,7 +50,7 @@ tour 01 aurora       frames=412 avg_ms=16.67 worst_ms=16.92 draws=14 shapes=373
 It needs FTP (2121), the kernel log (3232), an ELF loader (9021) and
 [ShadowMount Plus](https://github.com/drakmor/ShadowMountPlus) on the
 console, and the launch helper from
-[ps5-homebrew-dev-protocol](https://github.com/BlackBearRedux/ps5-homebrew-dev-protocol).
+[ps5-homebrew-dev-protocol](https://github.com/BlackBearRevived/ps5-homebrew-dev-protocol).
 
 ```bash
 make                                            # build dist/<TITLE_ID>

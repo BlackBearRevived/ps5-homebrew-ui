@@ -9,7 +9,7 @@ make app
 
 On Windows, `./build.ps1` runs the same build through WSL.
 
-The [Build workflow](https://github.com/BlackBearRedux/ps5-homebrew-ui/actions/workflows/tooling.yml)
+The [Build workflow](https://github.com/BlackBearRevived/ps5-homebrew-ui/actions/workflows/tooling.yml)
 runs on pushes to `main`, pull requests, version tags, manual requests, and nightly.
 It stores the ZIP and `SHA256SUMS`. GitHub Releases are published by version
 tags that match `contentVersion` in `sce_sys/param.json`. The public release
@@ -17,7 +17,7 @@ ZIP carries a GitHub Actions attestation. To verify a download, use:
 
 ```bash
 sha256sum --check SHA256SUMS
-gh attestation verify PPSA99050.zip -R BlackBearRedux/ps5-homebrew-ui
+gh attestation verify PPSA99050.zip -R BlackBearRevived/ps5-homebrew-ui
 ```
 
 To install a release, extract the ZIP and upload its `<TITLE_ID>/` folder to

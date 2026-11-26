@@ -99,7 +99,9 @@ Build-only choices use Make variables rather than application metadata:
 | `APP_DEFINITIONS` | Preprocessor definitions such as `FEATURE_AUDIO=1`. |
 | `APP_INCLUDE_PATHS` | Repository-relative include directories. |
 | `APP_STATIC_ARCHIVES` | Repository-relative `.a` files in linker order. |
+| `APP_IMPORT_STUBS` | Additional repository-relative `.so` import stubs. |
 | `APP_RUNTIME_MODULES` | PRX paths below the ignored `.local/runtime/` directory. |
+| `PS5_OPENGL_PREFIX` | Optional Linux/WSL path to an SDK directory containing `manifest.sha256`. The default build downloads and verifies the pinned OpenGL release. |
 | `PACBREW_PACKAGES` | PacBrew `pkg-config` module names. |
 | `PACBREW_INCLUDE_PATHS` | Paths below PacBrew's `/user/homebrew`. |
 | `PACBREW_STATIC_ARCHIVES` | PacBrew `.a` paths below `/user/homebrew`. |

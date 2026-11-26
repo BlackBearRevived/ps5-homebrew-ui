@@ -32,7 +32,9 @@ foreach ($name in @(
         "APP_DEFINITIONS",
         "APP_INCLUDE_PATHS",
         "APP_STATIC_ARCHIVES",
+        "APP_IMPORT_STUBS",
         "APP_RUNTIME_MODULES",
+        "PS5_OPENGL_PREFIX",
         "PACBREW_PACKAGES",
         "PACBREW_INCLUDE_PATHS",
         "PACBREW_STATIC_ARCHIVES")) {

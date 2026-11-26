@@ -4,7 +4,7 @@
 
 **Console-grade user interfaces for PS5 homebrew, drawn with OpenGL.**
 
-[![Build](https://github.com/BlackBearRedux/ps5-homebrew-ui/actions/workflows/tooling.yml/badge.svg?branch=main)](https://github.com/BlackBearRedux/ps5-homebrew-ui/actions/workflows/tooling.yml)
+[![Build](https://github.com/BlackBearRevived/ps5-homebrew-ui/actions/workflows/tooling.yml/badge.svg?branch=main)](https://github.com/BlackBearRevived/ps5-homebrew-ui/actions/workflows/tooling.yml)
 
 A small rendering, motion and sound kit, a themeable widget set, and one
 native app that holds a gallery of complete, working UI designs.
@@ -51,7 +51,7 @@ documentation to learn the craft, enough working code to copy from.
 | **Components** | A library of reusable pieces that own their focus, motion and sound: lists, grids, carousels, tabs, menus, dialogs, sheets, toasts, forms, progress, badges, counters and more. Each is restyled by any theme, tuned through a style struct and extended through slots. |
 | **Designs** | Complete screens, each in one file: a home screen, a library, a storefront, a HUD with a pause menu, a radial menu, an on-screen keyboard, a settings screen that really works, and more. |
 | **A tour** | The app can drive itself. The same scripted run renders every picture in these docs on a PC, runs the unit tests, and validates a build on the console. |
-| **A PS5 build** | Native build and packaging based on [PS5 Native App Boilerplate 1.000.000](https://github.com/BlackBearRedux/ps5-native-app-boilerplate/releases/tag/1.000.000), with [PS5 OpenGL SDK 1.0.3](https://github.com/BlackBearRedux/ps5-opengl/releases/tag/v1.0.3). |
+| **A PS5 build** | Native build and packaging based on [PS5 Native App Boilerplate 1.000.000](https://github.com/BlackBearRevived/ps5-native-app-boilerplate/releases/tag/1.000.000), with [PS5 OpenGL SDK 1.0.3](https://github.com/BlackBearRevived/ps5-opengl/releases/tag/v1.0.3). |
 
 ## The designs
 
@@ -174,12 +174,12 @@ app, open **Theme Lab** and press **L2** / **R2**.
 ### Install on PS5
 
 Download `PPSA99050.zip` and `SHA256SUMS` from the
-[latest release](https://github.com/BlackBearRedux/ps5-homebrew-ui/releases/latest).
+[latest release](https://github.com/BlackBearRevived/ps5-homebrew-ui/releases/latest).
 Verify the ZIP in Linux or WSL, then extract it:
 
 ```bash
 sha256sum --check SHA256SUMS
-gh attestation verify PPSA99050.zip -R BlackBearRedux/ps5-homebrew-ui
+gh attestation verify PPSA99050.zip -R BlackBearRevived/ps5-homebrew-ui
 unzip PPSA99050.zip
 ```
 

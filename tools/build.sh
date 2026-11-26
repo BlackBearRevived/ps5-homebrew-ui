@@ -28,7 +28,7 @@ for command in python3 sha256sum; do
         exit 2
     }
 done
-bash "$root/tools/setup-native-dependencies.sh" >/dev/null
+bash "$root/tools/prepare-opengl.sh"
 
 param="$root/sce_sys/param.json"
 title_id=$(python3 - "$param" <<'PY'
@@ -119,6 +119,13 @@ pacbrew_archives=()
 [[ -z ${PACBREW_PACKAGES:-} ]] || read -r -a pacbrew_packages <<< "$PACBREW_PACKAGES"
 [[ -z ${PACBREW_INCLUDE_PATHS:-} ]] || read -r -a pacbrew_includes <<< "$PACBREW_INCLUDE_PATHS"
 [[ -z ${PACBREW_STATIC_ARCHIVES:-} ]] || read -r -a pacbrew_archives <<< "$PACBREW_STATIC_ARCHIVES"
+
+# Make, PowerShell and direct builds share the same required OpenGL inputs.
+opengl_sdk=.deps/ps5-opengl/current
+definitions=(GL_GLEXT_PROTOTYPES=1 "${definitions[@]}")
+includes=(src "$opengl_sdk/include" "${includes[@]}")
+archives=(.deps/ps5-opengl/libps5opengl-group.a "${archives[@]}")
+import_stubs=("$opengl_sdk/lib/libSceAgc.so" "$opengl_sdk/lib/libSceAgcDriver.so" "${import_stubs[@]}")
 
 pacbrew_cflags=()
 pacbrew_libs=()
@@ -227,6 +234,8 @@ if [[ -f $root/src/runtime/app_heap.c ]]; then
     done
 fi
 ninja_inputs=("$native/ps5-pie.ld" "$native/app-symbols.map" "$sdk_root/bin/prospero-lld")
+# The generated linker group names this archive but Ninja cannot see inside it.
+ninja_inputs+=("$root/$opengl_sdk/lib/libPS5OpenGL.a")
 for input in "${link_inputs[@]}" "${stub_paths[@]}" "$sdk_root"/target/lib/*.so; do
     [[ $input == -* ]] || ninja_inputs+=("$input")
 done

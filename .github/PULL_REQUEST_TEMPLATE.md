@@ -18,4 +18,4 @@
 - [ ] Code I did not write is named, with its licence, in `THIRD_PARTY_NOTICES.md`.
 - [ ] I agree to license it under this repository's licence.
 
-See [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md) for the build and style rules.
+See [CONTRIBUTING.md](https://github.com/BlackBearRevived/ps5-homebrew-ui/blob/main/CONTRIBUTING.md) for the build and style rules.
