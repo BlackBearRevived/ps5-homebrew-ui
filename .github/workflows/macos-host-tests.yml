@@ -40,8 +40,7 @@ jobs:
           test "$(uname -m)" = arm64
           brew install ninja coreutils bash wget
           echo "$(brew --prefix bash)/bin" >> "$GITHUB_PATH"
-          echo "HOST_CC=$(xcrun --find clang)" >> "$GITHUB_ENV"
-          echo "HOST_CXX=$(xcrun --find clang++)" >> "$GITHUB_ENV"
+          echo "SDKROOT=$(xcrun --sdk macosx --show-sdk-path)" >> "$GITHUB_ENV"
           echo "$(brew --prefix coreutils)/libexec/gnubin" >> "$GITHUB_PATH"
       - name: Run the showcase unit tests
         run: |
