@@ -28,6 +28,8 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 25
     env:
+      HOST_CC: /usr/bin/clang
+      HOST_CXX: /usr/bin/clang++
       USE_CCACHE: 0
       HOST_TEST_LDFLAGS: "-Wl,-dead_strip"
       ASAN_OPTIONS: "detect_leaks=0"
