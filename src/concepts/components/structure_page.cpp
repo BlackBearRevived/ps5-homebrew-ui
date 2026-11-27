@@ -86,19 +86,19 @@ constexpr int kVariantCount = static_cast<int>(std::size(kVariants));
 
 constexpr ui::Hint kHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Choose"},
+    {ui::Button::confirm, "Choose"},
     {ui::Button::triangle, "Wheel"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kWheelHints[] = {
     {ui::Button::left_stick, "Aim", ui::Button::dpad},
-    {ui::Button::cross, "Choose"},
-    {ui::Button::circle, "Close"},
+    {ui::Button::confirm, "Choose"},
+    {ui::Button::back, "Close"},
 };
 constexpr ui::Hint kQuickHints[] = {
     {ui::Button::left_stick, "Aim", ui::Button::dpad},
     {ui::Button::triangle, "Release to choose"},
-    {ui::Button::circle, "Cancel"},
+    {ui::Button::back, "Cancel"},
 };
 
 constexpr std::uint32_t kConfirm = action_bit(Action::confirm);

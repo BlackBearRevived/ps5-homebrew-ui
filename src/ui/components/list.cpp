@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <ranges>
 #include <utility>
 
 namespace hui::ui
@@ -17,18 +18,15 @@ using gfx::Rect;
 void ListView::set_items(std::vector<ListItem> items)
 {
     items_ = std::move(items);
-    tops_.clear();
-    float y = 0.0f;
-    for (std::size_t i = 0; i < items_.size(); ++i)
+    headers_before_.clear();
+    headers_before_.reserve(items_.size());
+    int headers = 0;
+    for (const ListItem &item : items_)
     {
-        tops_.push_back(y);
-        y += row_size(static_cast<int>(i)) + style.gap;
+        headers_before_.push_back(headers);
+        headers += item.header;
     }
-    const int count = static_cast<int>(items_.size());
-    focus_ = std::clamp(focus_, 0, std::max(count - 1, 0));
-    if (count > 0 && items_[static_cast<std::size_t>(focus_)].header)
-        focus_ = std::max(step(focus_, 1), 0);
-    retarget(true);
+    set_focus(focus_);
 }
 
 void ListView::set_bounds(const Rect &bounds)
@@ -39,9 +37,18 @@ void ListView::set_bounds(const Rect &bounds)
 
 void ListView::set_focus(int index, bool snap)
 {
-    if (items_.empty())
-        return;
-    focus_ = std::clamp(index, 0, static_cast<int>(items_.size()) - 1);
+    focus_ = -1;
+    if (!items_.empty())
+    {
+        index = std::clamp(index, 0, static_cast<int>(items_.size()) - 1);
+        focus_ = index;
+        if (items_[static_cast<std::size_t>(index)].header)
+        {
+            focus_ = step(index, 1);
+            if (focus_ < 0)
+                focus_ = step(index, -1);
+        }
+    }
     retarget(snap);
 }
 
@@ -57,12 +64,17 @@ Rect ListView::inner() const
 
 float ListView::row_size(int index) const
 {
-    return items_[static_cast<std::size_t>(index)].header ? style.header_height : style.row_height;
+    return std::max(items_[static_cast<std::size_t>(index)].header ? style.header_height
+                                                                   : style.row_height,
+                    0.0f);
 }
 
 float ListView::row_top(int index) const
 {
-    return tops_[static_cast<std::size_t>(index)];
+    const int headers = headers_before_[static_cast<std::size_t>(index)];
+    return static_cast<float>(headers) * std::max(style.header_height, 0.0f) +
+           static_cast<float>(index - headers) * std::max(style.row_height, 0.0f) +
+           static_cast<float>(index) * std::max(style.gap, 0.0f);
 }
 
 float ListView::content_height() const
@@ -93,9 +105,16 @@ int ListView::step(int from, int direction) const
 
 void ListView::retarget(bool snap)
 {
-    if (items_.empty())
-        return;
     const Rect in = inner();
+    layout_inner_ = in;
+    layout_row_height_ = style.row_height;
+    layout_header_height_ = style.header_height;
+    layout_gap_ = style.gap;
+    if (focus_ < 0)
+    {
+        scroll_.position.snap(0.0f);
+        return;
+    }
     const float top = row_top(focus_);
     // Reveal the section header above the first row of a section too.
     const bool under_header = focus_ > 0 && items_[static_cast<std::size_t>(focus_ - 1)].header;
@@ -115,7 +134,7 @@ Event ListView::handle(const InputFrame &input, Feedback &feedback)
     if (items_.empty())
         return Event::none;
     const float x = bounds_.cx();
-    if (input.nav == Direction::up || input.nav == Direction::down)
+    if (focus_ >= 0 && (input.nav == Direction::up || input.nav == Direction::down))
     {
         const int direction = input.nav == Direction::down ? 1 : -1;
         int next = step(focus_, direction);
@@ -132,7 +151,7 @@ Event ListView::handle(const InputFrame &input, Feedback &feedback)
                  style.pitch_by_position ? tween::lerp(1.05f, 0.95f, along) : 1.0f);
         return Event::moved;
     }
-    if (input.is_pressed(Action::confirm))
+    if (focus_ >= 0 && input.is_pressed(Action::confirm))
     {
         if (items_[static_cast<std::size_t>(focus_)].disabled)
             return refuse(feedback, style, input, highlight_.refusal(), x);
@@ -152,6 +171,11 @@ Event ListView::handle(const InputFrame &input, Feedback &feedback)
 
 void ListView::update(float dt)
 {
+    const Rect in = inner();
+    if (in.w != layout_inner_.w || in.h != layout_inner_.h ||
+        style.row_height != layout_row_height_ || style.header_height != layout_header_height_ ||
+        style.gap != layout_gap_)
+        retarget(true);
     age_ += dt;
     highlight_.update(dt, style);
     scroll_.update(dt, std::max(style.omega(), 14.0f));
@@ -191,17 +215,27 @@ void ListView::draw(Canvas &canvas) const
         const float shown = std::min(row.y + row.h - in.y, in.y + in.h - row.y);
         return tween::clamp01((shown - row.h * 0.2f) / (row.h * style.edge_fade));
     };
+    const int count = static_cast<int>(items_.size());
+    const auto rows = std::views::iota(0, count);
+    const auto begin = std::ranges::partition_point(
+        rows, [&](int i) { return row_top(i) + row_size(i) < scroll - above; });
+    const int first = static_cast<int>(begin - rows.begin());
+    const auto end =
+        std::ranges::partition_point(std::ranges::subrange(begin, rows.end()),
+                                     [&](int i) { return row_top(i) <= scroll + in.h + above; });
+    const int last = static_cast<int>(end - rows.begin());
     const auto entrance = [&](int index)
     {
+        if (index == focus_)
+            return 1.0f;
         if (style.entrance_step <= 0.0f || style.reduced_motion)
             return tween::cubic_out(age_ / 0.2f);
-        return tween::stagger(age_, index, style.entrance_step, 0.32f);
+        return tween::stagger(age_, index - first, style.entrance_step, 0.32f);
     };
 
-    const int count = static_cast<int>(items_.size());
     if (style.cards || style.dividers)
     {
-        for (int i = 0; i < count; ++i)
+        for (int i = first; i < last; ++i)
         {
             const ListItem &item = items_[static_cast<std::size_t>(i)];
             const Rect row = row_rect(i);
@@ -221,16 +255,17 @@ void ListView::draw(Canvas &canvas) const
     }
 
     // The highlight is kept in content space; bring it to the screen here.
-    list.push_transform(1.0f, 0.0f, 0.0f, in.x, in.y - scroll);
-    const float amount = (0.35f + 0.65f * active_amount_.value) * entrance(focus_);
+    if (focus_ >= 0)
     {
+        list.push_transform(1.0f, 0.0f, 0.0f, in.x, in.y - scroll);
+        const float amount = 0.35f + 0.65f * active_amount_.value;
         HighlightStyle look = style.highlight;
         look.grow -= 2.0f * press_.value; // a press pushes it in for a moment
         highlight_.draw(canvas, style, look, amount);
+        list.pop_transform();
     }
-    list.pop_transform();
 
-    for (int i = 0; i < count; ++i)
+    for (int i = first; i < last; ++i)
     {
         const ListItem &item = items_[static_cast<std::size_t>(i)];
         const Rect row = row_rect(i);
@@ -250,8 +285,9 @@ void ListView::draw(Canvas &canvas) const
         }
         else
         {
-            const float focus =
-                highlight_.coverage({0.0f, row_top(i), in.w, row.h}) * active_amount_.value;
+            const float focus = focus_ >= 0 ? highlight_.coverage({0.0f, row_top(i), in.w, row.h}) *
+                                                  active_amount_.value
+                                            : 0.0f;
             if (content)
             {
                 content(canvas, row, item, i, focus);

@@ -122,6 +122,8 @@ float card_lift(const ComponentStyle &style, const CardLook &look, const CardSta
 // How far the focus indicator reaches past the frame: the room a container
 // keeps around its cells so a ring is never clipped.
 float card_ring_reach(const Theme &theme);
+// Crops the source to fill the target without stretching it.
+gfx::Rect cover_uv(const gfx::Rect &uv, float image_aspect, const gfx::Rect &target);
 
 // ---- drawing ----
 // A card into `card`, scaled about its centre and lifted as its state says.

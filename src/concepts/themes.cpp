@@ -1,4 +1,4 @@
-// ps5-homebrew-ui - Design "Theme Lab": one screen, thirty design languages.
+// ps5-homebrew-ui - Design "Theme Lab": one screen across the built-in themes.
 // Copyright (C) 2026 BlackBearReloaded
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -108,7 +108,7 @@ constexpr const char *kDemoName = "PLAYER ONE";
 constexpr int kSliderSteps = 10;
 
 constexpr const char *kTechniques[] = {
-    "ui::Theme: thirty design languages as plain data (colour, shape, depth, type, motion, sound)",
+    "ui::Theme: design languages as plain data (colour, shape, depth, type, motion, sound)",
     "ui::Painter: one widget set drawn in any theme; surfaces built eleven different ways",
     "Looks modelled on well-known web frameworks, measured from their own component pages",
     "Motion and sound belong to the theme: speed, bounce and sound set change with it",
@@ -148,7 +148,7 @@ class Themes final : public app::Concept
         static const app::ConceptInfo kInfo{
             "themes",
             "Theme Lab",
-            "One screen in thirty design languages: L2 and R2 restyle every widget",
+            "One screen across the built-in themes: L2 and R2 restyle every widget",
             "src/concepts/themes.cpp",
             audio::SoundSet::glass,
             Color::rgb(0x76d6ff),
@@ -216,22 +216,24 @@ class Themes final : public app::Concept
     void draw(app::Frame &frame) const override
     {
         const auto themes = ui::themes();
-        const ui::Theme &now = themes[static_cast<std::size_t>(theme_)];
-        const ui::Theme &old = themes[static_cast<std::size_t>(previous_theme_)];
+        const ui::Theme now =
+            ui::with_legibility(themes[static_cast<std::size_t>(theme_)], context_.settings);
+        const ui::Theme old = ui::with_legibility(themes[static_cast<std::size_t>(previous_theme_)],
+                                                  context_.settings);
         const float t = switch_.running ? switch_.progress() : 1.0f;
 
         // The backdrop changes at the midpoint, hidden behind a veil of the
         // page colour that is opaque exactly then.
         const ui::Theme &behind = t < 0.5f ? old : now;
         frame.backdrop = behind.backdrop;
-        frame.backdrop.time = clock_;
+        frame.backdrop.time = context_.settings.reduced_motion ? 0.0f : clock_;
         const float veil = 1.0f - std::fabs(2.0f * t - 1.0f);
-        if (behind.style == ui::SurfaceStyle::glass)
+        if (behind.style == ui::SurfaceStyle::glass && !behind.solid_surfaces)
         {
             // Glass needs something behind it worth blurring.
             for (int i = 0; i < 4; ++i)
             {
-                const float phase = clock_ * 0.12f + static_cast<float>(i) * 1.7f;
+                const float phase = frame.backdrop.time * 0.12f + static_cast<float>(i) * 1.7f;
                 frame.scene.circle(
                     480.0f + static_cast<float>(i) * 380.0f + std::sin(phase) * 120.0f,
                     560.0f + std::cos(phase * 1.3f) * 220.0f, 170.0f,
@@ -638,11 +640,13 @@ class Themes final : public app::Concept
         paint.button(kRects[kDialog], "Open dialog", ui::ButtonKind::primary, look(kDialog));
 
         // ---- hints, in glyphs that suit the page ----
-        const ui::GlyphStyle glyphs = theme.dark ? ui::GlyphStyle::dark() : ui::GlyphStyle::light();
+        const ui::GlyphStyle glyphs = theme.dark
+                                          ? ui::GlyphStyle::dark(context_.settings.swap_confirm)
+                                          : ui::GlyphStyle::light(context_.settings.swap_confirm);
         const ui::Hint hints[] = {
             {ui::Button::l2, "Theme", ui::Button::r2},
             {ui::Button::dpad, "Move"},
-            {ui::Button::cross, "Use"},
+            {ui::Button::confirm, "Use"},
         };
         ui::HintLayout layout;
         layout.cy = 1012.0f;

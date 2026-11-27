@@ -47,6 +47,9 @@ produced by `tools/bake-fonts.sh`; the licence texts ship beside them.
 The baker uses [stb_truetype](https://github.com/nothings/stb)
 (`third_party/stb/stb_truetype.h`, public domain or MIT) and the host snapshot
 tool uses stb_image_write (`third_party/stb/stb_image_write.h`, same terms).
+The artwork worker uses the PNG and JPEG decoders from `stb_image.h` at the
+same pinned STB commit as the music decoder. The Cinema Library covers are
+original generated showcase artwork.
 Both are host-only and are not linked into the PS5 application.
 
 ## Sound effects and music
@@ -73,6 +76,14 @@ The fragment shader in `src/gfx/gl_batch.cpp` adapts the two-dimensional
 signed-distance functions published by Inigo Quilez
 (https://iquilezles.org/articles/distfunctions2d/), which he releases under
 the MIT licence.
+
+## Unicode text entry
+
+Text entry uses [utf8proc v2.12.0](https://github.com/JuliaStrings/utf8proc/tree/v2.12.0)
+for UTF-8 validation and Unicode grapheme boundaries. The upstream MIT and
+Unicode data license texts are in [src/third_party/utf8proc/LICENSE.md](src/third_party/utf8proc/LICENSE.md).
+The vendored data file has an `.inc` extension so the build compiles it only
+through `utf8proc.c`.
 
 ## OpenGL runtime
 

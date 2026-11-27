@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "core/input.hpp"
 #include "gfx/draw_list.hpp"
 #include "ui/fonts.hpp"
 
@@ -30,7 +31,49 @@ enum class Button : std::uint8_t
     right_stick,
     dpad,
     touchpad,
+    confirm, // logical action, resolved through GlyphStyle
+    back,
 };
+
+// The button an action is on. Confirm and back are Cross and Circle unless
+// the player swapped them (pass the setting).
+inline Button button_for(Action action, bool swap_confirm = false)
+{
+    switch (action)
+    {
+    case Action::up:
+    case Action::down:
+    case Action::left:
+    case Action::right:
+        return Button::dpad;
+    case Action::confirm:
+        return swap_confirm ? Button::circle : Button::cross;
+    case Action::back:
+        return swap_confirm ? Button::cross : Button::circle;
+    case Action::north:
+        return Button::triangle;
+    case Action::west:
+        return Button::square;
+    case Action::page_prev:
+        return Button::l1;
+    case Action::page_next:
+        return Button::r1;
+    case Action::jump_prev:
+        return Button::l2;
+    case Action::jump_next:
+        return Button::r2;
+    case Action::menu:
+        return Button::options;
+    case Action::touch:
+        return Button::touchpad;
+    case Action::l3:
+        return Button::left_stick;
+    case Action::r3:
+        return Button::right_stick;
+    default:
+        return Button::none;
+    }
+}
 
 // How glyphs are coloured. dark() suits dark screens, light() light ones;
 // mono() draws the face symbols in the ink colour for strict palettes.
@@ -42,8 +85,10 @@ struct GlyphStyle
     gfx::Color label;         // the text beside a glyph in a hint row
     bool tinted_faces = true; // face symbols in their DualSense colours
 
-    static GlyphStyle dark();
-    static GlyphStyle light();
+    bool swap_confirm = false;
+
+    static GlyphStyle dark(bool swap_confirm = false);
+    static GlyphStyle light(bool swap_confirm = false);
     static GlyphStyle mono(gfx::Color ink, gfx::Color body);
 };
 

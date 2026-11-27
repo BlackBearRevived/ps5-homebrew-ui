@@ -9,6 +9,7 @@
 #include "ui/components/progress.hpp"
 
 #include <functional>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -185,6 +186,8 @@ class Keyboard
     // It keeps count of what it emits; call this when the text changed some
     // other way. A negative length means "unknown": nothing is refused.
     void set_length(int length);
+    // Pass the field itself when a key can extend its final grapheme.
+    void set_text_context(std::string_view text);
     int length() const
     {
         return length_;
@@ -293,6 +296,7 @@ class Keyboard
     float column_ = 0.5f; // where the player really is, in columns
     KeyboardShift shift_ = KeyboardShift::off;
     int length_ = -1;
+    std::optional<std::string> text_context_;
     bool armed_for_empty_ = false;
     bool active_ = true;
     Direction exit_ = Direction::none;

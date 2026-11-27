@@ -24,6 +24,9 @@ struct Settings
     bool show_fps = false;
     bool haptics = true;   // controller rumble on errors and big moments
     bool light_bar = true; // the controller's light follows the design's accent
+    bool large_text = false;
+    bool reduce_transparency = false;
+    bool strong_focus = false;
     // Display resolution, an index into kResolutions; applies at the next start.
     int resolution = 2;
     // How large on-screen controller hints are: 0 small, 1 medium, 2 large.

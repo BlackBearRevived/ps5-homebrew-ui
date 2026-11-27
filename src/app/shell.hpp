@@ -31,7 +31,8 @@ class Shell
 {
   public:
     Shell(const ui::Fonts &fonts, const demo::Catalog &catalog, std::string data_root,
-          std::uint32_t glass_texture);
+          std::uint32_t glass_texture, gfx::ArtworkCache *artwork = nullptr,
+          std::string_view artwork_root = {});
 
     static Settings load_settings(const std::string &data_root);
 

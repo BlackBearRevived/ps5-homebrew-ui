@@ -82,7 +82,7 @@ bool open_display(hui::ps5::Display &display, int *resolution)
     const Settings::Resolution &mode = Settings::kResolutions[*resolution];
     if (display.open(mode.width, mode.height))
     {
-        hui::sys::log("[HUI] display mode %s %dx%d", mode.label, display.width(), display.height());
+        hui::sys::log("[HUI] display mode %dx%d", display.width(), display.height());
         return true;
     }
     if (*resolution == 0)
@@ -151,6 +151,7 @@ bool save_picture(const std::string &path, int width, int height)
 
 int main()
 {
+    const auto launch_started = hui::sys::monotonic_us();
     using namespace hui;
     sys::log("[HUI] entry");
     sys::log("[HUI] storage dir=%d", save::ensure_directory(kDataRoot) ? 1 : 0);
@@ -172,6 +173,7 @@ int main()
     gfx::Font mono;
     gfx::Font pixel;
     gfx::Font hand;
+    gfx::Font serif;
     ui::Fonts fonts;
     if (!renderer.init() ||
         !load_font(renderer, "inter-regular.huifont", &regular, &fonts.regular) ||
@@ -179,7 +181,8 @@ int main()
         !load_font(renderer, "montserrat-medium.huifont", &display_font, &fonts.display) ||
         !load_font(renderer, "dejavu-sans-mono.huifont", &mono, &fonts.mono) ||
         !load_font(renderer, "press-start-2p.huifont", &pixel, &fonts.pixel) ||
-        !load_font(renderer, "patrick-hand.huifont", &hand, &fonts.hand))
+        !load_font(renderer, "patrick-hand.huifont", &hand, &fonts.hand) ||
+        !load_font(renderer, "dejavu-serif.huifont", &serif, &fonts.serif))
     {
         sys::log("[HUI] fatal: renderer init failed");
         sys::park();
@@ -208,7 +211,13 @@ int main()
     for (const std::string &error : bank.errors)
         sys::log("[HUI] sound rejected %s", error.c_str());
 
-    app::Shell shell(fonts, catalog, kDataRoot, renderer.glass_texture());
+    gfx::ArtworkCache artwork(
+        [&](const gfx::ArtworkCache::Pixels &pixels) {
+            return renderer.batch().create_texture(pixels.width, pixels.height, pixels.rgba.data());
+        },
+        [](std::uint32_t handle) { glDeleteTextures(1, &handle); });
+    app::Shell shell(fonts, catalog, kDataRoot, renderer.glass_texture(), &artwork,
+                     "/app0/assets/artwork");
     const std::string version = read_content_version("/app0/sce_sys/param.json");
     shell.set_version(version);
     sys::log("[HUI] version %s designs=%zu", version.empty() ? "unknown" : version.c_str(),
@@ -343,10 +352,12 @@ int main()
         const std::int64_t presented = sys::monotonic_us();
         const float frame_ms = static_cast<float>(presented - previous) / 1000.0f;
         app::Telemetry &telemetry = shell.telemetry();
+        telemetry.artwork_peak_bytes = artwork.peak_bytes();
         if (frames == 1)
         {
             sys::log("[HUI] first-swap ok shapes=%zu draws=%zu", renderer.last_instances(),
                      renderer.last_draw_calls());
+            telemetry.first_present_ms = static_cast<float>(presented - launch_started) / 1000.0f;
             const bool hidden = sys::hide_splash_screen();
             sys::log("[HUI] ready splash_hidden=%d", hidden ? 1 : 0);
             log_heap(frames);

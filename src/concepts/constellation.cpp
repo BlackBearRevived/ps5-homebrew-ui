@@ -1239,8 +1239,8 @@ class Constellation final : public app::Concept
         {
             list.glow(pill, 32, 18, colour.with_alpha(0.35f));
             list.rounded_rect(pill, 32, kWhite);
-            ui::draw_button(list, fonts, ui::GlyphStyle::light(), ui::Button::cross, pill.x + 20,
-                            pill.cy(), 34);
+            ui::draw_button(list, fonts, ui::GlyphStyle::light(context_.settings.swap_confirm),
+                            ui::Button::confirm, pill.x + 20, pill.cy(), 34);
             ui::text(list, fonts.semibold, "Unlock", pill.x + 68, pill.cy() + 10, 28,
                      Color::rgb(0x0a0e20));
         }
@@ -1373,15 +1373,15 @@ class Constellation final : public app::Concept
     void draw_hints(gfx::DrawList &list, std::uint32_t glass) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         const ui::HintLayout layout;
         const ui::Hint map_hints[] = {{ui::Button::dpad, "Move"},
-                                      {ui::Button::cross, "Unlock"},
+                                      {ui::Button::confirm, "Unlock"},
                                       {ui::Button::triangle, "Refund"},
                                       {ui::Button::l2, "Zoom", ui::Button::r2},
-                                      {ui::Button::circle, "Origin"}};
-        const ui::Hint prompt_hints[] = {{ui::Button::cross, "Choose"},
-                                         {ui::Button::circle, "Back"}};
+                                      {ui::Button::back, "Origin"}};
+        const ui::Hint prompt_hints[] = {{ui::Button::confirm, "Choose"},
+                                         {ui::Button::back, "Back"}};
         // One plate for both rows: it changes width as they cross-fade.
         const float prompt = tween::smoothstep(prompt_.value);
         const float width =

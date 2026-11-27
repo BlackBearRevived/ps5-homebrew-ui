@@ -1177,7 +1177,7 @@ class Player final : public app::Concept
         }
 
         // Left end of the row: the favourite star and the button that sets it.
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         const bool starred = favorite_[static_cast<std::size_t>(index_)];
         ui::draw_button(list, fonts, style, ui::Button::triangle, l.x, y, 34);
         list.star(l.x + 66, y - 1, 15.0f + 9.0f * star_.value,
@@ -1358,7 +1358,7 @@ class Player final : public app::Concept
     void draw_hints(gfx::DrawList &list) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         constexpr const char *kLabels[kControls] = {"Shuffle", "Previous", "Play", "Next",
                                                     "Repeat"};
         const char *play = playing_ ? "Pause" : "Play";
@@ -1371,7 +1371,7 @@ class Player final : public app::Concept
         case Zone::scrubber:
         {
             const ui::Hint hints[] = {{ui::Button::dpad, "Seek 5 s"},
-                                      {ui::Button::cross, play},
+                                      {ui::Button::confirm, play},
                                       {ui::Button::square, queue},
                                       {ui::Button::l2, "Seek 15 s", ui::Button::r2}};
             ui::draw_hints(list, fonts, style, hints, 4, 1824, true);
@@ -1380,7 +1380,7 @@ class Player final : public app::Concept
         case Zone::transport:
         {
             const ui::Hint hints[] = {
-                {ui::Button::cross, button_ == kPlay ? play : kLabels[button_]},
+                {ui::Button::confirm, button_ == kPlay ? play : kLabels[button_]},
                 {ui::Button::square, queue},
                 {ui::Button::l2, "Seek 15 s", ui::Button::r2}};
             ui::draw_hints(list, fonts, style, hints, 3, 1824, true);
@@ -1388,8 +1388,8 @@ class Player final : public app::Concept
         }
         case Zone::queue:
         {
-            const ui::Hint hints[] = {{ui::Button::cross, "Play track"},
-                                      {ui::Button::circle, "Back"},
+            const ui::Hint hints[] = {{ui::Button::confirm, "Play track"},
+                                      {ui::Button::back, "Back"},
                                       {ui::Button::square, queue}};
             ui::draw_hints(list, fonts, style, hints, 3, 1824, true);
             break;

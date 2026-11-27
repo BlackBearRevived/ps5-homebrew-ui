@@ -4,6 +4,8 @@
 
 #include "app/tour.hpp"
 
+#include <algorithm>
+#include <cmath>
 #include <cstdio>
 
 namespace hui::app
@@ -19,25 +21,38 @@ constexpr float kOutroSeconds = 0.6f;
 
 } // namespace
 
-Tour::Tour(Shell &shell, std::string only) : shell_(shell), only_(std::move(only))
+Tour::Tour(Shell &shell, std::string only) : shell_(shell), full_tour_(only.empty())
 {
-    if (!only_.empty())
+    if (full_tour_)
     {
-        bool found = false;
         for (std::size_t i = 0; i < shell_.concept_count(); ++i)
-        {
-            if (only_ == shell_.concept_at(i).info().id)
-            {
-                index_ = i;
-                found = true;
-            }
-        }
-        finished_ = !found;
+            designs_.push_back(i);
     }
     else
     {
-        finished_ = shell_.concept_count() == 0;
+        std::string_view remaining(only);
+        while (true)
+        {
+            const auto comma = remaining.find(',');
+            const std::string_view name = remaining.substr(0, comma);
+            std::size_t index = 0;
+            while (index < shell_.concept_count() && shell_.concept_at(index).info().id != name)
+                ++index;
+            if (index == shell_.concept_count() ||
+                std::ranges::find(designs_, index) != designs_.end())
+            {
+                designs_.clear();
+                break;
+            }
+            designs_.push_back(index);
+            if (comma == std::string_view::npos)
+                break;
+            remaining.remove_prefix(comma + 1);
+        }
     }
+    finished_ = designs_.empty();
+    if (!finished_)
+        index_ = designs_.front();
 }
 
 std::string Tour::picture_name(const char *suffix) const
@@ -66,13 +81,26 @@ void Tour::begin_concept()
 
 void Tour::end_concept()
 {
-    char line[200];
+    char line[300];
     const ConceptInfo &info = shell_.concept_at(index_).info();
+    const std::size_t target = static_cast<std::size_t>(stats_.frames * 0.99 + 0.999);
+    std::size_t count = 0;
+    std::size_t p99 = 0;
+    for (; p99 + 1 < stats_.frame_buckets.size(); ++p99)
+    {
+        count += stats_.frame_buckets[p99];
+        if (count >= target)
+            break;
+    }
+    const Telemetry &telemetry = shell_.telemetry();
     std::snprintf(line, sizeof(line),
-                  "tour %02zu %-12s frames=%d avg_ms=%.2f worst_ms=%.2f draws=%zu shapes=%zu",
+                  "tour %02zu %-12s frames=%d avg_ms=%.2f worst_ms=%.2f p99_ms=%.1f draws=%zu "
+                  "shapes=%zu peak_artwork_bytes=%zu first_present_ms=%.2f",
                   index_ + 1, info.id, stats_.frames,
                   stats_.frames > 0 ? stats_.total_ms / stats_.frames : 0.0,
-                  static_cast<double>(stats_.worst_ms), stats_.draw_calls, stats_.instances);
+                  static_cast<double>(stats_.worst_ms), static_cast<double>(p99) * 0.5,
+                  stats_.draw_calls, stats_.instances, telemetry.artwork_peak_bytes,
+                  static_cast<double>(telemetry.first_present_ms));
     report_.push_back(line);
 }
 
@@ -82,6 +110,9 @@ void Tour::record_frame(float frame_ms, std::size_t draw_calls, std::size_t inst
         return;
     ++stats_.frames;
     stats_.total_ms += static_cast<double>(frame_ms);
+    const auto bucket =
+        static_cast<std::size_t>(std::ceil(std::clamp(frame_ms, 0.0f, 100.0f) * 2.0f));
+    ++stats_.frame_buckets[bucket];
     if (frame_ms > stats_.worst_ms)
         stats_.worst_ms = frame_ms;
     if (draw_calls > stats_.draw_calls)
@@ -135,6 +166,7 @@ InputFrame Tour::step(float dt)
         }
         pictured_ = false;
         input.pressed = now.press;
+        input.nav_repeat = now.nav_repeat;
         input.held = now.press | now.hold;
         input.nav = now.nav;
         ++step_;
@@ -145,7 +177,7 @@ InputFrame Tour::step(float dt)
         return input;
 
     // After the first design, show the shell's info panel once.
-    if (!info_shown_ && only_.empty())
+    if (!info_shown_ && full_tour_)
     {
         shell_.set_info_open(true);
         if (clock_ < kOutroSeconds + 1.0f)
@@ -164,12 +196,13 @@ InputFrame Tour::step(float dt)
     }
 
     end_concept();
-    if (!only_.empty() || index_ + 1 >= shell_.concept_count())
+    ++design_;
+    if (design_ >= designs_.size())
     {
         finished_ = true;
         return input;
     }
-    ++index_;
+    index_ = designs_[design_];
     begin_concept();
     return input;
 }

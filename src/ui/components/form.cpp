@@ -233,14 +233,15 @@ Rect Form::inner() const
 
 float Form::scale() const
 {
-    return style.compact ? 0.8f : 1.0f;
+    return (style.compact ? 0.8f : 1.0f) * style.theme.text_scale;
 }
 
 // Compact type shrinks less than compact rows, and never below what reads
 // from a sofa.
 float Form::type(float size) const
 {
-    return style.compact ? std::max(size * 0.9f, std::min(size, 20.0f)) : size;
+    const float sized = style.compact ? std::max(size * 0.9f, std::min(size, 20.0f)) : size;
+    return sized * style.theme.text_scale;
 }
 
 float Form::base_size(int index) const
@@ -654,6 +655,28 @@ void Form::draw_row(Canvas &canvas, Painter &paint, const FormRow &row, const Re
     const float shift = style.reduced_motion ? 0.0f : style.focus_shift * focus;
     const float left = rect.x + style.padding + shift;
     const float right = rect.x + rect.w - style.padding;
+    const auto draw_text = [&](std::string_view text, float x, float em, float width, Color color,
+                               gfx::Align alignment)
+    {
+        const float midpoint = cy + em * 0.35f;
+        if (theme.text_scale <= 1.0f || paint.label_width(text, em) <= width)
+            return paint.label(fit_label(paint, text, em, width), x, midpoint, em, color,
+                               alignment);
+
+        const auto &face = paint.font(theme.label);
+        const auto lines =
+            paragraph_lines(face, theme.caps ? upper(text) : std::string(text), em, width, 2);
+        const float advance = em * 1.02f;
+        float baseline = midpoint - advance * 0.5f * static_cast<float>(lines.lines.size() - 1);
+        float measured = 0.0f;
+        for (const std::string &line : lines.lines)
+        {
+            measured = std::max(measured, paint.label(fit_label(paint, line, em, width), x,
+                                                      baseline, em, color, alignment));
+            baseline += advance;
+        }
+        return measured;
+    };
     // Where the label must stop. Each kind moves it to its control's left edge.
     float label_end = right;
 
@@ -748,21 +771,19 @@ void Form::draw_row(Canvas &canvas, Painter &paint, const FormRow &row, const Re
         }
         if (!row.text.empty())
         {
-            const float baseline = cy + value_size * 0.35f;
             const float column = control_rect(line, 0.0f).x;
             if (style.values_right)
             {
                 // A value may take up to its column; the label gets the rest.
                 const float room = end - left - (right - left) * style.label_ratio;
-                const float width =
-                    paint.label(fit_label(paint, row.text, value_size, std::max(room, 80.0f)), end,
-                                baseline, value_size, quiet, gfx::Align::right);
+                const float width = draw_text(row.text, end, value_size, std::max(room, 80.0f),
+                                              quiet, gfx::Align::right);
                 label_end = end - width;
             }
             else
             {
-                paint.label(fit_label(paint, row.text, value_size, std::max(end - column, 80.0f)),
-                            column, baseline, value_size, quiet);
+                draw_text(row.text, column, value_size, std::max(end - column, 80.0f), quiet,
+                          gfx::Align::left);
                 label_end = column;
             }
         }
@@ -778,8 +799,8 @@ void Form::draw_row(Canvas &canvas, Painter &paint, const FormRow &row, const Re
 
     if (!style.values_right)
         label_end = std::min(label_end, control_rect(line, 0.0f).x);
-    paint.label(fit_label(paint, row.label, label_size, std::max(label_end - 18.0f - left, 40.0f)),
-                left, cy + label_size * 0.35f, label_size, label_ink);
+    draw_text(row.label, left, label_size, std::max(label_end - 18.0f - left, 40.0f), label_ink,
+              gfx::Align::left);
     list.pop_opacity();
 
     // The description is not dimmed with a disabled row: it is what explains it.

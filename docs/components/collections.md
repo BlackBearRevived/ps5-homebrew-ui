@@ -322,6 +322,36 @@ Also: `set_focus(index, snap)`, `set_active(false)` (a shelf lets its focused
 item settle back; a centered wheel keeps its shape and only fades its ring),
 `enter()`, `preferred_height()`, `item_rect(index)`, `page()`, `pages()`.
 
+## ShelfBrowser
+
+Stack horizontal carousels and keep each shelf's place while moving up and down.
+Give every shelf and item a stable ID. `select(shelf, item)` restores the
+selection after a catalog refresh. If the active item disappears, the browser
+chooses a nearby item in the same shelf when it can. Each card can still use
+the carousel's look and the library's image placeholders.
+
+```cpp
+ui::ShelfBrowser browser;
+browser.style.theme = *ui::find_theme("cinema");
+browser.set_bounds({96, 472, 1728, 479});
+browser.set_shelves(load_shelves());
+browser.select(saved_shelf_id, saved_item_id);
+if (browser.handle(input, feedback) == ui::Event::activated)
+    open(browser.selection()->item);
+```
+
+`visit_near(radius, visit)` visits likely artwork requests in priority order.
+Look up texture handles after the cache has pumped its uploads. The application
+owns the cache and the data source. See [Cinema Library](../DESIGNS.md#library).
+
+## ArtworkDetailHeader
+
+Draw full-width artwork, a title, metadata, and a primary action. Update
+`artwork` with the result of an `ArtworkCache` lookup. Pending or unavailable
+artwork uses the same frame as the image. The lower scrim adapts to brightness.
+For a shared-element transition, draw artwork at the current pose and draw
+the stationary content with a separate opacity.
+
 ## Moving the focus between collections
 
 A shelf above a grid needs three lines of the screen's own: the shelf never

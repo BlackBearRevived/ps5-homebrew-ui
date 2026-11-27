@@ -166,28 +166,28 @@ constexpr int kVariantCount = static_cast<int>(std::size(kVariants));
 
 constexpr ui::Hint kHintsMove[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Choose"},
+    {ui::Button::confirm, "Choose"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kHintsEnter[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Enter"},
+    {ui::Button::confirm, "Enter"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kHintsWheel[] = {
     {ui::Button::dpad, "Turn, column"},
-    {ui::Button::circle, "Leave"},
+    {ui::Button::back, "Leave"},
 };
 constexpr ui::Hint kHintsField[] = {
     {ui::Button::dpad, "Adjust"},
     {ui::Button::left_stick, "Fine"},
-    {ui::Button::cross, "Field / hue"},
-    {ui::Button::circle, "Leave"},
+    {ui::Button::confirm, "Field / hue"},
+    {ui::Button::back, "Leave"},
 };
 constexpr ui::Hint kHintsList[] = {
     {ui::Button::dpad, "Pick"},
-    {ui::Button::cross, "Choose"},
-    {ui::Button::circle, "Close"},
+    {ui::Button::confirm, "Choose"},
+    {ui::Button::back, "Close"},
 };
 constexpr ui::Hint kHintsSlider[] = {
     {ui::Button::dpad, "Adjust, move"},
@@ -195,7 +195,7 @@ constexpr ui::Hint kHintsSlider[] = {
 };
 constexpr ui::Hint kHintsRange[] = {
     {ui::Button::dpad, "Adjust, move"},
-    {ui::Button::cross, "Other thumb"},
+    {ui::Button::confirm, "Other thumb"},
     {ui::Button::square, "Variant"},
 };
 

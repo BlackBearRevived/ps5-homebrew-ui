@@ -335,7 +335,8 @@ void neon_pane(gfx::DrawList &list, const Rect &r, float radius)
 
 // The hint row on a small dark plate: the floor's bright lines run under
 // that corner, and a hint must never be the thing that is hard to read.
-void hint_plate(gfx::DrawList &list, const ui::Fonts &fonts, const ui::Hint *hints, int count)
+void hint_plate(gfx::DrawList &list, const ui::Fonts &fonts, const ui::Hint *hints, int count,
+                bool swap_confirm)
 {
     const ui::HintLayout layout;
     float width = 0.0f;
@@ -347,7 +348,8 @@ void hint_plate(gfx::DrawList &list, const ui::Fonts &fonts, const ui::Hint *hin
     const Rect plate{right - width - 22, layout.cy - 32, width + 44, 64};
     list.rounded_rect(plate, 32, kNight.with_alpha(0.78f));
     list.bordered_rect(plate, 32, clear_of(kMagenta), 1.5f, kMagenta.with_alpha(0.4f));
-    ui::draw_hints(list, fonts, ui::GlyphStyle::dark(), hints, count, right, true, layout);
+    ui::draw_hints(list, fonts, ui::GlyphStyle::dark(swap_confirm), hints, count, right, true,
+                   layout);
 }
 
 // How brightly the sign burns. It stutters while it strikes, then breathes;
@@ -1352,9 +1354,9 @@ class Neon final : public app::Concept
         if (dialog_open_ || dialog_.value > 0.5f)
         {
             frame.overlay.push_opacity(dialog_.value);
-            const ui::Hint hints[] = {{ui::Button::cross, "Choose"},
-                                      {ui::Button::circle, "Cancel"}};
-            hint_plate(frame.overlay, fonts, hints, 2);
+            const ui::Hint hints[] = {{ui::Button::confirm, "Choose"},
+                                      {ui::Button::back, "Cancel"}};
+            hint_plate(frame.overlay, fonts, hints, 2, context_.settings.swap_confirm);
             frame.overlay.pop_opacity();
             return;
         }
@@ -1368,17 +1370,17 @@ class Neon final : public app::Concept
         {
             list.push_opacity(in * menu);
             const ui::Hint hints[] = {{ui::Button::dpad, "Navigate"},
-                                      {ui::Button::cross, "Select"}};
-            hint_plate(list, fonts, hints, 2);
+                                      {ui::Button::confirm, "Select"}};
+            hint_plate(list, fonts, hints, 2, context_.settings.swap_confirm);
             list.pop_opacity();
         }
         if (tracks > 0.01f)
         {
             list.push_opacity(in * tracks);
             const ui::Hint hints[] = {{ui::Button::dpad, "Track"},
-                                      {ui::Button::cross, "Race"},
-                                      {ui::Button::circle, "Back"}};
-            hint_plate(list, fonts, hints, 3);
+                                      {ui::Button::confirm, "Race"},
+                                      {ui::Button::back, "Back"}};
+            hint_plate(list, fonts, hints, 3, context_.settings.swap_confirm);
             list.pop_opacity();
         }
     }

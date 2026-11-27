@@ -1024,7 +1024,7 @@ class Radial final : public app::Concept
         const float in = tween::stagger(age_, 12, 0.045f, 0.45f) * open;
         if (in <= 0.01f)
             return;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         const float position = page_position_.value;
         const float x =
             kCx + ui::shake(page_nudge_.value, clock_, 12.0f, 8.0f) * page_nudge_direction_;
@@ -1059,17 +1059,17 @@ class Radial final : public app::Concept
     void draw_hints(gfx::DrawList &list, float open) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         const float in = tween::stagger(age_, 14, 0.045f, 0.5f);
         // The two rows share a place, so one leaves before the other arrives.
         list.push_opacity(in * tween::clamp01(open * 2.0f - 1.0f));
         const ui::Hint opened[] = {{ui::Button::left_stick, "Aim", ui::Button::dpad},
-                                   {ui::Button::cross, "Equip"},
-                                   {ui::Button::circle, "Close"}};
+                                   {ui::Button::confirm, "Equip"},
+                                   {ui::Button::back, "Close"}};
         ui::draw_hints(list, fonts, style, opened, 3, 1824, true);
         list.pop_opacity();
         list.push_opacity(in * tween::clamp01(1.0f - open * 2.0f));
-        const ui::Hint closed[] = {{ui::Button::left_stick, "Open the dial", ui::Button::cross}};
+        const ui::Hint closed[] = {{ui::Button::left_stick, "Open the dial", ui::Button::confirm}};
         ui::draw_hints(list, fonts, style, closed, 1, 1824, true);
         list.pop_opacity();
     }

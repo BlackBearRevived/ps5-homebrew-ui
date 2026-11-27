@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Runs the app's self-driving tour on a console and brings the evidence back.
 
-usage: PS5_HOST=<address> tools/console-tour.py <results dir> [design id|all]
+usage: PS5_HOST=<address> tools/console-tour.py <results dir> [id[,id...]|all]
 
 Steps: check the console's services; refuse if the title is running; upload
 dist/<TITLE_ID> (every file verified by hash); wait for its registration;
@@ -32,6 +32,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -65,15 +66,15 @@ class Console:
     """One FTP session.
 
     Signed files are compared as the bytes that are stored. Some FTP servers
-    for the console have a "SELF" switch that makes them hand out the
-    decrypted ELF instead: it must stay off, or every executable reads back
-    larger than, and different from, what was uploaded.
+    for the console return an ELF view by default. Use the per-session SELF
+    command when that view prevents an exact comparison.
     """
 
     def __init__(self, host, port):
         self.ftp = FTP()
         self.ftp.connect(host, port, timeout=30)
         self.ftp.login("anonymous", "ps5-homebrew-ui")
+        self.stored_bytes = False
 
     def close(self):
         try:
@@ -102,6 +103,27 @@ class Console:
         except all_errors:
             return None
         return data.getvalue()
+
+    def matches(self, path, digest):
+        data = self.read(path)
+        if data is None:
+            return False
+        if hashlib.sha256(data).hexdigest() == digest:
+            return True
+        if self.stored_bytes or not data.startswith(b"\x7fELF"):
+            return False
+        try:
+            self.ftp.sendcmd("SELF")
+        except error_perm as error:
+            if str(error).split(maxsplit=1)[0] not in {"500", "502", "504"}:
+                raise
+            return False
+        raw = self.read(path)
+        if raw is not None and hashlib.sha256(raw).hexdigest() == digest:
+            self.stored_bytes = True
+            return True
+        self.ftp.sendcmd("SELF")
+        return False
 
     def stamp(self, path):
         """Modification time and size of a file, or None (the server has no MDTM)."""
@@ -135,8 +157,7 @@ class Console:
         temporary = f"{directory}/.{name}.upload"
         self.make_dirs(directory)
         self.ftp.storbinary(f"STOR {temporary}", io.BytesIO(data), blocksize=256 * 1024)
-        back = self.read(temporary)
-        if back is None or hashlib.sha256(back).digest() != hashlib.sha256(data).digest():
+        if not self.matches(temporary, hashlib.sha256(data).hexdigest()):
             stop(f"upload of {path} did not read back identically")
         try:
             self.ftp.sendcmd(f"DELE {path}")  # only the file this upload replaces
@@ -167,11 +188,29 @@ def record_klog(host, port, path, done):
         Path(path).write_text(f"kernel log not recorded: {error}\n")
 
 
+def check_evidence(report, selection, captures, downloaded):
+    rows = [re.match(r"^tour \d+ ([a-z0-9-]+)\s+frames=([1-9]\d*)\s", line) for line in report]
+    if not rows or not all(rows):
+        yield "report.txt: expected one row with frames for each toured design"
+    elif selection != "all" and [row[1] for row in rows] != selection.split(","):
+        yield f"report.txt: toured designs differ from {selection}"
+
+    if not captures:
+        yield "app.log: no tour pictures reported"
+    for name, ok in captures:
+        if ok != "1":
+            yield f"app.log: picture {name} could not be saved"
+        elif name not in downloaded:
+            yield f"picture {name} could not be downloaded"
+
+
 def main():
     if len(sys.argv) not in (2, 3):
         raise SystemExit(__doc__)
     results = Path(sys.argv[1])
     only = sys.argv[2] if len(sys.argv) == 3 else "all"
+    if len(only) > 63 or not re.fullmatch(r"[a-z0-9-]+(?:,[a-z0-9-]+)*", only):
+        stop("use a design ID or comma-separated design IDs up to 63 characters")
     host = os.environ.get("PS5_HOST") or stop("set PS5_HOST")
     ftp_port = int(os.environ.get("FTP_PORT", "2121"))
     klog_port = int(os.environ.get("KLOG_PORT", "3232"))
@@ -213,8 +252,7 @@ def main():
         data = path.read_bytes()
         digest = hashlib.sha256(data).hexdigest()
         manifest[relative] = digest
-        installed = console.read(f"{remote}/{relative}")
-        if installed is not None and hashlib.sha256(installed).hexdigest() == digest:
+        if console.matches(f"{remote}/{relative}", digest):
             continue
         console.write(f"{remote}/{relative}", data)
         uploaded += 1
@@ -319,22 +357,21 @@ def main():
     (results / "report.txt").write_bytes(data)
     log = console.read(f"{dev}/app.log") or b""
     (results / "app.log").write_bytes(log)
-    pictures = []
-    try:
-        console.ftp.cwd(f"{dev}/tour")
-        pictures = sorted(name for name, _ in console.ftp.mlsd() if name.endswith(".bmp"))
-        console.ftp.cwd("/")
-    except all_errors:
-        pass
-    for name in pictures:
-        picture = console.read(f"{dev}/tour/{name}")
+    text = log.decode("utf-8", "replace")
+    captures = re.findall(r"\[HUI\] tour picture ([A-Za-z0-9_-]+) ok=([01])\b", text)
+    downloaded = set()
+    for name, ok in captures:
+        if ok != "1":
+            continue
+        picture = console.read(f"{dev}/tour/{name}.bmp")
         if picture:
-            (results / "tour" / name).write_bytes(picture)
+            (results / "tour" / f"{name}.bmp").write_bytes(picture)
+            downloaded.add(name)
     lifecycle = console.read("/data/shadowmount/debug.log") or b""
     (results / "shadowmount.txt").write_text("".join(
         line + "\n" for line in lifecycle.decode("utf-8", "replace").splitlines() if title in line))
     console.close()
-    say(f"Downloaded the report, the log and {len(pictures)} pictures to {results}")
+    say(f"Downloaded the report, the log and {len(downloaded)} pictures to {results}")
 
     # The app closes itself once its evidence window is over.
     say("Waiting for the app to close itself")
@@ -370,7 +407,6 @@ def main():
         pass
 
     problems = []
-    text = log.decode("utf-8", "replace")
     for line in text.splitlines():
         if any(word in line.lower() for word in BAD_LOG_WORDS) and "rejected=0" not in line:
             problems.append(f"app.log: {line.strip()}")
@@ -385,6 +421,7 @@ def main():
             if title in line and any(word in line.lower() for word in BAD_KLOG_WORDS):
                 problems.append(f"klog: {line.strip()[:200]}")
     report = (results / "report.txt").read_text().strip().splitlines()
+    problems.extend(check_evidence(report, only, captures, downloaded))
     print("\n".join(report))
 
     if settle > 0:
@@ -392,8 +429,7 @@ def main():
         time.sleep(settle)
         console = Console(host, ftp_port)
         for relative, digest in manifest.items():
-            data = console.read(f"{remote}/{relative}")
-            if data is None or hashlib.sha256(data).hexdigest() != digest:
+            if not console.matches(f"{remote}/{relative}", digest):
                 problems.append(f"installed file changed or unreadable: {relative}")
         console.close()
     if not all(port_open(host, port) for port in (ftp_port, elf_port)):

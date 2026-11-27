@@ -7,7 +7,7 @@ language, the way a web page changes when you swap its CSS framework.
 The kit has both because both are needed. A launcher's home screen deserves a
 bespoke design. Its settings page, a dialog or a tool does not: it wants good
 standard widgets in a consistent style. `ui::Theme` and `ui::Painter` give you
-those, in thirty styles, all drawn by the same OpenGL renderer as everything
+those, in the built-in styles, all drawn by the same OpenGL renderer as everything
 else.
 
 Open the **Theme Lab** design in the app and press **L2 / R2** to restyle one
@@ -145,6 +145,9 @@ asset is used, and the names of those projects belong to their owners.
 | 28 | [Sketch](#sketch) | Hand-drawn paper · after PaperCSS | Crooked pen lines, tinted fills and soft shadows: a UI on a notepad |
 | 29 | [Featherweight](#light) | Ultra-light · after Milligram | Almost nothing: thin grey rules and small purple capitals with wide tracking |
 | 30 | [Code](#code) | Developer tools · after Primer | Ink-blue night, hairline borders, a green call to action, blue focus |
+| 31 | [Cinema](#cinema) | Artwork-led entertainment | Warm white controls and deep scrims over full-width artwork |
+| 32 | [Field Journal](#field-journal) | Printed reference | Warm stock, serif headings and ochre dividers |
+| 33 | [Broadcast](#broadcast) | Live production | Navy plates, tabular figures and amber live indicators |
 
 <a id="acrylic"></a>
 
@@ -535,13 +538,48 @@ asset is used, and the names of those projects belong to their owners.
 <td width="50%" valign="top"><img src="media/themes/code.webp" alt="Code in motion"></td>
 </tr>
 </table>
+
+<a id="cinema"></a>
+
+### 31 &middot; Cinema
+
+*Artwork-led entertainment.* Warm white controls and deep scrims over full-width artwork. Theme id `cinema`.
+
+<table>
+<tr>
+<td width="100%" valign="top"><img src="media/themes/cinema.jpg" alt="Cinema"></td>
+</tr>
+</table>
+
+<a id="field-journal"></a>
+
+### 32 &middot; Field Journal
+
+*Printed reference.* Warm stock, serif headings and ochre dividers. Theme id `field-journal`.
+
+<table>
+<tr>
+<td width="100%" valign="top"><img src="media/themes/field-journal.jpg" alt="Field Journal"></td>
+</tr>
+</table>
+
+<a id="broadcast"></a>
+
+### 33 &middot; Broadcast
+
+*Live production.* Navy plates, tabular figures and amber live indicators. Theme id `broadcast`.
+
+<table>
+<tr>
+<td width="100%" valign="top"><img src="media/themes/broadcast.jpg" alt="Broadcast"></td>
+</tr>
+</table>
 <!-- END:themes -->
 
 ## Adding a theme
 
 1. In `src/ui/theme.cpp`, write a function that starts from `web_light()` or
-   `web_dark()` and overrides what differs, and add it to the array in
-   `themes()` (and raise the array's size).
+   `web_dark()` and add it to the array in `themes()`.
 2. Run `tools/host-snapshots.sh build/snapshots themes` and look at
    `build/snapshots/NN-themes-<id>.png`.
 3. Check contrast at a distance: body text against `surface`, `on_primary`
@@ -553,7 +591,7 @@ If the look needs a construction the existing styles cannot give, add a
 
 ## Honest limits
 
-- **Fonts.** The kit ships six faces. A theme picks among them, so a
+- **Fonts.** The kit ships seven faces, including DejaVu Serif for Field Journal. A theme picks among them, so a
   framework's own typeface is approximated, except where the typeface *is*
   the look: Pixel uses Press Start 2P, the face NES.css itself uses, and
   Sketch uses Patrick Hand, as PaperCSS does. (`ui/pixel_font.hpp` also
@@ -563,5 +601,12 @@ If the look needs a construction the existing styles cannot give, add a
   not.
 - **States.** Focus, pressed and disabled are drawn. Hover does not exist on a
   console.
-- **One widget set.** These are the controls a console UI needs. There is no
-  data table, tree, date picker or menu bar.
+- **Component styles.** Theme tokens apply to the component library, including
+  tables, trees, and date pickers. Browse the [component index](COMPONENT_INDEX.md).
+
+Accessibility settings apply on top of the chosen theme through
+`ui::with_legibility(theme, settings)`. Large Text increases type sizes in forms,
+dialogs, and keyboard prompts. Reduce Transparency uses solid surfaces.
+Strong Focus adds a thicker, two-tone indicator for focused controls.
+The [visual matrix](CONSOLE_VALIDATION.md#host-reference) covers themes with
+flat, glass, pixel, sketched, and high-contrast treatments.

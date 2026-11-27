@@ -4,6 +4,7 @@
 
 #include "ui/components/keyboard.hpp"
 
+#include "core/text_edit.hpp"
 #include "ui/components/action_glyph.hpp"
 
 #include <algorithm>
@@ -25,14 +26,6 @@ constexpr float kDefaultKeyWidth = 72.0f;
 constexpr float kDefaultKeyHeight = 64.0f;
 constexpr float kLayoutFade = 0.18f; // seconds the keys of a new layout take to appear
 constexpr float kPartGap = 10.0f;    // between the glyph, the symbol and the word of a wide key
-
-int characters(std::string_view text)
-{
-    int count = 0;
-    for (char c : text)
-        count += (static_cast<unsigned char>(c) & 0xc0) == 0x80 ? 0 : 1;
-    return count;
-}
 
 KeyboardKey wide(KeyKind kind, int span)
 {
@@ -287,7 +280,14 @@ void Keyboard::set_layout(int index)
 
 void Keyboard::set_length(int length)
 {
+    text_context_.reset();
     length_ = length;
+}
+
+void Keyboard::set_text_context(std::string_view text)
+{
+    text_context_ = text;
+    length_ = text_edit::length(text);
 }
 
 const KeyboardLayout &Keyboard::current() const
@@ -566,13 +566,24 @@ Event Keyboard::move(const InputFrame &input, Feedback &feedback)
 Event Keyboard::emit(std::string_view utf8, int row, int key, bool capital, Feedback &feedback)
 {
     const float x = row >= 0 ? key_rect(row, key).cx() : bounds_.cx();
-    if (style.max_length > 0 && length_ >= style.max_length)
+    const std::string clean = text_edit::single_line(utf8);
+    int next_length = length_;
+    std::string joined;
+    if (text_context_)
+    {
+        joined = *text_context_ + clean;
+        next_length = text_edit::length(joined);
+    }
+    else if (length_ >= 0)
+        next_length += text_edit::length(clean);
+    if (clean.empty() || (style.max_length > 0 && next_length > style.max_length))
         return refuse(feedback, style, InputFrame{}, highlight_.refusal(), x);
+    if (text_context_)
+        text_context_ = std::move(joined);
+    length_ = next_length;
     if (on_text)
-        on_text(utf8);
-    typed_.append(utf8);
-    if (length_ >= 0)
-        length_ += characters(utf8);
+        on_text(clean);
+    typed_.append(clean);
     float pitch = 1.0f;
     if (style.pitch_by_column && row >= 0 && current().columns > 1)
         pitch = tween::lerp(
@@ -601,7 +612,12 @@ Event Keyboard::erase(bool repeat, Feedback &feedback)
     if (on_backspace)
         on_backspace();
     ++erased_;
-    if (length_ > 0)
+    if (text_context_)
+    {
+        text_edit::erase_last(*text_context_);
+        length_ = text_edit::length(*text_context_);
+    }
+    else if (length_ > 0)
         --length_;
     play_cue(feedback, style, style.erase, x);
     return Event::changed;
@@ -885,9 +901,10 @@ void Keyboard::draw_cap(Canvas &canvas, Painter &paint, const KeyboardKey &key, 
             if (alpha <= 0.01f || value.empty())
                 return;
             // A key that types a word (".com") sets it as large as fits.
-            const float wide = cap_width(canvas, paint, value, style.label_size);
+            const float em = style.label_size * style.theme.text_scale;
+            const float wide = cap_width(canvas, paint, value, em);
             const float room = std::max(rect.w - 12.0f, 8.0f);
-            const float size = wide > room ? style.label_size * room / wide : style.label_size;
+            const float size = wide > room ? em * room / wide : em;
             cap_text(canvas, paint, value, rect.cx(), rect.cy() + size * 0.35f, size,
                      ink.with_alpha(alpha), gfx::Align::center);
         };
@@ -948,7 +965,7 @@ void Keyboard::draw_cap(Canvas &canvas, Painter &paint, const KeyboardKey &key, 
                         ? action_glyph_width(bound, style.glyph_size)
                         : 0.0f;
     const float symbol_w = symbol ? style.icon_size * 1.2f : 0.0f;
-    float word_size = style.wide_label_size;
+    float word_size = style.wide_label_size * style.theme.text_scale;
     float word_w = word.empty() ? 0.0f : paint.label_width(word, word_size);
     const auto total = [&]()
     {

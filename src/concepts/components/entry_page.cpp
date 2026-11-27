@@ -89,40 +89,40 @@ constexpr int kPadVariant = 1; // the PIN is typed on a numeric pad
 
 constexpr ui::Hint kHintsField[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Type"},
+    {ui::Button::confirm, "Type"},
     {ui::Button::triangle, "Type for me"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kHintsTyping[] = {
-    {ui::Button::dpad, "Keys"},      {ui::Button::cross, "Press"},
-    {ui::Button::triangle, "Space"}, {ui::Button::circle, "To the field"},
+    {ui::Button::dpad, "Keys"},      {ui::Button::confirm, "Press"},
+    {ui::Button::triangle, "Space"}, {ui::Button::back, "To the field"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kHintsStop[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Choose"},
+    {ui::Button::confirm, "Choose"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kHintsPinEdit[] = {
     {ui::Button::dpad, "Digit, box"},
-    {ui::Button::cross, "Next"},
-    {ui::Button::circle, "Leave"},
+    {ui::Button::confirm, "Next"},
+    {ui::Button::back, "Leave"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kHintsList[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Pick"},
-    {ui::Button::circle, "To the field"},
+    {ui::Button::confirm, "Pick"},
+    {ui::Button::back, "To the field"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kHintsListening[] = {
-    {ui::Button::circle, "Keep the old button"},
+    {ui::Button::back, "Keep the old button"},
 };
 constexpr ui::Hint kHintsPrompt[] = {
     {ui::Button::dpad, "Keys"},
-    {ui::Button::cross, "Press"},
+    {ui::Button::confirm, "Press"},
     {ui::Button::triangle, "Space"},
-    {ui::Button::circle, "Cancel"},
+    {ui::Button::back, "Cancel"},
 };
 
 constexpr app::TourStep kTour[] = {

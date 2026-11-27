@@ -329,6 +329,19 @@ chosen again.
 Inside a sheet, give the sheet the input first: it closes on back, and the
 centre takes the rest.
 
+## TransferCenter
+
+Show queued, active, paused, failed, and completed jobs from a live service.
+Call `set_jobs()` with the newest snapshot and keep each job's ID stable.
+Confirm pauses, resumes, or retries the selected job. Triangle opens a
+cancel confirmation with the safe choice focused. Square switches between
+the queue and its completion and failure history. Implement `on_action`
+to send requests back to your service.
+
+Call `draw_modal()` with the final overlay canvas so the cancellation dialog
+appears over the complete screen. See [Transfer Center](../DESIGNS.md#transfers)
+for a worked example in the Broadcast theme.
+
 ## NotificationBell
 
 A small indicator for a status bar: a bell drawn from shapes on a button,

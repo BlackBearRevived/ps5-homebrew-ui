@@ -158,3 +158,32 @@ every design's whole tour, 39,956 frames, about eleven minutes):
 "Most draw calls" and "most shapes" are the peaks seen during that design's
 tour. A frame over 16.7 ms here is the frame in which a picture was saved.
 <!-- END:measured -->
+
+## 4K60 roadmap validation
+
+On 2026-11-26, the PS5 tour presented 20,732 measured frames across Cinema
+Library, Transfer Center, Field Journal, and the Component Library. EGL
+reported a 3840 × 2160 surface at 60 Hz on the PS5 AGC OpenGL 4.6 backend.
+The 2160p60 SDK was built from BlackBearRevived/ps5-opengl commit `e97d4ff`.
+
+| Design | Frames | Mean | p99 (0.5 ms buckets) | Worst |
+| --- | ---: | ---: | ---: | ---: |
+| Cinema Library | 854 | 16.68 ms | 19.0 ms | 20.41 ms |
+| Transfer Center | 464 | 16.68 ms | 19.0 ms | 19.95 ms |
+| Field Journal | 248 | 16.68 ms | 19.0 ms | 20.00 ms |
+| Component Library | 19,166 | 16.69 ms | 18.0 ms | 82.32 ms |
+
+The app presented its first frame 422.77 ms after entry to `main`. The
+artwork cache peaked at 23.97 MiB of uploaded RGBA textures. This counter
+covers catalog artwork only. Console captures show the cover expansion and
+reversal, restored focus at item 1,000, the filter round trip, the scrim over
+bright artwork, and the placeholder for a missing cover. The tour saved 171
+captures and the app closed itself. ShadowMount Plus recorded the release of
+its runtime layers.
+
+Mean frame times stayed near the earlier tour's 16.67–16.69 ms range. The
+Component Library's 82.32 ms frame exceeded the earlier 21.02 ms worst
+frame. The log shows a music track change in the same 600-frame interval.
+The frame that caused the spike has no separate trace. Audio reported zero
+output errors, and the stream underrun counter stayed at 32 from the first
+600-frame sample through the end of the tour.

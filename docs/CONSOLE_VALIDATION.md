@@ -33,7 +33,9 @@ When the app finds a tour request it has not honoured yet, it:
 `dev/app.log` is the app's log. Put the request in place **before** launching:
 the tool does not write into the install folder of a running title.
 
-The design id `all` tours every design; one id (`aurora`) tours only that one.
+The design id `all` tours every design. Pass one ID or a comma-separated
+list such as `library,transfers,journal,components` to tour those designs
+in one launch.
 
 The report has one line per design:
 
@@ -43,6 +45,25 @@ tour 01 aurora       frames=412 avg_ms=16.67 worst_ms=16.92 draws=14 shapes=373
 
 `avg_ms` near 16.67 with a `worst_ms` under about 20 means the design held
 60 frames per second through its whole tour, including dialogs and blur.
+
+The tour also reports the frame-time p99 in half-millisecond buckets, the
+peak RGBA texture bytes in the artwork cache, and the time from application
+entry to the first successful present. The EGL log records the actual surface
+size and the SDK profile. The published 1080p SDK runs at its fixed profile.
+For a native 4K60 run, install a 2160p60 SDK from the same OpenGL source and use
+`make PS5_OPENGL_PREFIX=<sdk path>` before uploading.
+
+## Host reference
+
+```bash
+bash tools/visual-matrix.sh build/visual-matrix
+bash tools/host-snapshots.sh build/snapshots/library library 3840 2160
+```
+
+The matrix captures focused, disabled, and modal states in Acrylic, Pixel,
+Sketch, Friendly, and Contrast with both motion settings. The Cinema Library
+tour tests repeated navigation, a mid-transition reversal, restoring item
+1,000, a filter round trip, a bright cover, and a missing artwork file.
 
 ## Running it
 
@@ -62,6 +83,13 @@ trigger, waits until the console has registered the title, records the kernel
 log, launches the title, waits for the app's own exit, downloads the report,
 the pictures and `app.log`, and checks the log for errors. It never kills the
 app and never retries.
+
+If ftpsrv serves an ELF view of a signed executable or runtime module, the
+tool requests its stored bytes for that FTP session. A successful comparison
+still requires an exact SHA-256 match.
+
+The tool checks that the report lists the requested designs and that pictures
+reported by the current run were saved and downloaded.
 
 A title copied to `/data/homebrew` for the first time is not known to the
 console yet. ShadowMount Plus registers it once the folder has stopped

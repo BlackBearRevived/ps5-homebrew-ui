@@ -4,6 +4,8 @@
 
 #include "ui/components/text_field.hpp"
 
+#include "core/text_edit.hpp"
+
 #include "ui/components/focus_frame.hpp"
 
 #include <algorithm>
@@ -22,57 +24,6 @@ namespace
 
 // Painter::field sets its text at this size; the field measures with it.
 constexpr float kTextSize = 24.0f;
-
-bool continuation(char c)
-{
-    return (static_cast<unsigned char>(c) & 0xc0) == 0x80;
-}
-
-int characters(std::string_view text)
-{
-    int count = 0;
-    for (char c : text)
-        count += continuation(c) ? 0 : 1;
-    return count;
-}
-
-void drop_last(std::string &text)
-{
-    while (!text.empty() && continuation(text.back()))
-        text.pop_back();
-    if (!text.empty())
-        text.pop_back();
-}
-
-void drop_first(std::string &text)
-{
-    std::size_t next = 1;
-    while (next < text.size() && continuation(text[next]))
-        ++next;
-    text.erase(0, next);
-}
-
-// The first code point of a UTF-8 string (0 when it is empty or malformed).
-std::uint32_t first_codepoint(std::string_view text)
-{
-    if (text.empty())
-        return 0;
-    const auto byte = [&](std::size_t i) {
-        return i < text.size() ? static_cast<std::uint32_t>(static_cast<unsigned char>(text[i]))
-                               : 0;
-    };
-    const std::uint32_t lead = byte(0);
-    if (lead < 0x80)
-        return lead;
-    if ((lead & 0xe0) == 0xc0)
-        return ((lead & 0x1f) << 6) | (byte(1) & 0x3f);
-    if ((lead & 0xf0) == 0xe0)
-        return ((lead & 0x0f) << 12) | ((byte(1) & 0x3f) << 6) | (byte(2) & 0x3f);
-    if ((lead & 0xf8) == 0xf0)
-        return ((lead & 0x07) << 18) | ((byte(1) & 0x3f) << 12) | ((byte(2) & 0x3f) << 6) |
-               (byte(3) & 0x3f);
-    return 0;
-}
 
 // The face Painter::body draws with in this theme, or null for the built-in
 // bitmap letters, which have no symbols at all.
@@ -110,46 +61,27 @@ void TextField::set_text(std::string_view text)
 
 int TextField::length() const
 {
-    return characters(text_);
+    return text_edit::length(text_);
 }
 
 bool TextField::insert(char c)
 {
-    // Control characters have no place in a one-line field; bytes above 127
-    // are only meaningful as part of a UTF-8 string.
-    if (c < 0x20 || c == 0x7f || full())
-        return false;
-    text_.push_back(c);
-    blink_ = 0.0f;
-    return true;
+    return c >= 0x20 && c < 0x7f && insert(std::string_view(&c, 1));
 }
 
 bool TextField::insert(std::string_view utf8)
 {
-    bool changed = false;
-    std::size_t at = 0;
-    while (at < utf8.size() && !full())
-    {
-        std::size_t next = at + 1;
-        while (next < utf8.size() && continuation(utf8[next]))
-            ++next;
-        if (static_cast<unsigned char>(utf8[at]) >= 0x20 && utf8[at] != 0x7f)
-        {
-            text_.append(utf8.substr(at, next - at));
-            changed = true;
-        }
-        at = next;
-    }
-    if (changed)
-        blink_ = 0.0f;
-    return changed;
+    if (!text_edit::append(text_, utf8, style.max_length))
+        return false;
+    blink_ = 0.0f;
+    return true;
 }
 
 bool TextField::backspace()
 {
     if (text_.empty())
         return false;
-    drop_last(text_);
+    text_edit::erase_last(text_);
     blink_ = 0.0f;
     return true;
 }
@@ -185,7 +117,7 @@ Event TextField::backspace(Feedback &feedback)
 
 float TextField::preferred_height() const
 {
-    float height = style.field_height;
+    float height = style.field_height * style.theme.text_scale;
     if (!label_.empty())
         height += style.label_size + style.label_gap;
     if (!helper_.empty() || !error_.empty())
@@ -196,7 +128,7 @@ float TextField::preferred_height() const
 Rect TextField::field_rect() const
 {
     const float top = label_.empty() ? 0.0f : style.label_size + style.label_gap;
-    return {bounds_.x, bounds_.y + top, bounds_.w, style.field_height};
+    return {bounds_.x, bounds_.y + top, bounds_.w, style.field_height * style.theme.text_scale};
 }
 
 void TextField::set_active(bool active)
@@ -247,8 +179,8 @@ std::string TextField::shown(const Painter &paint, float room, std::string_view 
         for (int i = 0, count = length(); i < count; ++i)
             display += mask;
     }
-    while (!display.empty() && paint.body_width(display, kTextSize) > room)
-        drop_first(display);
+    while (!display.empty() && paint.body_width(display, kTextSize * style.theme.text_scale) > room)
+        text_edit::erase_first(display);
     return display;
 }
 
@@ -288,7 +220,8 @@ void TextField::draw(Canvas &canvas) const
     const float room = field.w - (line ? 14.0f : 46.0f);
     // The mask falls back to an asterisk in faces that have no bullet.
     const gfx::Font *face = body_face(canvas.fonts, theme);
-    const bool has_mask = face != nullptr && face->has_glyph(first_codepoint(style.mask));
+    const bool has_mask =
+        face != nullptr && face->has_glyph(text_edit::first_codepoint(style.mask));
     const std::string value = shown(paint, room, has_mask ? std::string_view(style.mask) : "*");
     const bool lit = style.caret_period <= 0.0f || style.reduced_motion ||
                      std::fmod(blink_, style.caret_period) < style.caret_period * 0.5f;
@@ -312,8 +245,9 @@ void TextField::draw(Canvas &canvas) const
             white ? Painter::on(theme.light).with_alpha(0.5f) : (line ? quiet : theme.text_muted);
         // It steps aside for the caret instead of sitting under it.
         const float x = field.x + (line ? 2.0f : 20.0f) + 12.0f * focus;
-        paint.body(fit_body(paint, placeholder_, kTextSize, room - 12.0f), x,
-                   field.cy() + kTextSize * 0.35f, kTextSize, faint);
+        const float em = kTextSize * theme.text_scale;
+        paint.body(fit_body(paint, placeholder_, em, room - 12.0f), x, field.cy() + em * 0.35f, em,
+                   faint);
     }
 
     if (wrong > 0.01f)

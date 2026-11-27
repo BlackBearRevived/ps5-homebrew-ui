@@ -6,6 +6,7 @@
 
 #include "app/shell.hpp"
 
+#include <array>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -21,7 +22,7 @@ namespace hui::app
 class Tour
 {
   public:
-    // only: when not empty, tour just the design with that id.
+    // An empty selection tours every design. Commas separate selected IDs.
     explicit Tour(Shell &shell, std::string only = {});
 
     // Advances the script by dt and returns the input for this frame.
@@ -53,6 +54,7 @@ class Tour
         int frames = 0;
         double total_ms = 0.0;
         float worst_ms = 0.0f;
+        std::array<std::size_t, 201> frame_buckets{}; // half milliseconds, last is 100 ms or more
         std::size_t draw_calls = 0;
         std::size_t instances = 0;
     };
@@ -62,7 +64,9 @@ class Tour
     std::string picture_name(const char *suffix) const;
 
     Shell &shell_;
-    std::string only_;
+    std::vector<std::size_t> designs_;
+    std::size_t design_ = 0;
+    bool full_tour_ = false;
     std::size_t index_ = 0; // design being toured
     std::size_t step_ = 0;  // next step of its script
     float clock_ = 0.0f;    // seconds into the current wait

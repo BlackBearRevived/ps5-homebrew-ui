@@ -1036,8 +1036,8 @@ class FirstRun final : public app::Concept
                     kShade.with_alpha(0.5f));
         list.glow(rect, rect.h * 0.5f, 22, kWarm.with_alpha(0.28f));
         list.gradient_rect(rect, rect.h * 0.5f, gfx::mix(kWarm, kWhite, 0.3f), kWarm);
-        ui::draw_button(list, fonts, ui::GlyphStyle::light(), ui::Button::cross, x, rect.cy(),
-                        glyph);
+        ui::draw_button(list, fonts, ui::GlyphStyle::light(context_.settings.swap_confirm),
+                        ui::Button::confirm, x, rect.cy(), glyph);
         ui::text(list, fonts.semibold, label, x + glyph + 14.0f, rect.cy() + 0.35f * size, size,
                  kNight);
         list.pop_transform();
@@ -1251,7 +1251,8 @@ class FirstRun final : public app::Concept
         const float glyph_w = ui::button_width(button, kGlyph);
         const float width = glyph_w + 12.0f + icon + fonts.semibold.measure(label, kText);
         float x = rect.cx() - width * 0.5f;
-        ui::draw_button(list, fonts, ui::GlyphStyle::dark(), button, x, rect.cy(), kGlyph);
+        ui::draw_button(list, fonts, ui::GlyphStyle::dark(context_.settings.swap_confirm), button,
+                        x, rect.cy(), kGlyph);
         x += glyph_w + 12.0f;
         if (key.kind == KeyKind::shift)
         {
@@ -1481,12 +1482,12 @@ class FirstRun final : public app::Concept
     void draw_hints(gfx::DrawList &list) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         constexpr float kRight = 1824.0f;
         if (celebrating_)
         {
-            const ui::Hint hints[] = {{ui::Button::cross, "Continue"},
-                                      {ui::Button::circle, "Back"}};
+            const ui::Hint hints[] = {{ui::Button::confirm, "Continue"},
+                                      {ui::Button::back, "Back"}};
             list.push_opacity(welcome_.value);
             ui::draw_hints(list, fonts, style, hints, 2, kRight, true);
             list.pop_opacity();
@@ -1503,23 +1504,23 @@ class FirstRun final : public app::Concept
             if (step == 0)
             {
                 const ui::Hint hints[] = {{ui::Button::dpad, "Choose"},
-                                          {ui::Button::cross, "Continue"}};
+                                          {ui::Button::confirm, "Continue"}};
                 ui::draw_hints(list, fonts, style, hints, 2, kRight, true);
             }
             else if (step == 1)
             {
                 const ui::Hint hints[] = {
-                    {ui::Button::cross, "Type"},     {ui::Button::square, "Delete"},
+                    {ui::Button::confirm, "Type"},   {ui::Button::square, "Delete"},
                     {ui::Button::triangle, "Space"}, {ui::Button::l2, "Shift"},
-                    {ui::Button::r2, "Done"},        {ui::Button::circle, "Back"},
+                    {ui::Button::r2, "Done"},        {ui::Button::back, "Back"},
                 };
                 ui::draw_hints(list, fonts, style, hints, 6, kRight, true);
             }
             else
             {
                 const ui::Hint hints[] = {
-                    {ui::Button::cross, summary_focus_ < kPrefs ? "Switch" : "Start"},
-                    {ui::Button::circle, "Back"},
+                    {ui::Button::confirm, summary_focus_ < kPrefs ? "Switch" : "Start"},
+                    {ui::Button::back, "Back"},
                 };
                 ui::draw_hints(list, fonts, style, hints, 2, kRight, true);
             }

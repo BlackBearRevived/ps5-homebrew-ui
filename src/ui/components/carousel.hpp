@@ -13,6 +13,8 @@
 namespace hui::ui
 {
 
+inline constexpr float kCarouselFocusMargin = 16.0f;
+
 enum class CarouselMode : std::uint8_t
 {
     leading,  // the focused item stays near the left edge and the row scrolls under it

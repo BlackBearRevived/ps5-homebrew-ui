@@ -60,7 +60,7 @@ Rect InputPrompt::panel_rect() const
     float height =
         2.0f * style.padding + field.preferred_height() + style.gap + keyboard.preferred_height();
     if (!title_.empty())
-        height += style.title_size * kTitleLine + style.gap * 0.6f;
+        height += (style.title_size * style.theme.text_scale) * kTitleLine + style.gap * 0.6f;
     if (style.buttons)
         height += style.gap + style.button_height;
     return {bounds_.cx() - width * 0.5f, bounds_.cy() - height * 0.5f, width, height};
@@ -72,7 +72,7 @@ void InputPrompt::place()
     const float inner = panel.w - 2.0f * style.padding;
     float y = panel.y + style.padding;
     if (!title_.empty())
-        y += style.title_size * kTitleLine + style.gap * 0.6f;
+        y += (style.title_size * style.theme.text_scale) * kTitleLine + style.gap * 0.6f;
     const float field_height = field.preferred_height();
     field.set_bounds({panel.x + style.padding, y, inner, field_height});
     y += field_height + style.gap;
@@ -108,7 +108,7 @@ void InputPrompt::open(Feedback &feedback, std::string_view initial)
     field.set_error("");
     keyboard.set_layout(0);
     keyboard.set_shift(KeyboardShift::off);
-    keyboard.set_length(field.length());
+    keyboard.set_text_context(field.text());
     place();
     // The middle of the board is the shortest way to anywhere.
     const int rows =
@@ -182,7 +182,7 @@ Event InputPrompt::handle(const InputFrame &input, Feedback &feedback)
 
     if (!on_buttons_)
     {
-        keyboard.set_length(field.length());
+        keyboard.set_text_context(field.text());
         const Event event = keyboard.handle(input, feedback);
         bool edited = false;
         for (int i = 0; i < keyboard.erased(); ++i)
@@ -193,7 +193,7 @@ Event InputPrompt::handle(const InputFrame &input, Feedback &feedback)
         {
             // Typing answers the complaint about an empty text.
             field.set_error("");
-            keyboard.set_length(field.length());
+            keyboard.set_text_context(field.text());
             return Event::changed;
         }
         if (event == Event::activated)
@@ -286,12 +286,13 @@ void InputPrompt::draw(Canvas &canvas) const
     const float inner = panel.w - 2.0f * style.padding;
     if (!title_.empty())
     {
-        const std::vector<std::string> title =
-            wrap_heading(canvas, theme, title_, style.title_size, inner, 1);
+        const std::vector<std::string> title = wrap_heading(
+            canvas, theme, title_, (style.title_size * style.theme.text_scale), inner, 1);
         if (!title.empty())
             paint.heading(title[0], panel.x + style.padding,
-                          panel.y + style.padding + style.title_size * 0.88f, style.title_size,
-                          theme.text);
+                          panel.y + style.padding +
+                              (style.title_size * style.theme.text_scale) * 0.88f,
+                          (style.title_size * style.theme.text_scale), theme.text);
     }
     field.draw(canvas);
     keyboard.draw(canvas);

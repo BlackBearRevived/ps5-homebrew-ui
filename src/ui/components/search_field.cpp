@@ -4,6 +4,8 @@
 
 #include "ui/components/search_field.hpp"
 
+#include "core/text_edit.hpp"
+
 #include "ui/components/focus_frame.hpp"
 #include "ui/components/overlay.hpp"
 
@@ -23,35 +25,6 @@ constexpr float kClearSize = 30.0f;   // the clear button's plate
 constexpr float kSpinnerSize = 26.0f; // the "searching" spinner
 constexpr float kRowInset = 14.0f;    // between a row's edge and its content
 constexpr float kIconRoom = 32.0f;    // a row's leading symbol and the space after it
-
-bool continuation(char c)
-{
-    return (static_cast<unsigned char>(c) & 0xc0) == 0x80;
-}
-
-int characters(std::string_view text)
-{
-    int count = 0;
-    for (char c : text)
-        count += continuation(c) ? 0 : 1;
-    return count;
-}
-
-void drop_last(std::string &text)
-{
-    while (!text.empty() && continuation(text.back()))
-        text.pop_back();
-    if (!text.empty())
-        text.pop_back();
-}
-
-void drop_first(std::string &text)
-{
-    std::size_t next = 1;
-    while (next < text.size() && continuation(text[next]))
-        ++next;
-    text.erase(0, next);
-}
 
 char lower(char c)
 {
@@ -121,44 +94,27 @@ void SearchField::set_text(std::string_view text)
 
 int SearchField::length() const
 {
-    return characters(text_);
+    return text_edit::length(text_);
 }
 
 bool SearchField::insert(char c)
 {
-    if (c < 0x20 || c == 0x7f || full())
-        return false;
-    text_.push_back(c);
-    edited();
-    return true;
+    return c >= 0x20 && c < 0x7f && insert(std::string_view(&c, 1));
 }
 
 bool SearchField::insert(std::string_view utf8)
 {
-    bool changed = false;
-    std::size_t at = 0;
-    while (at < utf8.size() && !full())
-    {
-        std::size_t next = at + 1;
-        while (next < utf8.size() && continuation(utf8[next]))
-            ++next;
-        if (static_cast<unsigned char>(utf8[at]) >= 0x20 && utf8[at] != 0x7f)
-        {
-            text_.append(utf8.substr(at, next - at));
-            changed = true;
-        }
-        at = next;
-    }
-    if (changed)
-        edited();
-    return changed;
+    if (!text_edit::append(text_, utf8, style.max_length))
+        return false;
+    edited();
+    return true;
 }
 
 bool SearchField::backspace()
 {
     if (text_.empty())
         return false;
-    drop_last(text_);
+    text_edit::erase_last(text_);
     edited();
     return true;
 }
@@ -476,7 +432,7 @@ std::string SearchField::shown(const Painter &paint, float room) const
 {
     std::string display = text_;
     while (!display.empty() && paint.body_width(display, style.text_size) > room)
-        drop_first(display);
+        text_edit::erase_first(display);
     return display;
 }
 

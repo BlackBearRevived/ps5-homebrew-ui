@@ -1369,7 +1369,7 @@ class Trophies final : public app::Concept
     void draw_tabs(gfx::DrawList &list) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         const float in = tween::stagger(age_, 2, 0.07f, 0.5f);
         const float cy = kTabY + kTabHeight * 0.5f;
         char text[64];
@@ -1898,18 +1898,18 @@ class Trophies final : public app::Concept
     void draw_hints(gfx::DrawList &list) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         if (detail_open_)
         {
             list.push_opacity(detail_.value);
-            const ui::Hint hints[] = {{ui::Button::circle, "Close"}};
+            const ui::Hint hints[] = {{ui::Button::back, "Close"}};
             ui::draw_hints(list, fonts, style, hints, 1, 1824, true);
             list.pop_opacity();
         }
         else
         {
             list.push_opacity(tween::stagger(age_, 9, 0.07f, 0.5f) * (1.0f - detail_.value));
-            const ui::Hint hints[] = {{ui::Button::cross, "Details"},
+            const ui::Hint hints[] = {{ui::Button::confirm, "Details"},
                                       {ui::Button::triangle, "Earn it"},
                                       {ui::Button::square, "Sort"},
                                       {ui::Button::l2, "Filter", ui::Button::r2}};

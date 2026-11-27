@@ -8,6 +8,7 @@
 #include "core/input.hpp"
 #include "core/settings.hpp"
 #include "demo/catalog.hpp"
+#include "gfx/artwork_cache.hpp"
 #include "gfx/backdrop_spec.hpp"
 #include "gfx/draw_list.hpp"
 #include "ui/feedback.hpp"
@@ -40,6 +41,8 @@ struct Telemetry
     std::size_t instances = 0;
     int voices = 0;      // sounds playing now
     double uptime = 0.0; // seconds since the app opened
+    float first_present_ms = 0.0f;
+    std::size_t artwork_peak_bytes = 0;
 
     void push(float ms)
     {
@@ -63,6 +66,8 @@ struct Context
     // applies the change (volumes, button swap, ...) and saves it.
     Settings &settings;
     bool settings_changed = false;
+    gfx::ArtworkCache *artwork = nullptr;
+    std::string_view artwork_root{};
 };
 
 // One frame of a design, back to front:
@@ -102,6 +107,7 @@ struct TourStep
     std::uint32_t hold = 0; // action bits held during the wait
     float trigger_l = 0.0f; // analog triggers held during the wait
     float trigger_r = 0.0f;
+    bool nav_repeat = false;
 };
 
 struct ConceptInfo

@@ -127,4 +127,35 @@ class Transition
     float elapsed_ = 0.0f;
 };
 
+// A cover and its detail hero are two layouts of the same artwork. Keep this
+// object across both screens so Back can reverse a transition mid-flight.
+class SharedElementTransition
+{
+  public:
+    void set_bounds(gfx::Rect source, gfx::Rect destination);
+    void set_expanded(bool expanded);
+    void update(float dt, bool reduced_motion = false);
+    void reset();
+
+    bool expanded() const
+    {
+        return expanded_;
+    }
+    bool running() const
+    {
+        return !amount_.settled();
+    }
+    float progress() const
+    {
+        return tween::clamp01(amount_.value);
+    }
+    gfx::Rect bounds() const;
+
+  private:
+    gfx::Rect source_{};
+    gfx::Rect destination_{};
+    tween::Spring amount_{};
+    bool expanded_ = false;
+};
+
 } // namespace hui::ui

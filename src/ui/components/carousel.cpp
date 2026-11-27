@@ -311,9 +311,8 @@ void Carousel::draw(Canvas &canvas) const
     const float right = bounds_.x + bounds_.w;
     // Sideways the clip leaves room for the ring of an item that rests on
     // the edge; items cut by it are already fading (see `edge`).
-    constexpr float kBleed = 16.0f;
-    list.push_clip(
-        {left - kBleed, bounds_.y - 60.0f, bounds_.w + 2.0f * kBleed, bounds_.h + 120.0f});
+    list.push_clip({left - kCarouselFocusMargin, bounds_.y - 60.0f,
+                    bounds_.w + 2.0f * kCarouselFocusMargin, bounds_.h + 120.0f});
 
     // The share of an item that is inside the shelf, 0..1.
     const auto inside = [&](const Rect &r)
@@ -380,7 +379,7 @@ void Carousel::draw(Canvas &canvas) const
 
     // Only what can be seen, and the (at most two) items under the focus
     // last, the nearer one on top.
-    const float reach = kBleed + 2.0f * at.push;
+    const float reach = kCarouselFocusMargin + 2.0f * at.push;
     const int low = ring ? -(1 << 20) : 0;
     const int high = ring ? (1 << 20) : count - 1;
     const int first =

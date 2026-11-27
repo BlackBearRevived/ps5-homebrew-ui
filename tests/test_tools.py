@@ -5,6 +5,8 @@
 #
 # Exercises identity initialization and deployment resolution without a console.
 
+import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -12,12 +14,46 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import Mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
+TOUR_SPEC = importlib.util.spec_from_file_location("console_tour", ROOT / "tools/console-tour.py")
+TOUR = importlib.util.module_from_spec(TOUR_SPEC)
+TOUR_SPEC.loader.exec_module(TOUR)
 
 
 class ToolTests(unittest.TestCase):
+    def test_console_verifies_the_stored_signed_bytes(self):
+        stored = b"the original signed module"
+        digest = hashlib.sha256(stored).hexdigest()
+        path = "/title/.libc.prx.upload"
+
+        for raw in (stored, b"wrong stored bytes"):
+            with self.subTest(valid=raw == stored):
+                console = TOUR.Console.__new__(TOUR.Console)
+                console.ftp = Mock()
+                console.stored_bytes = False
+                console.read = Mock(side_effect=[b"\x7fELF translated view", raw, stored])
+                self.assertEqual(console.matches(path, digest), raw == stored)
+                self.assertEqual(console.stored_bytes, raw == stored)
+                self.assertEqual(console.ftp.sendcmd.call_count, 1 if raw == stored else 2)
+                console.ftp.sendcmd.assert_called_with("SELF")
+                self.assertTrue(console.matches(path, digest))
+                self.assertEqual(console.ftp.sendcmd.call_count, 1 if raw == stored else 2)
+
+    def test_console_requires_current_evidence_for_the_selected_designs(self):
+        report = ["tour 22 library frames=410 avg_ms=16.67", "tour 23 transfers frames=259 avg_ms=16.67"]
+        captures = [("22-library-restored-1000", "1"), ("23-transfers-retry", "1")]
+        downloaded = {name for name, _ in captures}
+        verify = TOUR.check_evidence
+
+        self.assertEqual(list(verify(report, "library,transfers", captures, downloaded)), [])
+        self.assertTrue(list(verify(report[:1], "library,transfers", captures, downloaded)))
+        self.assertTrue(list(verify([], "all", captures, downloaded)))
+        self.assertTrue(list(verify(report, "all", captures, {"23-transfers-retry", "stale"})))
+        self.assertTrue(list(verify(report, "all", [("22-library-restored-1000", "0")], downloaded)))
+
     def run_init(self, param, **values):
         environment = os.environ.copy()
         environment.update(values)

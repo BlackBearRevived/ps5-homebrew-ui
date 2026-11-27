@@ -85,16 +85,24 @@ void stick(gfx::DrawList &list, const Fonts &fonts, const GlyphStyle &style, con
 
 } // namespace
 
-GlyphStyle GlyphStyle::dark()
+GlyphStyle GlyphStyle::dark(bool swap_confirm)
 {
-    return {gfx::Color::rgb(0x11131f, 0.92f), gfx::Color::rgb(0x6c7196, 0.9f),
-            gfx::Color::rgb(0xe4e3f5), gfx::Color::rgb(0xf5f3ff, 0.86f), true};
+    return {gfx::Color::rgb(0x11131f, 0.92f),
+            gfx::Color::rgb(0x6c7196, 0.9f),
+            gfx::Color::rgb(0xe4e3f5),
+            gfx::Color::rgb(0xf5f3ff, 0.86f),
+            true,
+            swap_confirm};
 }
 
-GlyphStyle GlyphStyle::light()
+GlyphStyle GlyphStyle::light(bool swap_confirm)
 {
-    return {gfx::Color::rgb(0x1b1d2b), gfx::Color::rgb(0x1b1d2b, 0.0f), gfx::Color::rgb(0xf4f1ea),
-            gfx::Color::rgb(0x1b1d2b, 0.8f), true};
+    return {gfx::Color::rgb(0x1b1d2b),
+            gfx::Color::rgb(0x1b1d2b, 0.0f),
+            gfx::Color::rgb(0xf4f1ea),
+            gfx::Color::rgb(0x1b1d2b, 0.8f),
+            true,
+            swap_confirm};
 }
 
 GlyphStyle GlyphStyle::mono(gfx::Color ink, gfx::Color body)
@@ -126,11 +134,17 @@ float button_width(Button button, float size)
 void draw_button(gfx::DrawList &list, const Fonts &fonts, const GlyphStyle &style, Button button,
                  float x, float cy, float size)
 {
+    if (button == Button::confirm)
+        button = button_for(Action::confirm, style.swap_confirm);
+    else if (button == Button::back)
+        button = button_for(Action::back, style.swap_confirm);
     const float w = button_width(button, size);
     const float cx = x + w * 0.5f;
     switch (button)
     {
     case Button::none:
+    case Button::confirm:
+    case Button::back:
         return;
     case Button::cross:
     case Button::circle:

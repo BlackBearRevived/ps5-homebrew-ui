@@ -94,25 +94,25 @@ constexpr int kShortcutVariant = 1;
 
 constexpr ui::Hint kHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Send"},
+    {ui::Button::confirm, "Send"},
     {ui::Button::triangle, "Focus notifications"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kShortcutHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Send"},
+    {ui::Button::confirm, "Send"},
     {ui::Button::triangle, "Newest action"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kStackHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Choose"},
-    {ui::Button::circle, "Back to the page"},
+    {ui::Button::confirm, "Choose"},
+    {ui::Button::back, "Back to the page"},
 };
 constexpr ui::Hint kCenterHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Choose"},
-    {ui::Button::circle, "Close"},
+    {ui::Button::confirm, "Choose"},
+    {ui::Button::back, "Close"},
 };
 
 constexpr std::uint32_t kConfirm = action_bit(Action::confirm);

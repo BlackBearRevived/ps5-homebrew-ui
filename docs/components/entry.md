@@ -549,3 +549,11 @@ Square cycles three variants:
 
 Tour pictures: `entry`, `entry-pin`, `entry-prompt`, `entry-numeric`,
 `entry-flat`.
+## SearchFilterPanel
+
+Edit a query, filter chips, and sorting controls before applying them to a
+collection. Call `open(applied, feedback)` to start a draft. Set the result
+count from `draft()` while the panel is open. `Event::activated` commits the
+draft through the caller, while Back discards the editing session. The search
+field offers recently applied searches and opens a controller keyboard.
+The caller owns the result set and its focus bookmark.

@@ -13,7 +13,7 @@ Press **L1** / **R1** to switch between them.
 <img src="docs/media/switcher.webp" width="860" alt="L1 and R1 cycling through every design in the app">
 
 <!-- BEGIN:counts -->
-**21 designs** &middot; **30 themes** &middot; **99 reusable components**
+**24 designs** &middot; **33 themes** &middot; **104 reusable components**
 <!-- END:counts -->
 &middot; **67 sound effects** in two sets &middot; **one OpenGL 4.6 shader** behind all of it
 
@@ -47,7 +47,7 @@ documentation to learn the craft, enough working code to copy from.
 | **Motion** | Springs for everything that moves, easing curves, staggered entrances, a focus highlight that glides. Frame-rate independent, interruptible. |
 | **Sound** | A 32-voice mixer on its own thread, a vocabulary of 42 cues, two complete sets of recorded effects, stereo placement, pitch that carries meaning, music with ducking, controller rumble. |
 | **Type and glyphs** | Six baked distance-field fonts, sharp at any size. Every DualSense button drawn from shapes, in any colour scheme. |
-| **Widgets and themes** | Buttons, switches, sliders, tabs, fields, chips, lists and dialogs in thirty design languages, from frosted glass to neo-brutalism to 8-bit. |
+| **Widgets and themes** | Buttons, switches, sliders, tabs, fields, chips, lists and dialogs in the built-in design languages, from frosted glass to neo-brutalism to 8-bit. |
 | **Components** | A library of reusable pieces that own their focus, motion and sound: lists, grids, carousels, tabs, menus, dialogs, sheets, toasts, forms, progress, badges, counters and more. Each is restyled by any theme, tuned through a style struct and extended through slots. |
 | **Designs** | Complete screens, each in one file: a home screen, a library, a storefront, a HUD with a pause menu, a radial menu, an on-screen keyboard, a settings screen that really works, and more. |
 | **A tour** | The app can drive itself. The same scripted run renders every picture in these docs on a PC, runs the unit tests, and validates a build on the console. |
@@ -98,18 +98,23 @@ its clip, its techniques and its source.
 <td width="50%" valign="top"><a href="docs/DESIGNS.md#settings"><img src="docs/media/designs/settings.jpg" alt="Control Room"></a><br><b>18 &middot; Control Room</b><br><sub>A settings screen with real controls: sliders, switches, steppers, a dialog</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#themes"><img src="docs/media/designs/themes.jpg" alt="Theme Lab"></a><br><b>19 &middot; Theme Lab</b><br><sub>One screen in thirty design languages: L2 and R2 restyle every widget</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#components"><img src="docs/media/designs/components.jpg" alt="Component Library"></a><br><b>20 &middot; Component Library</b><br><sub>Reusable lists, grids, dialogs, forms and indicators, restyled by thirty themes</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#themes"><img src="docs/media/designs/themes.jpg" alt="Theme Lab"></a><br><b>19 &middot; Theme Lab</b><br><sub>One screen across the built-in themes: L2 and R2 restyle every widget</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#components"><img src="docs/media/designs/components.jpg" alt="Component Library"></a><br><b>20 &middot; Component Library</b><br><sub>Reusable lists, grids, dialogs, forms and indicators, restyled by the built-in themes</sub></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><a href="docs/DESIGNS.md#toolbox"><img src="docs/media/designs/toolbox.jpg" alt="Toolbox"></a><br><b>21 &middot; Toolbox</b><br><sub>The kit on one screen: shapes, type, motion, glyphs and every sound</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#library"><img src="docs/media/designs/library.jpg" alt="Cinema Library"></a><br><b>22 &middot; Cinema Library</b><br><sub>A large artwork-led library with reversible details</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#transfers"><img src="docs/media/designs/transfers.jpg" alt="Transfer Center"></a><br><b>23 &middot; Transfer Center</b><br><sub>Live progress and recovery in the Broadcast theme</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#journal"><img src="docs/media/designs/journal.jpg" alt="Field Journal"></a><br><b>24 &middot; Field Journal</b><br><sub>An illustrated field reference with long-form typography</sub></td>
 </tr>
 </table>
 <!-- END:designs -->
 
 ## The themes
 
-The same working screen in thirty design languages. Ten are styles in their
+The same working screen in the built-in design languages. Ten are styles in their
 own right; twenty are modelled on well-known web frameworks, with colours,
 radii, borders and shadows measured from their own component pages. In the
 app, open **Theme Lab** and press **L2** / **R2**.
@@ -166,6 +171,11 @@ app, open **Theme Lab** and press **L2** / **R2**.
 <td width="33%" valign="top"><a href="docs/THEMES.md#light"><img src="docs/media/themes/light.jpg" alt="Featherweight"></a><br><b>29 &middot; Featherweight</b><br><sub>Ultra-light · after Milligram</sub></td>
 <td width="33%" valign="top"><a href="docs/THEMES.md#code"><img src="docs/media/themes/code.jpg" alt="Code"></a><br><b>30 &middot; Code</b><br><sub>Developer tools · after Primer</sub></td>
 </tr>
+<tr>
+<td width="33%" valign="top"><a href="docs/THEMES.md#cinema"><img src="docs/media/themes/cinema.jpg" alt="Cinema"></a><br><b>31 &middot; Cinema</b><br><sub>Artwork-led entertainment</sub></td>
+<td width="33%" valign="top"><a href="docs/THEMES.md#field-journal"><img src="docs/media/themes/field-journal.jpg" alt="Field Journal"></a><br><b>32 &middot; Field Journal</b><br><sub>Printed reference</sub></td>
+<td width="33%" valign="top"><a href="docs/THEMES.md#broadcast"><img src="docs/media/themes/broadcast.jpg" alt="Broadcast"></a><br><b>33 &middot; Broadcast</b><br><sub>Live production</sub></td>
+</tr>
 </table>
 <!-- END:themes -->
 
@@ -218,7 +228,7 @@ nightly caching and releases.
   list, a grid, a form or a dialog is a member variable, three calls per
   frame and a style struct.
 - **Style standard widgets.** [docs/THEMES.md](docs/THEMES.md): pick one of
-  thirty themes or define your own as data.
+  built-in themes or define your own as data.
 - **Take the kit.** [docs/ADOPTING.md](docs/ADOPTING.md): which directories to
   copy, and the twenty-line program that draws with them.
 
@@ -228,7 +238,7 @@ nightly caching and releases.
 | --- | --- |
 | [CRAFT.md](docs/CRAFT.md) | What makes a console UI feel finished: the ten-foot rules, motion, sound, edges, depth, type, and the checklist |
 | [DESIGNS.md](docs/DESIGNS.md) | Every design: clip, pictures, techniques, source |
-| [THEMES.md](docs/THEMES.md) | The widget set, the theme tokens, all thirty themes, adding your own |
+| [THEMES.md](docs/THEMES.md) | The widget set, the theme tokens, all built-in themes, adding your own |
 | [COMPONENTS.md](docs/COMPONENTS.md) | The component library: the five rules, customising, every component with its knobs, slots, events and cues |
 | [COMPONENT_INDEX.md](docs/COMPONENT_INDEX.md) | One table of every component: class, header, what it is for |
 | [KIT.md](docs/KIT.md) | API reference: shapes, text, backdrops, glass, motion, input, feedback |

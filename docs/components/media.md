@@ -375,6 +375,15 @@ Slot: `art(canvas, box, radius)` draws the artwork. Without it a placeholder
 | Back | `cancelled` | `sounds.cancel` |
 | Any press while hidden | `none`: the controls come back | |
 
+## CaptionTrackPicker
+
+Choose an audio track and a subtitle track, then preview the size and
+background opacity of the captions. Set `MediaControlsStyle::tracks_action`
+to a shortcut such as `Action::l3`. When the transport emits
+`MediaCommand::tracks`, open the picker and route controller input to it.
+Read `options()` whenever the picker returns `Event::changed`. Back
+closes it and restores the transport control that opened it.
+
 ## LoadingScreen
 
 The screen between two screens: what is loading, how far it is, something to

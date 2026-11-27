@@ -83,6 +83,7 @@ class ListView
     {
         return items_;
     }
+    // Use set_items to change the section structure.
     ListItem &item(int index)
     {
         return items_[static_cast<std::size_t>(index)];
@@ -93,6 +94,7 @@ class ListView
         return bounds_;
     }
 
+    // -1 when there is no focusable row.
     int focus() const
     {
         return focus_;
@@ -124,9 +126,14 @@ class ListView
     void retarget(bool snap);
 
     std::vector<ListItem> items_;
-    std::vector<float> tops_;
+    // Prefix counts let the public style change without rebuilding row offsets.
+    std::vector<int> headers_before_;
+    float layout_row_height_ = 0.0f;
+    float layout_header_height_ = 0.0f;
+    float layout_gap_ = 0.0f;
+    gfx::Rect layout_inner_{};
     gfx::Rect bounds_{0.0f, 0.0f, 600.0f, 400.0f};
-    int focus_ = 0;
+    int focus_ = -1;
     bool active_ = true;
     float age_ = 10.0f;
     Highlight highlight_;

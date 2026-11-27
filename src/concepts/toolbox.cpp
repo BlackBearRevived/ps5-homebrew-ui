@@ -204,11 +204,12 @@ class Toolbox final : public app::Concept
 
         const ui::Hint hints[] = {
             {ui::Button::dpad, "Choose a sound"},
-            {ui::Button::cross, "Play"},
+            {ui::Button::confirm, "Play"},
             {ui::Button::square, "Sound set"},
             {ui::Button::touchpad, "About this design"},
         };
-        ui::draw_hints(list, fonts, ui::GlyphStyle::dark(), hints, 4, 1824, true);
+        ui::draw_hints(list, fonts, ui::GlyphStyle::dark(context_.settings.swap_confirm), hints, 4,
+                       1824, true);
         list.pop_opacity();
     }
 
@@ -388,8 +389,8 @@ class Toolbox final : public app::Concept
             std::uint32_t actions;
         };
         const Key keys[] = {
-            {ui::Button::cross, action_bit(Action::confirm)},
-            {ui::Button::circle, action_bit(Action::back)},
+            {ui::Button::confirm, action_bit(Action::confirm)},
+            {ui::Button::back, action_bit(Action::back)},
             {ui::Button::square, action_bit(Action::west)},
             {ui::Button::triangle, action_bit(Action::north)},
             {ui::Button::l1, 0},
@@ -403,7 +404,7 @@ class Toolbox final : public app::Concept
             {ui::Button::right_stick, action_bit(Action::r3)},
             {ui::Button::touchpad, 0},
         };
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         float x = kBoardX;
         for (const Key &key : keys)
         {

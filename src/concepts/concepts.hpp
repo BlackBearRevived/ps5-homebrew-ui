@@ -35,5 +35,8 @@ std::unique_ptr<app::Concept> make_settings(app::Context &context);
 std::unique_ptr<app::Concept> make_themes(app::Context &context);
 std::unique_ptr<app::Concept> make_components(app::Context &context);
 std::unique_ptr<app::Concept> make_toolbox(app::Context &context);
+std::unique_ptr<app::Concept> make_library(app::Context &context);
+std::unique_ptr<app::Concept> make_transfers(app::Context &context);
+std::unique_ptr<app::Concept> make_journal(app::Context &context);
 
 } // namespace hui::concepts

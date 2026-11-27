@@ -237,10 +237,12 @@ Dialog::Layout Dialog::layout(const Canvas &canvas) const
     const float text_width = std::max(inner - indent, 40.0f);
 
     if (!content_.title.empty())
-        out.title = wrap_heading(canvas, theme, content_.title, style.title_size, text_width,
-                                 style.title_lines);
+        out.title =
+            wrap_heading(canvas, theme, content_.title, (style.title_size * style.theme.text_scale),
+                         text_width, style.title_lines);
     if (!content_.body.empty())
-        out.body = wrap_body(paint, content_.body, style.body_size, text_width, style.body_lines);
+        out.body = wrap_body(paint, content_.body, (style.body_size * style.theme.text_scale),
+                             text_width, style.body_lines);
 
     float y = style.padding;
     if (style.centered)
@@ -260,11 +262,13 @@ Dialog::Layout Dialog::layout(const Canvas &canvas) const
         out.icon_cy = style.padding + style.icon_size * 0.5f;
     }
     out.title_top = y;
-    y += static_cast<float>(out.title.size()) * style.title_size * kTitleLine;
+    y += static_cast<float>(out.title.size()) * (style.title_size * style.theme.text_scale) *
+         kTitleLine;
     if (!out.title.empty() && !out.body.empty())
         y += style.gap * 0.55f;
     out.body_top = y;
-    y += static_cast<float>(out.body.size()) * style.body_size * style.body_line;
+    y += static_cast<float>(out.body.size()) * (style.body_size * style.theme.text_scale) *
+         style.body_line;
     if (leading)
         y = std::max(y, style.padding + style.icon_size);
     y += style.padding * 0.8f;
@@ -321,16 +325,19 @@ void Dialog::draw(Canvas &canvas) const
     for (std::size_t i = 0; i < at.title.size(); ++i)
     {
         const float top =
-            panel.y + at.title_top + static_cast<float>(i) * style.title_size * kTitleLine;
-        paint.heading(at.title[i], text_x, top + style.title_size * 0.88f, style.title_size,
-                      theme.text, align);
+            panel.y + at.title_top +
+            static_cast<float>(i) * (style.title_size * style.theme.text_scale) * kTitleLine;
+        paint.heading(at.title[i], text_x,
+                      top + (style.title_size * style.theme.text_scale) * 0.88f,
+                      (style.title_size * style.theme.text_scale), theme.text, align);
     }
     for (std::size_t i = 0; i < at.body.size(); ++i)
     {
         const float top =
-            panel.y + at.body_top + static_cast<float>(i) * style.body_size * style.body_line;
-        paint.body(at.body[i], text_x, top + style.body_size * 0.95f, style.body_size,
-                   theme.text_muted, align);
+            panel.y + at.body_top +
+            static_cast<float>(i) * (style.body_size * style.theme.text_scale) * style.body_line;
+        paint.body(at.body[i], text_x, top + (style.body_size * style.theme.text_scale) * 0.95f,
+                   (style.body_size * style.theme.text_scale), theme.text_muted, align);
     }
 
     // A destructive answer is the same button in a theme whose main colour

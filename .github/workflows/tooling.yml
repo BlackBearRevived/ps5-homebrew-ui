@@ -27,6 +27,41 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  host-visual:
+    name: Visual matrix and installed consumer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install host toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang-18 cmake ninja-build libegl-dev libgl-dev libopengl-dev libgl1-mesa-dri
+      - name: Build and run the installed-package example
+        run: |
+          export CC=clang-18 CXX=clang++-18
+          cmake -S . -B build/consumer-library -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/consumer-library
+          cmake --install build/consumer-library --prefix "$RUNNER_TEMP/hui"
+          cmake -S examples/consumer -B build/consumer-app -G Ninja -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/hui"
+          cmake --build build/consumer-app
+          ctest --test-dir build/consumer-app --output-on-failure
+      - name: Render the component matrix in Mesa
+        env:
+          HOST_CC: clang-18
+          HOST_CXX: clang++-18
+          USE_CCACHE: 0
+        run: bash tools/visual-matrix.sh
+      - name: Upload screenshots for review
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: component-visual-matrix
+          path: build/visual-matrix/**/*.png
+          if-no-files-found: error
+
   build:
     name: Lint, build, and package
     runs-on: ubuntu-24.04

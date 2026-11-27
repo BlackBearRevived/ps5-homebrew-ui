@@ -8,7 +8,7 @@
 //
 //   - L2 / R2 turn the pages, one per group of components;
 //   - Square cycles a page's variants: the same component with other knobs;
-//   - Options restyles everything in the next of the thirty themes.
+//   - Options restyles everything in the next built-in theme.
 //
 // The file itself is only the frame around the pages (header, theme and page
 // transitions, hints). The pages live in src/concepts/components/, and each
@@ -49,6 +49,7 @@ constexpr gallery::PageFactory kPages[] = {
     gallery::make_actions_page,   gallery::make_forms_page,       gallery::make_pickers_page,
     gallery::make_entry_page,     gallery::make_indicators_page,  gallery::make_data_page,
     gallery::make_media_page,     gallery::make_game_page,        gallery::make_layout_page,
+    gallery::make_apps_page,
 };
 
 constexpr float kMargin = 96.0f;
@@ -61,7 +62,7 @@ constexpr const char *kTechniques[] = {
     "Components own their focus, motion and sound: a screen places them and reads events",
     "One style struct per component: a ui::Theme plus the component's own knobs",
     "Slots (std::function) replace parts of a component's drawing with your own",
-    "Every component drawn in all thirty themes, restyled live without losing state",
+    "Every component drawn in all built-in themes, restyled live without losing state",
     "Page changes slide in the direction of travel; theme changes hide behind a veil",
 };
 
@@ -82,7 +83,7 @@ class Components final : public app::Concept
         static const app::ConceptInfo kInfo{
             "components",
             "Component Library",
-            "Reusable lists, grids, dialogs, forms and indicators, restyled by thirty themes",
+            "Reusable lists, grids, dialogs, forms and indicators, restyled by the built-in themes",
             "src/concepts/components.cpp",
             audio::SoundSet::glass,
             Color::rgb(0x8be9c1),
@@ -101,7 +102,10 @@ class Components final : public app::Concept
     {
         age_ += dt;
         clock_ += dt;
-        if (reduced_ != context_.settings.reduced_motion)
+        if (reduced_ != context_.settings.reduced_motion ||
+            (theme_style_.text_scale > 1.0f) != context_.settings.large_text ||
+            theme_style_.solid_surfaces != context_.settings.reduce_transparency ||
+            theme_style_.strong_focus != context_.settings.strong_focus)
             restyle();
 
         const int count = static_cast<int>(pages_.size());
@@ -139,16 +143,17 @@ class Components final : public app::Concept
 
     void draw(app::Frame &frame) const override
     {
-        const ui::Theme &theme = ui::themes()[static_cast<std::size_t>(theme_)];
+        const ui::Theme &theme = theme_style_;
         frame.backdrop = theme.backdrop;
-        frame.backdrop.time = clock_;
-        if (theme.style == ui::SurfaceStyle::glass)
+        const float decorative_time = reduced_ ? 0.0f : clock_;
+        frame.backdrop.time = decorative_time;
+        if (theme.style == ui::SurfaceStyle::glass && !theme.solid_surfaces)
         {
             // Glass needs something behind it worth blurring: slow pools of
             // light, soft enough not to compete with text drawn on the page.
             for (int i = 0; i < 4; ++i)
             {
-                const float phase = clock_ * 0.12f + static_cast<float>(i) * 1.7f;
+                const float phase = decorative_time * 0.12f + static_cast<float>(i) * 1.7f;
                 const float cx = 480.0f + static_cast<float>(i) * 380.0f + std::sin(phase) * 120.0f;
                 const float cy = 560.0f + std::cos(phase * 1.3f) * 220.0f;
                 frame.scene.shadow({cx - 150.0f, cy - 150.0f, 300.0f, 300.0f}, 150.0f, 170.0f,
@@ -165,7 +170,7 @@ class Components final : public app::Concept
         gfx::DrawList &list = frame.overlay;
         // The blurred copy exists only in frames that asked for it.
         const std::uint32_t glass = frame.glass ? frame.glass_texture : 0;
-        ui::Canvas canvas{list, context_.fonts, glass, clock_};
+        ui::Canvas canvas{list, context_.fonts, glass, decorative_time};
         ui::Painter paint(list, context_.fonts, theme, glass);
         list.push_opacity(tween::smoothstep(shown) * tween::cubic_out(age_ / 0.3f));
         draw_header(paint, theme);
@@ -189,7 +194,7 @@ class Components final : public app::Concept
         // The frame's blur holds the backdrop only (the page is drawn after
         // it), so a frosted panel up here would show the page sharp through
         // it. Given no glass texture, the overlays draw solid instead.
-        ui::Canvas above{list, context_.fonts, 0, clock_};
+        ui::Canvas above{list, context_.fonts, 0, decorative_time};
         const std::size_t before = list.instances().size();
         if (!page_switch_.running)
             pages_[static_cast<std::size_t>(page_)]->draw_modal(above);
@@ -213,9 +218,10 @@ class Components final : public app::Concept
     void restyle()
     {
         reduced_ = context_.settings.reduced_motion;
-        const ui::Theme &theme = ui::themes()[static_cast<std::size_t>(theme_)];
+        theme_style_ =
+            ui::with_legibility(ui::themes()[static_cast<std::size_t>(theme_)], context_.settings);
         for (const std::unique_ptr<gallery::Page> &entry : pages_)
-            entry->restyle(theme, reduced_);
+            entry->restyle(theme_style_, reduced_);
     }
 
     void draw_page(ui::Canvas &canvas, int index, float opacity, float dx) const
@@ -280,7 +286,9 @@ class Components final : public app::Concept
         }
         hints[count++] = {ui::Button::l2, "Page", ui::Button::r2};
         hints[count++] = {ui::Button::options, "Theme"};
-        ui::GlyphStyle glyphs = theme.dark ? ui::GlyphStyle::dark() : ui::GlyphStyle::light();
+        const bool swap = context_.settings.swap_confirm;
+        ui::GlyphStyle glyphs =
+            theme.dark ? ui::GlyphStyle::dark(swap) : ui::GlyphStyle::light(swap);
         glyphs.label = paint.page_text();
         if (plate)
         {
@@ -328,19 +336,64 @@ class Components final : public app::Concept
                     for (const char *c =
                              pages_[static_cast<std::size_t>((walk_page + p) % count)]->title();
                          *c != '\0'; ++c)
-                        name += static_cast<char>(*c >= 'A' && *c <= 'Z' ? *c - 'A' + 'a' : *c);
+                        name += static_cast<char>(*c == ' '                ? '-'
+                                                  : *c >= 'A' && *c <= 'Z' ? *c - 'A' + 'a'
+                                                                           : *c);
                     capture_names_.push_back(std::move(name));
                     tour_.push_back(
                         {0.8f, next_page, Direction::none, capture_names_.back().c_str()});
                 }
             }
             // A step's picture is taken before its press: it shows theme i.
-            const bool pictured = i == 2 || i == 5 || i == 7 || i == 13 || i == 18;
+            const bool pictured = i == 2 || i == 5 || i == 7 || i == 13 || i == 18 || i >= 30;
             tour_.push_back({pictured ? 0.75f : 0.5f, next_theme, Direction::none,
                              pictured ? themes[i].id : nullptr});
         }
         for (int i = walk_page; i < static_cast<int>(pages_.size()); ++i)
             tour_.push_back({0.35f, next_page});
+
+        add_visual_matrix();
+    }
+
+    void add_visual_matrix()
+    {
+        constexpr std::uint32_t previous_page = action_bit(Action::jump_prev);
+        constexpr std::uint32_t next_page = action_bit(Action::jump_next);
+        constexpr std::uint32_t next_theme = action_bit(Action::menu);
+        const auto repeat_nav = [&](Direction direction, int count)
+        {
+            for (int i = 0; i < count; ++i)
+                tour_.push_back({0.12f, 0, direction});
+        };
+        const auto themes = ui::themes();
+        for (std::size_t i = 0; i < themes.size(); ++i)
+        {
+            const std::string_view id = themes[i].id;
+            if (id == "acrylic" || id == "contrast" || id == "pixel" || id == "friendly" ||
+                id == "sketch")
+            {
+                const auto capture = [&](std::string_view state, std::uint32_t press = 0)
+                {
+                    capture_names_.push_back("matrix-" + std::string(id) + "-" +
+                                             std::string(state));
+                    tour_.push_back({0.75f, press, Direction::none, capture_names_.back().c_str()});
+                };
+                repeat_nav(Direction::left, 2);
+                repeat_nav(Direction::up, 10);
+                capture("focused");
+                repeat_nav(Direction::down, 6);
+                capture("disabled", action_bit(Action::confirm));
+                for (int page = 0; page < 4; ++page)
+                    tour_.push_back({0.35f, next_page});
+                repeat_nav(Direction::left, 3);
+                repeat_nav(Direction::up, 3);
+                tour_.push_back({0.35f, action_bit(Action::confirm)});
+                capture("modal", action_bit(Action::back));
+                for (int page = 0; page < 4; ++page)
+                    tour_.push_back({0.4f, previous_page});
+            }
+            tour_.push_back({0.48f, next_theme});
+        }
     }
 
     app::Context &context_;
@@ -352,6 +405,7 @@ class Components final : public app::Concept
     int direction_ = 1;
     int theme_ = 0;
     int next_theme_ = 0;
+    ui::Theme theme_style_{};
     bool reduced_ = false;
     float age_ = 0.0f;
     float clock_ = 0.0f;

@@ -551,6 +551,12 @@ const float gap = ui::space(2);                           // 16: multiples of 8
 
 ## Transition
 
+Use `SharedElementTransition` for artwork that travels between a shelf and a
+detail screen. Set both bounds, call `set_expanded()`, and use `bounds()` and
+`progress()` while drawing. Changing direction preserves the current pose.
+With Reduce Motion, draw the source and destination at their fixed bounds
+and use the same progress for a dissolve.
+
 How a region arrives, leaves or changes its content: an opacity, an offset
 and a scale, eased at the theme's pace, applied to everything drawn between
 `begin()` and `end()`.

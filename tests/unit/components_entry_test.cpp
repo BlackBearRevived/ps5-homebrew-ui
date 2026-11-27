@@ -8,6 +8,7 @@
 #include "ui/components/keyboard.hpp"
 #include "ui/components/pin_entry.hpp"
 #include "ui/components/search_field.hpp"
+#include "ui/components/text_field.hpp"
 
 #include <gtest/gtest.h>
 
@@ -108,6 +109,47 @@ TEST_F(ComponentsEntry, KeyboardSendsWhatItTypes)
     EXPECT_TRUE(asked(Cue::select));
     EXPECT_EQ(send(press(Action::back)), Event::cancelled);
     EXPECT_TRUE(asked(Cue::back));
+}
+
+TEST_F(ComponentsEntry, KeyboardRejectsMultiCharacterKeysThatDoNotFit)
+{
+    keys_.set_layouts({KeyboardLayout::email()});
+    keys_.style.max_length = 12;
+    keys_.set_length(11);
+    EXPECT_EQ(keys_.tap(".com", feedback_), Event::refused);
+    EXPECT_TRUE(text_.empty());
+    EXPECT_TRUE(keys_.typed().empty());
+    EXPECT_EQ(keys_.length(), 11);
+    ASSERT_EQ(feedback_.cues.size(), 1u);
+    EXPECT_TRUE(asked(Cue::error));
+}
+
+TEST_F(ComponentsEntry, KeyboardAndFieldsUseWholeGraphemes)
+{
+    const std::string_view accent = "\xcc\x81";
+    const std::string_view flag = "\xf0\x9f\x87\xba\xf0\x9f\x87\xb3";
+    hui::ui::TextField field;
+    field.style.max_length = 1;
+    keys_.style.max_length = 1;
+    ASSERT_TRUE(field.insert('e'));
+    keys_.set_text_context(field.text());
+    keys_.on_text = [&](std::string_view text) { EXPECT_TRUE(field.insert(text)); };
+    keys_.on_backspace = [&] { EXPECT_TRUE(field.backspace()); };
+    EXPECT_EQ(keys_.tap(accent, feedback_), Event::changed);
+    EXPECT_EQ(field.text(), "e\xcc\x81");
+    EXPECT_EQ(field.length(), 1);
+    EXPECT_EQ(keys_.length(), 1);
+    EXPECT_EQ(keys_.backspace(feedback_), Event::changed);
+    EXPECT_TRUE(field.text().empty());
+    EXPECT_EQ(keys_.length(), 0);
+
+    hui::ui::SearchField search;
+    search.style.max_length = 1;
+    ASSERT_TRUE(search.insert(flag));
+    EXPECT_EQ(search.length(), 1);
+    EXPECT_FALSE(search.insert('x'));
+    EXPECT_TRUE(search.backspace());
+    EXPECT_TRUE(search.text().empty());
 }
 
 TEST_F(ComponentsEntry, KeyboardShiftIsSpentByALetterAndLocksOnASecondPress)

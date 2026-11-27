@@ -32,6 +32,7 @@ class ConceptFixture : public ::testing::Test
         load("dejavu-sans-mono", &mono_, &fonts_.mono);
         load("press-start-2p", &pixel_, &fonts_.pixel);
         load("patrick-hand", &hand_, &fonts_.hand);
+        load("dejavu-serif", &serif_, &fonts_.serif);
     }
 
     static InputFrame idle()
@@ -99,7 +100,7 @@ class ConceptFixture : public ::testing::Test
         EXPECT_FALSE(frame_.scene.empty() && frame_.overlay.empty()) << design.info().id;
     }
 
-    gfx::Font regular_, semibold_, display_, mono_, pixel_, hand_;
+    gfx::Font regular_, semibold_, display_, mono_, pixel_, hand_, serif_;
     ui::Fonts fonts_;
     demo::Catalog catalog_;
     app::Telemetry telemetry_;

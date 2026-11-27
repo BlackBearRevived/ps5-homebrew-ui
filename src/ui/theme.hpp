@@ -10,6 +10,12 @@
 
 #include <cstdint>
 #include <span>
+#include <string_view>
+
+namespace hui
+{
+struct Settings;
+}
 
 namespace hui::ui
 {
@@ -46,6 +52,7 @@ enum class FontRole : std::uint8_t
     mono,
     pixel, // Press Start 2P on the pixel grid (ui/pixel_font.hpp draws a 5x7 face without it)
     hand,  // Patrick Hand: handwriting
+    serif, // DejaVu Serif: editorial headings
 };
 
 // Everything a widget needs to know to draw itself. A theme is data: adding
@@ -99,12 +106,15 @@ struct Theme
     float focus_width = 3.0f;      // the ring's stroke
     float focus_gap = 4.0f;        // its distance from the control
     bool underline_fields = false; // text fields are a line, not a box
+    bool solid_surfaces = false;
+    bool strong_focus = false;
 
     // ---- type ----
     FontRole heading = FontRole::display;
     FontRole label = FontRole::semibold;
     bool caps = false;     // labels in capitals
     float tracking = 0.0f; // extra space between label glyphs
+    float text_scale = 1.0f;
 
     // ---- motion and sound ----
     float omega = 16.0f;  // how fast things move (rad/s); 60 or more snaps
@@ -115,5 +125,12 @@ struct Theme
 
 // The built-in themes, in gallery order.
 std::span<const Theme> themes();
+const Theme *find_theme(std::string_view id);
+Theme with_legibility(Theme theme, const Settings &settings);
+
+// Relative luminance contrast after compositing ink over an opaque background.
+float text_contrast(gfx::Color ink, gfx::Color background);
+// Keep the supplied ink where possible, shifting toward black or white.
+gfx::Color readable_ink(gfx::Color ink, gfx::Color background, float minimum = 4.5f);
 
 } // namespace hui::ui

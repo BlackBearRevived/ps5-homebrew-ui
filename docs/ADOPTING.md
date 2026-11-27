@@ -1,9 +1,8 @@
 # Adopting the kit in your own app
 
-You do not have to fork this app to use what is in it. The kit is a set of
-plain C++20 files with no dependencies beyond OpenGL 4.5+, the C++ standard
-library and `stb_vorbis` (music only). There are three ways in, from lightest
-to fullest.
+The kit is C++20 and needs an OpenGL context and the platform's thread
+library. Its bundled dependencies handle image and audio decoding (STB) and
+Unicode grapheme boundaries (utf8proc). There are three ways to adopt it.
 
 ## 1. Read it and write your own
 
@@ -13,22 +12,56 @@ photographs the app. [CRAFT.md](CRAFT.md) is independent of this code.
 
 ## 2. Take the kit
 
-Copy these directories into your project and add them to your build:
+Install a versioned CMake package when you want to keep the library separate
+from your app. The package exports `hui::ui` and the installed font and audio
+directory through `PS5HomebrewUI_ASSET_DIR`.
+
+```sh
+cmake -S . -B build/sdk -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build/sdk
+cmake --install build/sdk --prefix "$PWD/build/install"
+cmake -S examples/consumer -B build/consumer -G Ninja -DCMAKE_PREFIX_PATH="$PWD/build/install"
+cmake --build build/consumer
+ctest --test-dir build/consumer --output-on-failure
+```
+
+The [external example](../examples/consumer/main.cpp) opens settings, enters
+a detail screen, and checks the return focus in a Mesa EGL context. The
+package contains the UI, renderer, input model, and audio code as a static
+archive. It uses the app's `hui::sys::log` and `hui::sys::monotonic_us` hooks.
+
+For a PS5 library build, use the Prospero toolchain and the directory containing
+the installed SDK's `PS5OpenGLConfig.cmake`. Set `PS5_SDK` and `PS5_OPENGL_PREFIX`
+to your toolchain and OpenGL SDK installation paths.
+
+```sh
+cmake -S . -B build/sdk-ps5 -G Ninja -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_TOOLCHAIN_FILE="$PS5_SDK/toolchain/prospero.cmake" \
+  -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY -DHUI_USE_PS5_OPENGL=ON \
+  -DPS5OpenGL_DIR="$PS5_OPENGL_PREFIX/lib/cmake/PS5OpenGL"
+cmake --build build/sdk-ps5
+cmake --install build/sdk-ps5 --prefix "$PWD/build/install-ps5"
+```
+
+Use the native app boilerplate to provide platform services and package the
+title. Give the app's CMake configuration the same `PS5OpenGL_DIR` when it uses
+`find_package(PS5HomebrewUI)`.
+
+For a source integration, copy these directories into your project.
 
 | Directory | You get | Needs |
 | --- | --- | --- |
-| `src/gfx/` | Draw list, GL batch, SDF fonts, backdrops, renderer, canvas | OpenGL headers, `platform/ps5/system.hpp` for logging |
+| `src/gfx/` | Draw list, GL batch, SDF fonts, backdrops, renderer, canvas, artwork cache | OpenGL headers, `platform/ps5/system.hpp` for logging, `third_party/stb` for images |
 | `src/ui/` | Fonts, controller glyphs, motion helpers, themes, widgets, pixel font, confetti | `gfx/`, `core/tween.hpp`, `audio/cues.hpp` (for the sound set enum) |
 | `src/ui/components/` | The component library: lists, grids, carousels, tabs, menus, dialogs, sheets, toasts, forms, indicators ([COMPONENTS.md](COMPONENTS.md)) | the rest of `src/ui/`, `core/input.hpp` |
-| `src/core/` | Input model, tweens and springs, settings, save files | nothing |
+| `src/core/` | Input model, tweens and springs, settings, save files, text editing | `third_party/utf8proc` for grapheme boundaries |
 | `src/audio/` | Mixer, cue vocabulary and sound bank, music player | `core/save_file` (file reading), `third_party/stb` |
+| `src/third_party/` | Image and audio decoding, Unicode grapheme segmentation | STB and utf8proc license notices |
 | `src/platform/ps5/` | EGL display, controller, audio output thread, system services | ps5-opengl SDK, PS5 payload SDK |
 | `assets/fonts/`, `assets/audio/` | Baked fonts and the two sound sets | see the licences in THIRD_PARTY_NOTICES.md |
 
-The only coupling to this app is the logging function `sys::log`. Keep
-`platform/ps5/system.cpp` or provide your own five functions (`log`,
-`monotonic_us`, `sleep_us`, `park`, `quit`); `host/platform_host.cpp` is a
-twenty-line example.
+Keep `platform/ps5/system.cpp` or provide the platform functions your app
+uses. See `host/platform_host.cpp` for a small implementation.
 
 The smallest program that draws with the kit:
 

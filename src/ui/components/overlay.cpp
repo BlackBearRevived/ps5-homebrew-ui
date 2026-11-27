@@ -222,7 +222,7 @@ void draw_overlay_panel(Canvas &canvas, const Theme &theme, const Rect &r, bool 
     gfx::DrawList &list = canvas.list;
     const float corner =
         std::min(radius < 0.0f ? theme.radius_card : radius, std::min(r.w, r.h) * 0.5f);
-    const bool frost = frosted && can_frost(canvas, theme);
+    const bool frost = frosted && !theme.solid_surfaces && can_frost(canvas, theme);
 
     if (frost && theme.style == SurfaceStyle::glass)
     {

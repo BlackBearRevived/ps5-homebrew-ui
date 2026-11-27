@@ -87,6 +87,8 @@ const FontRef &Painter::font(FontRole role) const
         return fonts_.pixel.font != nullptr ? fonts_.pixel : fonts_.mono;
     case FontRole::hand:
         return fonts_.hand.font != nullptr ? fonts_.hand : fonts_.regular;
+    case FontRole::serif:
+        return fonts_.serif.font != nullptr ? fonts_.serif : fonts_.display;
     default:
         return fonts_.regular;
     }
@@ -346,7 +348,7 @@ gfx::Rect Painter::surface(const gfx::Rect &r, float radius, gfx::Color fill_col
     case SurfaceStyle::glass:
         list_.shadow({r.x, r.y + offset * raise, r.w, r.h}, radius, theme_.shadow_blur,
                      theme_.shadow.with_alpha(0.5f * raise));
-        if (glass_ != 0)
+        if (glass_ != 0 && !theme_.solid_surfaces)
             list_.glass(glass_, r, radius, kWhite);
         list_.rounded_rect(r, radius, shade(fill_color, -0.2f * (1.0f - raise)));
         stroke(r, radius, line, theme_.light);
@@ -459,6 +461,16 @@ void Painter::focus_ring(const gfx::Rect &r, float radius, float amount)
     list_.push_opacity(tween::clamp01(amount));
     const float reach = theme_.focus_gap + theme_.focus_width;
     const float ring_radius = radius > 0.0f ? radius + reach : 0.0f;
+    if (theme_.strong_focus)
+    {
+        const gfx::Rect outline = r.inset(-theme_.focus_gap);
+        const float corner = radius > 0.0f ? radius + theme_.focus_gap : 0.0f;
+        stroke(outline.inset(-2.0f), corner, theme_.focus_width + 4.0f,
+               theme_.dark ? Color::rgb(0x000000) : Color::rgb(0xffffff));
+        stroke(outline, corner, theme_.focus_width, theme_.focus);
+        list_.pop_opacity();
+        return;
+    }
     switch (theme_.style)
     {
     case SurfaceStyle::bevel:
@@ -861,14 +873,15 @@ void Painter::tabs(const gfx::Rect &r, std::span<const char *const> labels, floa
 void Painter::field(const gfx::Rect &r, std::string_view value, bool caret, const Look &look)
 {
     const float radius = std::min(theme_.radius, 12.0f);
-    const float baseline = baseline_for(r.cy(), 24);
+    const float em = 24.0f * theme_.text_scale;
+    const float baseline = baseline_for(r.cy(), em);
     if (theme_.underline_fields)
     {
         // A line that thickens and takes the primary colour when focused.
         const float thick = 2.0f + 2.0f * look.focus;
         list_.rounded_rect({r.x, r.y + r.h - thick, r.w, thick}, 0,
                            gfx::mix(theme_.text_muted, theme_.primary, look.focus));
-        const float end = body(value, r.x + 2.0f, baseline, 24, theme_.text);
+        const float end = body(value, r.x + 2.0f, baseline, em, theme_.text);
         if (caret)
             list_.rounded_rect({r.x + 5.0f + end, r.cy() - 15.0f, 2.5f, 30.0f}, 0, theme_.primary);
         return;
@@ -877,7 +890,7 @@ void Painter::field(const gfx::Rect &r, std::string_view value, bool caret, cons
     const Color face = white ? theme_.light : theme_.surface_high;
     well(r, radius, face);
     const Color ink = white ? on(face) : theme_.text;
-    const float end = body(value, r.x + 20.0f, baseline, 24, ink);
+    const float end = body(value, r.x + 20.0f, baseline, em, ink);
     if (caret)
         list_.rounded_rect({r.x + 23.0f + end, r.cy() - 15.0f, 2.5f, 30.0f}, 0,
                            white || theme_.style == SurfaceStyle::pixel ? ink : theme_.accent);

@@ -2050,7 +2050,7 @@ class Dashboard final : public app::Concept
     void draw_hints(app::Frame &frame, float open) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         const char *square = live_ ? "Pause" : "Resume";
         // The two rows cross-fade as the detail view takes over.
         const float grid = tile_in(kTileCount) * (1.0f - tween::clamp01(open * 2.0f));
@@ -2058,7 +2058,7 @@ class Dashboard final : public app::Concept
         {
             frame.scene.push_opacity(grid);
             const ui::Hint hints[] = {{ui::Button::dpad, "Move"},
-                                      {ui::Button::cross, "Expand"},
+                                      {ui::Button::confirm, "Expand"},
                                       {ui::Button::square, square}};
             ui::draw_hints(frame.scene, fonts, style, hints, 3, kGridX + kGridW, true);
             frame.scene.pop_opacity();
@@ -2072,7 +2072,7 @@ class Dashboard final : public app::Concept
             if (kTiles[detail_].pick != nullptr)
                 hints[count++] = {ui::Button::dpad, kTiles[detail_].pick};
             hints[count++] = {ui::Button::square, square};
-            hints[count++] = {ui::Button::circle, "Back"};
+            hints[count++] = {ui::Button::back, "Back"};
             ui::draw_hints(frame.overlay, fonts, style, hints, count, kGridX + kGridW, true);
             frame.overlay.pop_opacity();
         }

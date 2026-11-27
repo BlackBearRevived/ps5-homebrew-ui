@@ -136,6 +136,9 @@ enum class Field : std::uint8_t
     vibration,
     light_bar,
     reduce_motion,
+    large_text,
+    reduce_transparency,
+    strong_focus,
     reset,
     count,
 };
@@ -195,6 +198,12 @@ constexpr Row kAccessRows[] = {
     {"Reduce motion", "Replaces slides, zooms and overshoot with short fades.", Kind::toggle,
      Field::reduce_motion},
     {"Hint size", kHintSizeHelp, Kind::stepper, Field::hint_size},
+    {"Large text", "Enlarges text in settings, forms, dialogs and keyboard prompts.", Kind::toggle,
+     Field::large_text},
+    {"Reduce transparency", "Uses opaque surfaces so artwork cannot interfere with text.",
+     Kind::toggle, Field::reduce_transparency},
+    {"Strong focus outline", "Draws a thicker outline around the current control.", Kind::toggle,
+     Field::strong_focus},
 };
 constexpr Row kAboutRows[] = {
     {"Reset all settings", "Returns every option on these pages to its default value.",
@@ -206,7 +215,8 @@ constexpr Category kCategories[] = {
     {"Audio", "Balance music, effects and menu sounds.", kAudioRows, 3},
     {"Display", "Resolution, the performance overlay and the size of the hints.", kDisplayRows, 3},
     {"Controller", "Button layout, vibration and the light bar.", kControllerRows, 3},
-    {"Accessibility", "Make the interface calmer and easier to read.", kAccessRows, 2},
+    {"Accessibility", "Make the interface calmer and easier to read.", kAccessRows,
+     static_cast<int>(std::size(kAccessRows))},
     {"About", "What this app is, and the way back to its defaults.", kAboutRows, 1},
 };
 constexpr int kCategoryCount = 5;
@@ -438,6 +448,12 @@ class SettingsDesign final : public app::Concept
             return s.light_bar ? 1 : 0;
         case Field::reduce_motion:
             return s.reduced_motion ? 1 : 0;
+        case Field::large_text:
+            return s.large_text ? 1 : 0;
+        case Field::reduce_transparency:
+            return s.reduce_transparency ? 1 : 0;
+        case Field::strong_focus:
+            return s.strong_focus ? 1 : 0;
         default:
             return 0;
         }
@@ -495,6 +511,15 @@ class SettingsDesign final : public app::Concept
             break;
         case Field::reduce_motion:
             s.reduced_motion = next != 0;
+            break;
+        case Field::large_text:
+            s.large_text = next != 0;
+            break;
+        case Field::reduce_transparency:
+            s.reduce_transparency = next != 0;
+            break;
+        case Field::strong_focus:
+            s.strong_focus = next != 0;
             break;
         default:
             return;
@@ -989,7 +1014,8 @@ class SettingsDesign final : public app::Concept
         list.shadow({r.x, r.y + 10, r.w, r.h}, kRadius, 24, Color::rgb(0x000000, 0.4f));
         list.glow(r, kRadius, 18, kAccent.with_alpha(0.14f + 0.1f * breath));
         list.rounded_rect(r, kRadius, gfx::mix(kSurface, kAccent, 0.17f));
-        list.bordered_rect(r, kRadius, kClear, 2.0f, kAccent);
+        list.bordered_rect(r, kRadius, kClear, context_.settings.strong_focus ? 5.0f : 2.0f,
+                           kAccent);
         list.pop_opacity();
     }
 
@@ -1056,8 +1082,15 @@ class SettingsDesign final : public app::Concept
         const ui::Fonts &fonts = context_.fonts;
         if (!focused)
             list.rounded_rect(r, kRadius, kInk.with_alpha(0.035f));
-        ui::text(list, focused ? fonts.semibold : fonts.regular, row.label, r.x + kRowPad,
-                 centred(r.cy(), 28), 28, kInk.with_alpha(focused ? 1.0f : 0.84f));
+        const ui::FontRef &face = focused ? fonts.semibold : fonts.regular;
+        const float em = context_.settings.large_text ? 34.0f : 28.0f;
+        const float width = r.w - 2.0f * kRowPad - kSliderW - 104.0f;
+        const auto lines = ui::paragraph_lines(face, row.label, em, width, 2);
+        const float line = em * 1.03f;
+        const float baseline =
+            centred(r.cy(), em) - line * 0.5f * static_cast<float>(lines.lines.size() - 1);
+        ui::paragraph(list, face, lines, r.x + kRowPad, baseline, em, line,
+                      kInk.with_alpha(focused ? 1.0f : 0.84f));
         switch (row.kind)
         {
         case Kind::slider:

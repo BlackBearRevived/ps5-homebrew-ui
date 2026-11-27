@@ -1721,7 +1721,7 @@ class Store final : public app::Concept
     void draw_chips(gfx::DrawList &list) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle glyphs = ui::GlyphStyle::dark();
+        const ui::GlyphStyle glyphs = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         const float in = tween::stagger(age_, 3, 0.07f, 0.5f);
         Rect chips[kFilters];
         chip_layout(chips);
@@ -2546,12 +2546,12 @@ class Store final : public app::Concept
         if (alpha <= 0.01f)
             return;
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         list.push_opacity(alpha);
         if (layer == 0)
         {
             const char *confirm = zone_ == Zone::chips ? "Browse" : "Details";
-            const ui::Hint hints[] = {{ui::Button::cross, confirm},
+            const ui::Hint hints[] = {{ui::Button::confirm, confirm},
                                       {ui::Button::square, "Cart"},
                                       {ui::Button::l2, "Filter", ui::Button::r2}};
             ui::draw_hints(list, fonts, style, hints, 3, kRight, true);
@@ -2561,9 +2561,9 @@ class Store final : public app::Concept
             const char *confirm = page_focus_ == PageFocus::shots      ? "Look"
                                   : page_focus_ == PageFocus::wishlist ? "Wishlist"
                                                                        : "Add to cart";
-            const ui::Hint hints[] = {{ui::Button::cross, confirm},
+            const ui::Hint hints[] = {{ui::Button::confirm, confirm},
                                       {ui::Button::square, "Cart"},
-                                      {ui::Button::circle, "Back"}};
+                                      {ui::Button::back, "Back"}};
             ui::draw_hints(list, fonts, style, hints, 3, kRight, true);
         }
         else if (layer == 2)
@@ -2572,10 +2572,10 @@ class Store final : public app::Concept
             // Cross on the button, and nothing but Close in an empty cart.
             const int live = live_lines();
             const ui::Hint on_line[] = {{ui::Button::triangle, "Remove"},
-                                        {ui::Button::cross, "Checkout"},
-                                        {ui::Button::circle, "Close"}};
-            const ui::Hint on_button[] = {{ui::Button::cross, "Checkout"},
-                                          {ui::Button::circle, "Close"}};
+                                        {ui::Button::confirm, "Checkout"},
+                                        {ui::Button::back, "Close"}};
+            const ui::Hint on_button[] = {{ui::Button::confirm, "Checkout"},
+                                          {ui::Button::back, "Close"}};
             if (drawer_focus_ < live)
                 ui::draw_hints(list, fonts, style, on_line, 3, kRight, true);
             else
@@ -2584,8 +2584,8 @@ class Store final : public app::Concept
         }
         else
         {
-            const ui::Hint hints[] = {{ui::Button::cross, "Choose"},
-                                      {ui::Button::circle, "Cancel"}};
+            const ui::Hint hints[] = {{ui::Button::confirm, "Choose"},
+                                      {ui::Button::back, "Cancel"}};
             ui::draw_hints(list, fonts, style, hints, 2, kRight, true);
         }
         list.pop_opacity();

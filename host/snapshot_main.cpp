@@ -34,6 +34,8 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <chrono>
+#include <thread>
 #include <string>
 #include <vector>
 
@@ -170,6 +172,7 @@ int main(int argc, char **argv)
     hui::gfx::Font mono;
     hui::gfx::Font pixel;
     hui::gfx::Font hand;
+    hui::gfx::Font serif;
     hui::ui::Fonts fonts;
     if (!renderer.init() ||
         !load_font(renderer, assets + "/fonts/inter-regular.huifont", &regular, &fonts.regular) ||
@@ -179,7 +182,8 @@ int main(int argc, char **argv)
                    &fonts.display) ||
         !load_font(renderer, assets + "/fonts/dejavu-sans-mono.huifont", &mono, &fonts.mono) ||
         !load_font(renderer, assets + "/fonts/press-start-2p.huifont", &pixel, &fonts.pixel) ||
-        !load_font(renderer, assets + "/fonts/patrick-hand.huifont", &hand, &fonts.hand))
+        !load_font(renderer, assets + "/fonts/patrick-hand.huifont", &hand, &fonts.hand) ||
+        !load_font(renderer, assets + "/fonts/dejavu-serif.huifont", &serif, &fonts.serif))
         return 1;
     hui::demo::Catalog catalog;
     if (!catalog.build_covers(renderer, fonts))
@@ -253,7 +257,23 @@ int main(int argc, char **argv)
     hui::save::ensure_directory(output);
     hui::save::ensure_directory(data_root);
     std::remove((data_root + "/settings.bin").c_str());
-    hui::app::Shell shell(fonts, catalog, data_root, renderer.glass_texture());
+    if (std::getenv("HUI_REDUCED_MOTION") || std::getenv("HUI_LARGE_TEXT"))
+    {
+        hui::Settings settings;
+        settings.reduced_motion = std::getenv("HUI_REDUCED_MOTION") != nullptr;
+        settings.large_text = std::getenv("HUI_LARGE_TEXT") != nullptr;
+        hui::save::write_atomic(
+            data_root + "/settings.bin",
+            hui::save::encode(hui::save::Kind::settings, 1, hui::encode_settings(settings)));
+    }
+    const std::string artwork_root = assets + "/artwork";
+    hui::gfx::ArtworkCache artwork(
+        [&](const hui::gfx::ArtworkCache::Pixels &pixels) {
+            return renderer.batch().create_texture(pixels.width, pixels.height, pixels.rgba.data());
+        },
+        [](std::uint32_t handle) { glDeleteTextures(1, &handle); });
+    hui::app::Shell shell(fonts, catalog, data_root, renderer.glass_texture(), &artwork,
+                          artwork_root);
     shell.set_version("host");
 
     constexpr float kDt = 1.0f / 60.0f;
@@ -278,8 +298,10 @@ int main(int argc, char **argv)
             pixels[i] = 255;
         const std::string path = output + "/" + name + ".png";
         ok = stbi_write_png(path.c_str(), width, height, 4, pixels.data(), width * 4) != 0 && ok;
+        const GLenum gl_error = glGetError();
+        ok = ok && gl_error == GL_NO_ERROR;
         std::fprintf(stderr, "wrote %s: %zu shapes, %zu draw calls, GL error 0x%x\n", path.c_str(),
-                     renderer.last_instances(), renderer.last_draw_calls(), glGetError());
+                     renderer.last_instances(), renderer.last_draw_calls(), gl_error);
     };
 
     if (const char *strip = std::getenv("HUI_STRIP"))
@@ -377,8 +399,11 @@ int main(int argc, char **argv)
         return 2;
     }
     long frames = 0;
+    const char *capture_filter = std::getenv("HUI_CAPTURE_FILTER");
+    std::size_t captures = 0;
     while (!tour.finished() && frames < 60 * 60 * 60)
     {
+        const auto frame_start = std::chrono::steady_clock::now();
         const hui::InputFrame input = tour.step(kDt);
         // Nothing is presented here, so the numbers a console would measure
         // are stood in for: 60 Hz with a little jitter and a rare long frame.
@@ -394,14 +419,22 @@ int main(int argc, char **argv)
         ++frames;
         if (!tour.capture().empty())
         {
-            render(tour.capture());
+            if (!capture_filter || tour.capture().find(capture_filter) != std::string::npos)
+            {
+                render(tour.capture());
+                ++captures;
+            }
             tour.capture_done();
         }
         else
         {
             shell.rehearse(); // as on the console, every frame is drawn
         }
+        // Give the real artwork worker the same opportunity to decode as on
+        // the console. A simulated second can otherwise pass in milliseconds.
+        if (std::string_view(shell.concept_at(shell.current()).info().id) == "library")
+            std::this_thread::sleep_until(frame_start + std::chrono::milliseconds(16));
     }
     std::fprintf(stderr, "tour: %ld frames simulated\n", frames);
-    return ok ? 0 : 1;
+    return ok && tour.finished() && (!capture_filter || captures != 0) ? 0 : 1;
 }

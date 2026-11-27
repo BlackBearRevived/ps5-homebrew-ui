@@ -159,4 +159,35 @@ void Transition::end(Canvas &canvas) const
         canvas.list.pop_clip();
 }
 
+void SharedElementTransition::set_bounds(gfx::Rect source, gfx::Rect destination)
+{
+    source_ = source;
+    destination_ = destination;
+}
+
+void SharedElementTransition::set_expanded(bool expanded)
+{
+    expanded_ = expanded;
+    amount_.target = expanded ? 1.0f : 0.0f;
+}
+
+void SharedElementTransition::update(float dt, bool reduced_motion)
+{
+    // Reduced motion uses this same progress for the source/destination dissolve.
+    amount_.update(dt, reduced_motion ? 34.0f : 15.0f);
+}
+
+void SharedElementTransition::reset()
+{
+    expanded_ = false;
+    amount_.snap(0.0f);
+}
+
+gfx::Rect SharedElementTransition::bounds() const
+{
+    const float at = progress();
+    return {tween::lerp(source_.x, destination_.x, at), tween::lerp(source_.y, destination_.y, at),
+            tween::lerp(source_.w, destination_.w, at), tween::lerp(source_.h, destination_.h, at)};
+}
+
 } // namespace hui::ui

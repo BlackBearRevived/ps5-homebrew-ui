@@ -1898,12 +1898,12 @@ class Terminal final : public app::Concept
         int count = 0;
         if (mode_ == Mode::boot)
         {
-            hints[count++] = {ui::Button::cross, "SKIP"};
+            hints[count++] = {ui::Button::confirm, "SKIP"};
         }
         else if (!opened_)
         {
             hints[count++] = {ui::Button::dpad, "SELECT"};
-            hints[count++] = {ui::Button::cross, "OPEN"};
+            hints[count++] = {ui::Button::confirm, "OPEN"};
             hints[count++] = {ui::Button::square, "THEME"};
         }
         else
@@ -1911,36 +1911,36 @@ class Terminal final : public app::Concept
             switch (focus_)
             {
             case kLibrary:
-                hints[count++] = {ui::Button::cross, "MARK"};
+                hints[count++] = {ui::Button::confirm, "MARK"};
                 break;
             case kMessages:
-                hints[count++] = {ui::Button::cross, "FLAG"};
+                hints[count++] = {ui::Button::confirm, "FLAG"};
                 break;
             case kSystem:
                 hints[count++] = {ui::Button::dpad, "WINDOW"};
                 break;
             case kNetwork:
-                hints[count++] = {ui::Button::cross, "PING"};
+                hints[count++] = {ui::Button::confirm, "PING"};
                 break;
             case kDiagnostics:
                 hints[count++] = {ui::Button::dpad, "RATE"};
-                hints[count++] = {ui::Button::cross, hold_ ? "RUN" : "HOLD"};
+                hints[count++] = {ui::Button::confirm, hold_ ? "RUN" : "HOLD"};
                 break;
             case kArchive:
             {
                 int nodes[kNodeCount];
                 const int visible = visible_nodes(nodes);
                 const int node = nodes[std::min(cursor_[kArchive], visible - 1)];
-                hints[count++] = {ui::Button::cross, !kNodes[node].folder ? "TAG"
-                                                     : expanded_[node]    ? "CLOSE"
-                                                                          : "OPEN"};
+                hints[count++] = {ui::Button::confirm, !kNodes[node].folder ? "TAG"
+                                                       : expanded_[node]    ? "CLOSE"
+                                                                            : "OPEN"};
                 break;
             }
             default:
-                hints[count++] = {ui::Button::cross, "CONFIRM"};
+                hints[count++] = {ui::Button::confirm, "CONFIRM"};
                 break;
             }
-            hints[count++] = {ui::Button::circle, focus_ == kShutdown ? "CANCEL" : "MENU"};
+            hints[count++] = {ui::Button::back, focus_ == kShutdown ? "CANCEL" : "MENU"};
             if (focus_ != kShutdown)
                 hints[count++] = {ui::Button::square, "THEME"};
         }
@@ -1949,7 +1949,8 @@ class Terminal final : public app::Concept
         for (int i = 0; i < count; ++i)
             total += 3 + cells(hints[i].label) + (i + 1 < count ? 3 : 0);
         float col = static_cast<float>(kCols - total);
-        const ui::GlyphStyle style = ui::GlyphStyle::mono(s.ink, s.dark);
+        ui::GlyphStyle style = ui::GlyphStyle::mono(s.ink, s.dark);
+        style.swap_confirm = context_.settings.swap_confirm;
         const float cy = s.y(kStatusRow) + kLine * 0.5f;
         for (int i = 0; i < count; ++i)
         {

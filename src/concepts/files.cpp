@@ -2759,9 +2759,9 @@ class Files final : public app::Concept
         layout.cy = bar.cy();
         layout.item_gap = 30;
         const ui::Hint hints[] = {{ui::Button::options, "Copy, move, delete"},
-                                  {ui::Button::circle, "Clear"}};
-        ui::draw_hints(list, fonts, ui::GlyphStyle::dark(), hints, 2, bar.x + bar.w - 24, true,
-                       layout);
+                                  {ui::Button::back, "Clear"}};
+        ui::draw_hints(list, fonts, ui::GlyphStyle::dark(context_.settings.swap_confirm), hints, 2,
+                       bar.x + bar.w - 24, true, layout);
         list.pop_opacity();
     }
 
@@ -3177,7 +3177,7 @@ class Files final : public app::Concept
     void draw_hints(gfx::DrawList &list) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         switch (layer_)
         {
         case Layer::none:
@@ -3185,22 +3185,22 @@ class Files final : public app::Concept
             list.push_opacity(in(8) * (1.0f - tween::clamp01(dim_.value * 2.0f)));
             if (zone_ == Zone::rail)
             {
-                const ui::Hint hints[] = {{ui::Button::cross, "Go to"},
-                                          {ui::Button::circle, "Back to the list"}};
+                const ui::Hint hints[] = {{ui::Button::confirm, "Go to"},
+                                          {ui::Button::back, "Back to the list"}};
                 ui::draw_hints(list, fonts, style, hints, 2, kRight, true);
             }
             else if (rows_.empty())
             {
                 // Nothing to open, mark or act on: only the way out is offered.
-                const ui::Hint hints[] = {{ui::Button::circle, "Up"}, {ui::Button::dpad, "Places"}};
+                const ui::Hint hints[] = {{ui::Button::back, "Up"}, {ui::Button::dpad, "Places"}};
                 ui::draw_hints(list, fonts, style, hints, 2, kRight, true);
             }
             else
             {
                 const bool marking = bar_.target > 0.5f;
                 const ui::Hint hints[] = {
-                    {ui::Button::cross, "Open"},
-                    {ui::Button::circle, marking ? "Clear" : "Up"},
+                    {ui::Button::confirm, "Open"},
+                    {ui::Button::back, marking ? "Clear" : "Up"},
                     {ui::Button::square, "Select"},
                     {ui::Button::triangle, kSortHints[static_cast<int>(sort_)]},
                     {ui::Button::options, "Menu"},
@@ -3214,36 +3214,36 @@ class Files final : public app::Concept
         case Layer::menu:
         case Layer::confirm:
         {
-            const ui::Hint hints[] = {{ui::Button::cross, "Choose"},
-                                      {ui::Button::circle, "Cancel"}};
+            const ui::Hint hints[] = {{ui::Button::confirm, "Choose"},
+                                      {ui::Button::back, "Cancel"}};
             ui::draw_hints(list, fonts, style, hints, 2, kRight, true);
             break;
         }
         case Layer::picker:
         {
-            const ui::Hint hints[] = {{ui::Button::cross, pick_move_ ? "Move here" : "Copy here"},
+            const ui::Hint hints[] = {{ui::Button::confirm, pick_move_ ? "Move here" : "Copy here"},
                                       {ui::Button::l2, "Drive", ui::Button::r2},
-                                      {ui::Button::circle, "Cancel"}};
+                                      {ui::Button::back, "Cancel"}};
             ui::draw_hints(list, fonts, style, hints, 3, kRight, true);
             break;
         }
         case Layer::progress:
         {
-            const ui::Hint hints[] = {{ui::Button::cross, "Cancel"}};
+            const ui::Hint hints[] = {{ui::Button::confirm, "Cancel"}};
             ui::draw_hints(list, fonts, style, hints, 1, kRight, true);
             break;
         }
         case Layer::rename:
         {
             const ui::Hint hints[] = {{ui::Button::dpad, "Suggestion"},
-                                      {ui::Button::cross, "Rename"},
-                                      {ui::Button::circle, "Cancel"}};
+                                      {ui::Button::confirm, "Rename"},
+                                      {ui::Button::back, "Cancel"}};
             ui::draw_hints(list, fonts, style, hints, 3, kRight, true);
             break;
         }
         case Layer::details:
         {
-            const ui::Hint hints[] = {{ui::Button::circle, "Close"}};
+            const ui::Hint hints[] = {{ui::Button::back, "Close"}};
             ui::draw_hints(list, fonts, style, hints, 1, kRight, true);
             break;
         }

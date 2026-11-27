@@ -420,8 +420,8 @@ class Aurora final : public app::Concept
         const Rect play{x, 540, 220, 64};
         list.glow(play, 32, 18, it.accent.with_alpha(0.35f));
         list.rounded_rect(play, 32, kWhite);
-        ui::draw_button(list, fonts, ui::GlyphStyle::light(), ui::Button::cross, play.x + 22,
-                        play.cy(), 34);
+        ui::draw_button(list, fonts, ui::GlyphStyle::light(context_.settings.swap_confirm),
+                        ui::Button::confirm, play.x + 22, play.cy(), 34);
         ui::text(list, fonts.semibold, it.progress > 0.0f ? "Resume" : "Play", play.x + 72,
                  play.cy() + 10, 28, Color::rgb(0x0b0d16));
         const Rect more{x + 240, 540, 64, 64};
@@ -590,16 +590,16 @@ class Aurora final : public app::Concept
     void draw_hints(gfx::DrawList &list) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         if (sheet_open_)
         {
-            const ui::Hint hints[] = {{ui::Button::cross, "Choose"}, {ui::Button::circle, "Back"}};
+            const ui::Hint hints[] = {{ui::Button::confirm, "Choose"}, {ui::Button::back, "Back"}};
             ui::draw_hints(list, fonts, style, hints, 2, 1824, true);
         }
         else
         {
             list.push_opacity(tween::stagger(age_, 8, 0.08f, 0.5f) * (1.0f - sheet_.value));
-            const ui::Hint hints[] = {{ui::Button::cross, "Details"},
+            const ui::Hint hints[] = {{ui::Button::confirm, "Details"},
                                       {ui::Button::triangle, "Favorite"}};
             ui::draw_hints(list, fonts, style, hints, 2, 1824, true);
             list.pop_opacity();

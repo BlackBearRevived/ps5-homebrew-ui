@@ -934,8 +934,8 @@ class CoverFlow final : public app::Concept
         const Rect play = Rect{x, panel.y + 478, 250, 68}.inset(reduced() ? 0.0f : -4.0f * press);
         list.glow(play, 34, 22, it.accent.with_alpha(0.3f + 0.2f * breath + 0.4f * press));
         list.rounded_rect(play, 34, kWhite);
-        ui::draw_button(list, fonts, ui::GlyphStyle::light(), ui::Button::cross, play.x + 24,
-                        play.cy(), 34);
+        ui::draw_button(list, fonts, ui::GlyphStyle::light(context_.settings.swap_confirm),
+                        ui::Button::confirm, play.x + 24, play.cy(), 34);
         const char *verb =
             launch_.running ? "Starting \xE2\x80\xA6" : (it.progress > 0.0f ? "Resume" : "Play");
         ui::text(list, fonts.semibold, verb, play.x + 74, play.cy() + 10, 28, kInk);
@@ -954,12 +954,12 @@ class CoverFlow final : public app::Concept
     void draw_hints(gfx::DrawList &list, float lift) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         if (open_)
         {
-            const ui::Hint hints[] = {{ui::Button::cross, "Play"},
+            const ui::Hint hints[] = {{ui::Button::confirm, "Play"},
                                       {ui::Button::triangle, "Favorite"},
-                                      {ui::Button::circle, "Back"}};
+                                      {ui::Button::back, "Back"}};
             list.push_opacity(tween::clamp01(lift * 2.0f));
             ui::draw_hints(list, fonts, style, hints, 3, 1824, true);
             list.pop_opacity();
@@ -969,7 +969,7 @@ class CoverFlow final : public app::Concept
             const ui::Hint hints[] = {{ui::Button::left_stick, "Spin"},
                                       {ui::Button::dpad, "Step"},
                                       {ui::Button::l2, "Jump", ui::Button::r2},
-                                      {ui::Button::cross, "Open"},
+                                      {ui::Button::confirm, "Open"},
                                       {ui::Button::triangle, "Favorite"}};
             list.push_opacity(tween::stagger(age_, 9, 0.08f, 0.5f) * (1.0f - lift));
             ui::draw_hints(list, fonts, style, hints, 5, 1824, true);

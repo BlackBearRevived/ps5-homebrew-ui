@@ -34,9 +34,12 @@ on a PC (`tools/render-media.sh`), with the same code that runs on the console.
 | 16 | [Satchel](#inventory) | An inventory you handle: lift, carry, swap, stack and equip, with a comparing tooltip | paper | [`inventory.cpp`](../src/concepts/inventory.cpp) |
 | 17 | [Launch Sequence](#boot) | Before the menu: studio splash, title, profiles and an honest loading screen | glass | [`boot.cpp`](../src/concepts/boot.cpp) |
 | 18 | [Control Room](#settings) | A settings screen with real controls: sliders, switches, steppers, a dialog | glass | [`settings.cpp`](../src/concepts/settings.cpp) |
-| 19 | [Theme Lab](#themes) | One screen in thirty design languages: L2 and R2 restyle every widget | glass | [`themes.cpp`](../src/concepts/themes.cpp) |
-| 20 | [Component Library](#components) | Reusable lists, grids, dialogs, forms and indicators, restyled by thirty themes | glass | [`components.cpp`](../src/concepts/components.cpp) |
+| 19 | [Theme Lab](#themes) | One screen across the built-in themes: L2 and R2 restyle every widget | glass | [`themes.cpp`](../src/concepts/themes.cpp) |
+| 20 | [Component Library](#components) | Reusable lists, grids, dialogs, forms and indicators, restyled by the built-in themes | glass | [`components.cpp`](../src/concepts/components.cpp) |
 | 21 | [Toolbox](#toolbox) | The kit on one screen: shapes, type, motion, glyphs and every sound | glass | [`toolbox.cpp`](../src/concepts/toolbox.cpp) |
+| 22 | [Cinema Library](#library) | A large artwork-led library with reversible details | glass | [`library.cpp`](../src/concepts/library.cpp) |
+| 23 | [Transfer Center](#transfers) | Live progress and recovery in the Broadcast theme | glass | [`transfers.cpp`](../src/concepts/transfers.cpp) |
+| 24 | [Field Journal](#journal) | An illustrated field reference with long-form typography | glass | [`journal.cpp`](../src/concepts/journal.cpp) |
 
 <a id="aurora"></a>
 
@@ -661,11 +664,11 @@ Source: [`src/concepts/settings.cpp`](../src/concepts/settings.cpp) &middot; tes
 
 ## 19 &middot; Theme Lab
 
-One screen in thirty design languages: L2 and R2 restyle every widget.
+One screen across the built-in themes: L2 and R2 restyle every widget.
 
 **What it demonstrates**
 
-- ui::Theme: thirty design languages as plain data (colour, shape, depth, type, motion, sound)
+- ui::Theme: design languages as plain data (colour, shape, depth, type, motion, sound)
 - ui::Painter: one widget set drawn in any theme; surfaces built eleven different ways
 - Looks modelled on well-known web frameworks, measured from their own component pages
 - Motion and sound belong to the theme: speed, bounce and sound set change with it
@@ -685,7 +688,7 @@ Source: [`src/concepts/themes.cpp`](../src/concepts/themes.cpp) &middot; tests: 
 
 ## 20 &middot; Component Library
 
-Reusable lists, grids, dialogs, forms and indicators, restyled by thirty themes.
+Reusable lists, grids, dialogs, forms and indicators, restyled by the built-in themes.
 
 <img src="media/designs/components.webp" width="640" alt="Component Library in motion">
 
@@ -694,7 +697,7 @@ Reusable lists, grids, dialogs, forms and indicators, restyled by thirty themes.
 - Components own their focus, motion and sound: a screen places them and reads events
 - One style struct per component: a ui::Theme plus the component's own knobs
 - Slots (std::function) replace parts of a component's drawing with your own
-- Every component drawn in all thirty themes, restyled live without losing state
+- Every component drawn in all built-in themes, restyled live without losing state
 - Page changes slide in the direction of travel; theme changes hide behind a veil
 
 Source: [`src/concepts/components.cpp`](../src/concepts/components.cpp) &middot; tests: [`tests/unit/concepts_test.cpp`](../tests/unit/concepts_test.cpp) &middot; sound set: `glass`
@@ -713,7 +716,19 @@ Source: [`src/concepts/components.cpp`](../src/concepts/components.cpp) &middot;
 <td width="50%" valign="top"><img src="media/designs/components-actions.jpg" alt="Component Library: components-actions"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-app-flows-detail.jpg" alt="Component Library: components-app-flows-detail"></td>
+<td width="50%" valign="top"><img src="media/designs/components-app-flows-filter.jpg" alt="Component Library: components-app-flows-filter"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/components-app-flows-transfer.jpg" alt="Component Library: components-app-flows-transfer"></td>
+<td width="50%" valign="top"><img src="media/designs/components-app-flows.jpg" alt="Component Library: components-app-flows"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/components-broadcast.jpg" alt="Component Library: components-broadcast"></td>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-actions.jpg" alt="Component Library: components-brutal-actions"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/components-brutal-app-flows.jpg" alt="Component Library: components-brutal-app-flows"></td>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-collections.jpg" alt="Component Library: components-brutal-collections"></td>
 </tr>
 <tr>
@@ -742,38 +757,42 @@ Source: [`src/concepts/components.cpp`](../src/concepts/components.cpp) &middot;
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-structure.jpg" alt="Component Library: components-brutal-structure"></td>
+<td width="50%" valign="top"><img src="media/designs/components-cinema.jpg" alt="Component Library: components-cinema"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-classic.jpg" alt="Component Library: components-classic"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-clay.jpg" alt="Component Library: components-clay"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-collections-hero.jpg" alt="Component Library: components-collections-hero"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-collections-paged.jpg" alt="Component Library: components-collections-paged"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-collections-posters.jpg" alt="Component Library: components-collections-posters"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-collections-wheel.jpg" alt="Component Library: components-collections-wheel"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-collections.jpg" alt="Component Library: components-collections"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-data-charts.jpg" alt="Component Library: components-data-charts"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-data-plain.jpg" alt="Component Library: components-data-plain"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-data-range.jpg" alt="Component Library: components-data-range"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-data.jpg" alt="Component Library: components-data"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-entry-flat.jpg" alt="Component Library: components-entry-flat"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-entry-numeric.jpg" alt="Component Library: components-entry-numeric"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-entry-pin.jpg" alt="Component Library: components-entry-pin"></td>
-<td width="50%" valign="top"><img src="media/designs/components-entry-prompt.jpg" alt="Component Library: components-entry-prompt"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-entry-prompt.jpg" alt="Component Library: components-entry-prompt"></td>
 <td width="50%" valign="top"><img src="media/designs/components-entry.jpg" alt="Component Library: components-entry"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/components-field-journal.jpg" alt="Component Library: components-field-journal"></td>
 <td width="50%" valign="top"><img src="media/designs/components-forms-compact.jpg" alt="Component Library: components-forms-compact"></td>
 </tr>
 <tr>
@@ -825,60 +844,64 @@ Source: [`src/concepts/components.cpp`](../src/concepts/components.cpp) &middot;
 <td width="50%" valign="top"><img src="media/designs/components-lists.jpg" alt="Component Library: components-lists"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-media-captions.jpg" alt="Component Library: components-media-captions"></td>
 <td width="50%" valign="top"><img src="media/designs/components-media-compact.jpg" alt="Component Library: components-media-compact"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-media-loading.jpg" alt="Component Library: components-media-loading"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-media-reader.jpg" alt="Component Library: components-media-reader"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-media-zoom.jpg" alt="Component Library: components-media-zoom"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-media.jpg" alt="Component Library: components-media"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-navigation-boxed.jpg" alt="Component Library: components-navigation-boxed"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-navigation-menu.jpg" alt="Component Library: components-navigation-menu"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-navigation-segmented.jpg" alt="Component Library: components-navigation-segmented"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-navigation-underline.jpg" alt="Component Library: components-navigation-underline"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-navigation.jpg" alt="Component Library: components-navigation"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications-accent.jpg" alt="Component Library: components-notifications-accent"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications-center.jpg" alt="Component Library: components-notifications-center"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications-compact.jpg" alt="Component Library: components-notifications-compact"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications-progress.jpg" alt="Component Library: components-notifications-progress"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications-queue.jpg" alt="Component Library: components-notifications-queue"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications.jpg" alt="Component Library: components-notifications"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-overlays-bottom.jpg" alt="Component Library: components-overlays-bottom"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-overlays-compact.jpg" alt="Component Library: components-overlays-compact"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-overlays-sheet.jpg" alt="Component Library: components-overlays-sheet"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-overlays-toasts.jpg" alt="Component Library: components-overlays-toasts"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-overlays.jpg" alt="Component Library: components-overlays"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-paper.jpg" alt="Component Library: components-paper"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pickers-compact.jpg" alt="Component Library: components-pickers-compact"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pickers-hsv.jpg" alt="Component Library: components-pickers-hsv"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pickers-select.jpg" alt="Component Library: components-pickers-select"></td>
-<td width="50%" valign="top"><img src="media/designs/components-pickers.jpg" alt="Component Library: components-pickers"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-pickers.jpg" alt="Component Library: components-pickers"></td>
 <td width="50%" valign="top"><img src="media/designs/components-pico.jpg" alt="Component Library: components-pico"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-actions.jpg" alt="Component Library: components-pixel-actions"></td>
+<td width="50%" valign="top"><img src="media/designs/components-pixel-app-flows.jpg" alt="Component Library: components-pixel-app-flows"></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-collections.jpg" alt="Component Library: components-pixel-collections"></td>
@@ -910,42 +933,45 @@ Source: [`src/concepts/components.cpp`](../src/concepts/components.cpp) &middot;
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-actions.jpg" alt="Component Library: components-sketch-actions"></td>
+<td width="50%" valign="top"><img src="media/designs/components-sketch-app-flows.jpg" alt="Component Library: components-sketch-app-flows"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-collections.jpg" alt="Component Library: components-sketch-collections"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-data.jpg" alt="Component Library: components-sketch-data"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-entry.jpg" alt="Component Library: components-sketch-entry"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-forms.jpg" alt="Component Library: components-sketch-forms"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-game.jpg" alt="Component Library: components-sketch-game"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-indicators.jpg" alt="Component Library: components-sketch-indicators"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-layout.jpg" alt="Component Library: components-sketch-layout"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-lists.jpg" alt="Component Library: components-sketch-lists"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-media.jpg" alt="Component Library: components-sketch-media"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-navigation.jpg" alt="Component Library: components-sketch-navigation"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-notifications.jpg" alt="Component Library: components-sketch-notifications"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-overlays.jpg" alt="Component Library: components-sketch-overlays"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-pickers.jpg" alt="Component Library: components-sketch-pickers"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-structure.jpg" alt="Component Library: components-sketch-structure"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-structure-compact.jpg" alt="Component Library: components-structure-compact"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-structure-quick.jpg" alt="Component Library: components-structure-quick"></td>
-<td width="50%" valign="top"><img src="media/designs/components-structure-radial.jpg" alt="Component Library: components-structure-radial"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-structure-radial.jpg" alt="Component Library: components-structure-radial"></td>
 <td width="50%" valign="top"><img src="media/designs/components-structure-vertical.jpg" alt="Component Library: components-structure-vertical"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-structure.jpg" alt="Component Library: components-structure"></td>
 </tr>
 </table>
@@ -975,6 +1001,101 @@ Source: [`src/concepts/toolbox.cpp`](../src/concepts/toolbox.cpp) &middot; tests
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="media/designs/toolbox-glass-set.jpg" alt="Toolbox: toolbox-glass-set"></td>
+</tr>
+</table>
+
+<a id="library"></a>
+
+## 22 &middot; Cinema Library
+
+A large artwork-led library with reversible details.
+
+**What it demonstrates**
+
+- Stable IDs preserve focus across reordered and filtered shelves
+- The artwork cache decodes JPEG files off the render thread
+- The shared cover can reverse in flight when the player presses Back
+- The hero scrim adapts to the artwork's brightness
+
+Source: [`src/concepts/library.cpp`](../src/concepts/library.cpp) &middot; tests: [`tests/unit/concepts_test.cpp`](../tests/unit/concepts_test.cpp) &middot; sound set: `glass`
+
+<table>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/library.jpg" alt="Cinema Library: library"></td>
+<td width="50%" valign="top"><img src="media/designs/library-bright-detail.jpg" alt="Cinema Library: library-bright-detail"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/library-expanding.jpg" alt="Cinema Library: library-expanding"></td>
+<td width="50%" valign="top"><img src="media/designs/library-filter-restored-1000.jpg" alt="Cinema Library: library-filter-restored-1000"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/library-filtered.jpg" alt="Cinema Library: library-filtered"></td>
+<td width="50%" valign="top"><img src="media/designs/library-missing-cover.jpg" alt="Cinema Library: library-missing-cover"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/library-restored-1000.jpg" alt="Cinema Library: library-restored-1000"></td>
+<td width="50%" valign="top"><img src="media/designs/library-reversing.jpg" alt="Cinema Library: library-reversing"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/library-search.jpg" alt="Cinema Library: library-search"></td>
+<td width="50%" valign="top"><img src="media/designs/library-uncached-browse.jpg" alt="Cinema Library: library-uncached-browse"></td>
+</tr>
+</table>
+
+<a id="transfers"></a>
+
+## 23 &middot; Transfer Center
+
+Live progress and recovery in the Broadcast theme.
+
+**What it demonstrates**
+
+- The queue keeps the same focused task when the service sends new progress
+- An action is sent to the service and waits for its reported state
+- Status symbols and labels accompany color
+
+Source: [`src/concepts/transfers.cpp`](../src/concepts/transfers.cpp) &middot; tests: [`tests/unit/concepts_test.cpp`](../tests/unit/concepts_test.cpp) &middot; sound set: `glass`
+
+<table>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/transfers.jpg" alt="Transfer Center: transfers"></td>
+<td width="50%" valign="top"><img src="media/designs/transfers-active.jpg" alt="Transfer Center: transfers-active"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/transfers-cancel-confirmation.jpg" alt="Transfer Center: transfers-cancel-confirmation"></td>
+<td width="50%" valign="top"><img src="media/designs/transfers-failure.jpg" alt="Transfer Center: transfers-failure"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/transfers-history.jpg" alt="Transfer Center: transfers-history"></td>
+<td width="50%" valign="top"><img src="media/designs/transfers-paused.jpg" alt="Transfer Center: transfers-paused"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/transfers-retry.jpg" alt="Transfer Center: transfers-retry"></td>
+</tr>
+</table>
+
+<a id="journal"></a>
+
+## 24 &middot; Field Journal
+
+An illustrated field reference with long-form typography.
+
+**What it demonstrates**
+
+- The list's focus bar marks the active section in the margin
+- Serif display type and a warm background support longer reading
+- Diagram annotations stay clear when the page is restyled
+
+Source: [`src/concepts/journal.cpp`](../src/concepts/journal.cpp) &middot; tests: [`tests/unit/concepts_test.cpp`](../tests/unit/concepts_test.cpp) &middot; sound set: `glass`
+
+<table>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/journal.jpg" alt="Field Journal: journal"></td>
+<td width="50%" valign="top"><img src="media/designs/journal-basin.jpg" alt="Field Journal: journal-basin"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/journal-observatory.jpg" alt="Field Journal: journal-observatory"></td>
+<td width="50%" valign="top"><img src="media/designs/journal-tide-station.jpg" alt="Field Journal: journal-tide-station"></td>
 </tr>
 </table>
 <!-- END:designs -->

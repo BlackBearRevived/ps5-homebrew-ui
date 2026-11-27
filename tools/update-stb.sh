@@ -20,6 +20,7 @@ resolved=$(git -C "$work/stb" rev-parse HEAD)
 destination="$root/src/third_party/stb"
 mkdir -p "$destination"
 cp "$work/stb/stb_vorbis.c" "$destination/stb_vorbis.inc"
+cp "$work/stb/stb_image.h" "$destination/stb_image.h"
 cp "$work/stb/LICENSE" "$destination/LICENSE"
 echo "$resolved" > "$destination/UPSTREAM"
 echo "stb_vorbis vendored at $resolved"

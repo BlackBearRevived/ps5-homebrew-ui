@@ -121,14 +121,14 @@ constexpr int kRatioCount = static_cast<int>(std::size(kRatioNames));
 
 constexpr ui::Hint kHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Choose"},
+    {ui::Button::confirm, "Choose"},
     {ui::Button::right_stick, "Scroll"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kModalHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Choose"},
-    {ui::Button::circle, "Close"},
+    {ui::Button::confirm, "Choose"},
+    {ui::Button::back, "Close"},
 };
 
 constexpr std::uint32_t kConfirm = action_bit(Action::confirm);

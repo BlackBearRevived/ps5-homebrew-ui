@@ -155,26 +155,26 @@ constexpr int kVariantCount = static_cast<int>(std::size(kVariants));
 
 constexpr ui::Hint kHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Press"},
+    {ui::Button::confirm, "Press"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kMenuHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Choose"},
-    {ui::Button::circle, "Close"},
+    {ui::Button::confirm, "Choose"},
+    {ui::Button::back, "Close"},
 };
 // The tour's hints say what the bubble says: skip, back, next, done.
 constexpr ui::Hint kTourFirst[] = {
-    {ui::Button::cross, "Next"},
-    {ui::Button::circle, "Skip"},
+    {ui::Button::confirm, "Next"},
+    {ui::Button::back, "Skip"},
 };
 constexpr ui::Hint kTourHints[] = {
-    {ui::Button::cross, "Next"},
-    {ui::Button::circle, "Back"},
+    {ui::Button::confirm, "Next"},
+    {ui::Button::back, "Back"},
 };
 constexpr ui::Hint kTourLast[] = {
-    {ui::Button::cross, "Done"},
-    {ui::Button::circle, "Back"},
+    {ui::Button::confirm, "Done"},
+    {ui::Button::back, "Back"},
 };
 
 constexpr std::uint32_t kConfirm = action_bit(Action::confirm);

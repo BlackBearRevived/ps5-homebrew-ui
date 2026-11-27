@@ -1,4 +1,4 @@
-// ps5-homebrew-ui - The thirty built-in themes.
+// ps5-homebrew-ui - The built-in themes.
 // Copyright (C) 2026 BlackBearReloaded
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -11,7 +11,10 @@
 
 #include "ui/theme.hpp"
 
+#include "core/settings.hpp"
+
 #include <array>
+#include <cmath>
 
 namespace hui::ui
 {
@@ -720,7 +723,7 @@ Theme bulma()
     t.on_secondary = rgb(0x363636);
     t.accent = rgb(0x485fc7);
     t.outline = rgb(0xdbdbdb);
-    t.focus = rgb(0x485fc7, 0.3f);
+    t.focus = rgb(0x485fc7, 0.86f);
     t.shadow = rgb(0x0a0a0a, 0.12f);
     t.radius = 10.0f;
     t.radius_card = 19.0f;
@@ -898,45 +901,205 @@ Theme primer()
     return t;
 }
 
+Theme cinema()
+{
+    Theme t = web_dark("cinema", "Cinema", "Artwork-led entertainment",
+                       "Warm white controls and deep scrims over full-width artwork");
+    t.page = rgb(0x0b0b0f);
+    t.backdrop = backdrop(BackdropMode::bokeh, 0x18101a, 0x08090d, 0x4a2932, 0x302639);
+    t.surface = rgb(0x19171b);
+    t.surface_high = rgb(0x302a30);
+    t.text = rgb(0xfff4e7);
+    t.text_muted = rgb(0xccbfc1);
+    t.primary = t.focus = rgb(0xffddaf);
+    t.on_primary = rgb(0x221923);
+    t.shadow = rgb(0x060408, 0.48f);
+    t.shadow_blur = 18.0f;
+    t.shadow_offset = 5.0f;
+    t.secondary = t.surface_high;
+    t.outline = rgb(0x635259);
+    t.accent = rgb(0xffa877);
+    t.heading = FontRole::display;
+    t.style = SurfaceStyle::soft;
+    t.radius = 12.0f;
+    t.radius_card = 18.0f;
+    t.focus_width = 4.0f;
+    t.omega = 20.0f;
+    return t;
+}
+
+Theme field_journal()
+{
+    Theme t = web_light("field-journal", "Field Journal", "Printed reference",
+                        "Warm stock, serif headings and ochre dividers");
+    t.page = rgb(0xeae2cd);
+    t.backdrop = backdrop(BackdropMode::paper, 0xf5eedc, 0xded1b4, 0x100e08);
+    t.surface = rgb(0xfcf5e4);
+    t.surface_high = rgb(0xefe5cc);
+    t.text = rgb(0x2c271e);
+    t.text_muted = rgb(0x635543);
+    t.primary = t.focus = rgb(0x704719);
+    t.accent = rgb(0x936421);
+    t.secondary = t.surface_high;
+    t.on_secondary = t.text;
+    t.outline = rgb(0xaa9470);
+    t.heading = FontRole::serif;
+    t.style = SurfaceStyle::soft;
+    t.shadow = rgb(0x483a25).with_alpha(0.19f);
+    t.shadow_offset = 4.0f;
+    t.shadow_blur = 10.0f;
+    t.label = FontRole::regular;
+    t.radius = t.radius_card = 2.0f;
+    t.omega = 16.0f;
+    return t;
+}
+
+Theme broadcast()
+{
+    Theme t = web_dark("broadcast", "Broadcast", "Live production",
+                       "Navy plates, tabular figures and amber live indicators");
+    t.page = rgb(0x071524);
+    t.backdrop = backdrop(BackdropMode::waves, 0x06131f, 0x10293a, 0x164451, 0x19354b);
+    t.surface = rgb(0x12263c);
+    t.surface_high = rgb(0x203953);
+    t.text = rgb(0xf4f8ff);
+    t.text_muted = rgb(0xb6c9de);
+    t.primary = t.accent = rgb(0xffc45e);
+    t.shadow = rgb(0x020b12, 0.44f);
+    t.shadow_blur = 14.0f;
+    t.shadow_offset = 5.0f;
+    t.on_primary = rgb(0x1b201e);
+    t.focus = rgb(0x8fdcff);
+    t.outline = rgb(0x476984);
+    t.label = FontRole::mono;
+    t.style = SurfaceStyle::soft;
+    t.border = 1.5f;
+    t.corner = Corner::chamfer;
+    t.radius = 6.0f;
+    t.radius_card = 10.0f;
+    t.omega = 23.0f;
+    return t;
+}
+
 } // namespace
+
+float text_contrast(Color ink, Color background)
+{
+    const auto luminance = [](Color color)
+    {
+        const auto linear = [](float value)
+        { return value <= 0.04045f ? value / 12.92f : std::pow((value + 0.055f) / 1.055f, 2.4f); };
+        return 0.2126f * linear(color.r) + 0.7152f * linear(color.g) + 0.0722f * linear(color.b);
+    };
+    const float foreground = luminance(gfx::mix(background, ink, ink.a));
+    const float base = luminance(background);
+    return (std::max(foreground, base) + 0.05f) / (std::min(foreground, base) + 0.05f);
+}
+
+Color readable_ink(Color ink, Color background, float minimum)
+{
+    if (text_contrast(ink, background) >= minimum)
+        return ink;
+    const Color black = Color::rgb(0x000000);
+    const Color white = Color::rgb(0xffffff);
+    const Color target =
+        text_contrast(black, background) > text_contrast(white, background) ? black : white;
+    float low = 0.0f;
+    float high = 1.0f;
+    for (int i = 0; i < 12; ++i)
+    {
+        const float middle = (low + high) * 0.5f;
+        if (text_contrast(gfx::mix(ink, target, middle), background) < minimum)
+            low = middle;
+        else
+            high = middle;
+    }
+    return gfx::mix(ink, target, high);
+}
 
 std::span<const Theme> themes()
 {
-    static const std::array<Theme, 30> kThemes = {
-        // Design languages.
-        acrylic(),
-        brutal(),
-        clay(),
-        tiles(),
-        gloss(),
-        classic(),
-        blueprint(),
-        hazard(),
-        candy(),
-        contrast(),
-        // Modelled on web frameworks.
-        pixel(),
-        mantine(),
-        daisy(),
-        pico(),
-        ant(),
-        chakra(),
-        nuxt(),
-        shoelace(),
-        propeller(),
-        semantic(),
-        bootstrap(),
-        preline(),
-        flowbite(),
-        bulma(),
-        uikit(),
-        materialize(),
-        foundation(),
-        papercss(),
-        milligram(),
-        primer(),
-    };
+    static const auto kThemes = []
+    {
+        std::array result = {
+            // Design languages.
+            acrylic(),
+            brutal(),
+            clay(),
+            tiles(),
+            gloss(),
+            classic(),
+            blueprint(),
+            hazard(),
+            candy(),
+            contrast(),
+            // Modelled on web frameworks.
+            pixel(),
+            mantine(),
+            daisy(),
+            pico(),
+            ant(),
+            chakra(),
+            nuxt(),
+            shoelace(),
+            propeller(),
+            semantic(),
+            bootstrap(),
+            preline(),
+            flowbite(),
+            bulma(),
+            uikit(),
+            materialize(),
+            foundation(),
+            papercss(),
+            milligram(),
+            primer(),
+            cinema(),
+            field_journal(),
+            broadcast(),
+        };
+        for (Theme &theme : result)
+        {
+            const Color base = gfx::mix(theme.page, theme.surface, theme.surface.a);
+            const Color primary = gfx::mix(base, theme.primary, theme.primary.a);
+            theme.on_primary = readable_ink(theme.on_primary, primary);
+            theme.text_muted = readable_ink(theme.text_muted, base);
+        }
+        return result;
+    }();
     return kThemes;
+}
+
+const Theme *find_theme(std::string_view id)
+{
+    for (const Theme &theme : themes())
+    {
+        if (theme.id == id)
+            return &theme;
+    }
+    return nullptr;
+}
+
+Theme with_legibility(Theme theme, const Settings &settings)
+{
+    theme.text_scale = settings.large_text ? 1.24f : 1.0f;
+    theme.solid_surfaces = settings.reduce_transparency;
+    theme.strong_focus = settings.strong_focus;
+    if (theme.solid_surfaces)
+    {
+        theme.surface = gfx::mix(theme.page, theme.surface, theme.surface.a);
+        theme.surface.a = 1.0f;
+        theme.surface_high = gfx::mix(theme.surface, theme.surface_high, theme.surface_high.a);
+        theme.surface_high.a = 1.0f;
+    }
+    if (theme.strong_focus)
+    {
+        theme.focus.a = 1.0f;
+        theme.focus = readable_ink(theme.focus, theme.page, 3.0f);
+        theme.focus_width = std::max(theme.focus_width, 5.0f);
+        theme.focus_gap = std::max(theme.focus_gap, 4.0f);
+    }
+    return theme;
 }
 
 } // namespace hui::ui

@@ -122,7 +122,7 @@ constexpr int kVariantCount = static_cast<int>(std::size(kVariants));
 
 constexpr ui::Hint kHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Press"},
+    {ui::Button::confirm, "Press"},
     {ui::Button::square, "Variant"},
 };
 

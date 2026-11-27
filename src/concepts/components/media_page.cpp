@@ -13,7 +13,7 @@
 // and R2 turn the gallery's pages, so Triangle steps the zoom instead.
 
 #include "concepts/components/page.hpp"
-
+#include "ui/components/caption_tracks.hpp"
 #include "ui/components/image_viewer.hpp"
 #include "ui/components/loading_screen.hpp"
 #include "ui/components/media_controls.hpp"
@@ -102,42 +102,47 @@ constexpr ui::Hint kTextHints[] = {
 };
 constexpr ui::Hint kViewerHints[] = {
     {ui::Button::dpad, "Browse"},
-    {ui::Button::cross, "Fit / fill"},
+    {ui::Button::confirm, "Fit / fill"},
     {ui::Button::triangle, "Zoom"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kZoomHints[] = {
     {ui::Button::left_stick, "Pan"},
     {ui::Button::triangle, "Zoom"},
-    {ui::Button::circle, "Fit"},
+    {ui::Button::back, "Fit"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kLaunchHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Open"},
+    {ui::Button::confirm, "Open"},
     {ui::Button::square, "Variant"},
 };
+constexpr ui::Hint kTrackHints[] = {
+    {ui::Button::dpad, "Change"},
+    {ui::Button::back, "Back"},
+};
 constexpr ui::Hint kControlsHints[] = {
+    {ui::Button::left_stick, "Tracks"},
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Select"},
+    {ui::Button::confirm, "Select"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kScrubHints[] = {
     {ui::Button::dpad, "Seek"},
-    {ui::Button::cross, "Play / pause"},
+    {ui::Button::confirm, "Play / pause"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kVolumeHints[] = {
     {ui::Button::dpad, "Volume"},
-    {ui::Button::cross, "Done"},
+    {ui::Button::confirm, "Done"},
 };
 constexpr ui::Hint kLoadingHints[] = {
     {ui::Button::dpad, "Tips"},
-    {ui::Button::circle, "Cancel"},
+    {ui::Button::back, "Cancel"},
 };
 constexpr ui::Hint kReadyHints[] = {
     {ui::Button::dpad, "Tips"},
-    {ui::Button::cross, "Continue"},
+    {ui::Button::confirm, "Continue"},
 };
 
 constexpr app::TourStep kTour[] = {
@@ -155,6 +160,10 @@ constexpr app::TourStep kTour[] = {
     {0.3f, 0, Direction::down},
     {0.4f, action_bit(Action::west)},
     {0.9f, action_bit(Action::west), Direction::none, "media-compact"},
+    {0.35f, action_bit(Action::l3)},
+    {0.65f, 0, Direction::down, "media-captions"},
+    {0.3f, 0, Direction::right},
+    {0.4f, action_bit(Action::back)},
     {0.5f, 0, Direction::up},
     {0.3f, 0, Direction::right},
     {0.25f, 0, Direction::right},
@@ -236,6 +245,8 @@ const char *command_name(ui::MediaCommand command)
         return "repeat";
     case ui::MediaCommand::volume:
         return "volume";
+    case ui::MediaCommand::tracks:
+        return "tracks";
     case ui::MediaCommand::mute:
         return "mute";
     case ui::MediaCommand::none:
@@ -379,13 +390,16 @@ class MediaPage final : public Page
     void enter() override
     {
         loader_.hide();
+        tracks_.dismiss(controls_);
         status_.clear();
     }
 
     void update(const InputFrame &input, float dt, ui::Feedback &feedback) override
     {
         clock_ += dt;
-        if (loader_.is_open())
+        if (tracks_.is_open())
+            tracks_.handle(controls_, input, feedback);
+        else if (loader_.is_open())
             update_loader(input, dt, feedback);
         else if (input.is_pressed(Action::west))
         {
@@ -426,6 +440,7 @@ class MediaPage final : public Page
         text_.update(dt);
         viewer_.update(dt);
         controls_.update(dt);
+        tracks_.update(dt);
         loader_.update(dt);
         launch_focus_.target = area_ == Area::launch ? 1.0f : 0.0f;
         launch_focus_.update(dt, 18.0f);
@@ -468,10 +483,13 @@ class MediaPage final : public Page
     void draw_modal(ui::Canvas &canvas) const override
     {
         loader_.draw(canvas);
+        tracks_.draw(canvas);
     }
 
     std::span<const ui::Hint> hints() const override
     {
+        if (tracks_.is_open())
+            return kTrackHints;
         if (loader_.is_open())
         {
             if (loader_.ready())
@@ -543,6 +561,10 @@ class MediaPage final : public Page
         ui::ImageViewerStyle viewer;
         ui::MediaControlsStyle controls;
         ui::LoadingScreenStyle loader;
+        controls.tracks_action = Action::l3;
+        tracks_.style.theme = theme_;
+        tracks_.style.reduced_motion = reduced_;
+        tracks_.set_tracks({"Original stereo", "Commentary"}, {"English", "French"});
         text.theme = viewer.theme = controls.theme = loader.theme = theme_;
         text.reduced_motion = viewer.reduced_motion = reduced_;
         controls.reduced_motion = loader.reduced_motion = reduced_;
@@ -753,6 +775,9 @@ class MediaPage final : public Page
         case ui::MediaCommand::play:
             playing_ = true;
             break;
+        case ui::MediaCommand::tracks:
+            tracks_.open(controls_, tracks_.options(), feedback);
+            break;
         case ui::MediaCommand::pause:
             playing_ = false;
             break;
@@ -804,6 +829,7 @@ class MediaPage final : public Page
     ui::TextView text_;
     ui::ImageViewer viewer_;
     ui::MediaControls controls_;
+    ui::CaptionTrackPicker tracks_;
     ui::LoadingScreen loader_;
     Area area_ = Area::text;
     Area right_area_ = Area::viewer; // where "right" from the article returns to

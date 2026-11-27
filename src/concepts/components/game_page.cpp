@@ -80,34 +80,34 @@ constexpr int kVariantCount = static_cast<int>(std::size(kVariants));
 
 constexpr ui::Hint kHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Open"},
+    {ui::Button::confirm, "Open"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kPauseHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Choose"},
-    {ui::Button::circle, "Resume"},
+    {ui::Button::confirm, "Choose"},
+    {ui::Button::back, "Resume"},
 };
 constexpr ui::Hint kProfileHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Play"},
-    {ui::Button::circle, "Close"},
+    {ui::Button::confirm, "Play"},
+    {ui::Button::back, "Close"},
 };
 constexpr ui::Hint kBagHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Lift"},
+    {ui::Button::confirm, "Lift"},
     {ui::Button::triangle, "Filter"},
-    {ui::Button::circle, "Back"},
+    {ui::Button::back, "Back"},
 };
 constexpr ui::Hint kCarryHints[] = {
     {ui::Button::dpad, "Carry"},
-    {ui::Button::cross, "Set down"},
-    {ui::Button::circle, "Put back"},
+    {ui::Button::confirm, "Set down"},
+    {ui::Button::back, "Put back"},
 };
 constexpr ui::Hint kTreeHints[] = {
     {ui::Button::dpad, "Move"},
-    {ui::Button::cross, "Learn"},
-    {ui::Button::circle, "Back"},
+    {ui::Button::confirm, "Learn"},
+    {ui::Button::back, "Back"},
 };
 
 constexpr std::uint32_t kConfirm = action_bit(Action::confirm);

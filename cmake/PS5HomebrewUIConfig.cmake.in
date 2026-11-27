@@ -1,0 +1,15 @@
+# ps5-homebrew-ui - Find the dependencies of the installed library.
+# Copyright (C) 2026 BlackBearReloaded
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+find_dependency(Threads)
+if(@HUI_USE_PS5_OPENGL@)
+    find_dependency(PS5OpenGL CONFIG)
+else()
+    find_dependency(OpenGL)
+endif()
+set_and_check(PS5HomebrewUI_ASSET_DIR "@PACKAGE_CMAKE_INSTALL_DATADIR@/ps5-homebrew-ui")
+include("${CMAKE_CURRENT_LIST_DIR}/PS5HomebrewUITargets.cmake")
+check_required_components(PS5HomebrewUI)

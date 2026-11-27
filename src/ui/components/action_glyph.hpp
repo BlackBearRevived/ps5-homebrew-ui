@@ -17,46 +17,6 @@
 namespace hui::ui
 {
 
-// The button an action is on. Confirm and back are Cross and Circle unless
-// the player swapped them (pass the setting).
-inline Button button_for(Action action, bool swap_confirm = false)
-{
-    switch (action)
-    {
-    case Action::up:
-    case Action::down:
-    case Action::left:
-    case Action::right:
-        return Button::dpad;
-    case Action::confirm:
-        return swap_confirm ? Button::circle : Button::cross;
-    case Action::back:
-        return swap_confirm ? Button::cross : Button::circle;
-    case Action::north:
-        return Button::triangle;
-    case Action::west:
-        return Button::square;
-    case Action::page_prev:
-        return Button::l1;
-    case Action::page_next:
-        return Button::r1;
-    case Action::jump_prev:
-        return Button::l2;
-    case Action::jump_next:
-        return Button::r2;
-    case Action::menu:
-        return Button::options;
-    case Action::touch:
-        return Button::touchpad;
-    case Action::l3:
-        return Button::left_stick;
-    case Action::r3:
-        return Button::right_stick;
-    default:
-        return Button::none;
-    }
-}
-
 // The glyph colours that suit a theme's page.
 inline GlyphStyle glyph_style_for(const Theme &theme)
 {

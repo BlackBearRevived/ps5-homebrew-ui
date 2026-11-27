@@ -172,6 +172,8 @@ Before a screen is done:
 - [ ] Everything readable sits inside the safe area; body text is at least 24.
 - [ ] Exactly one focused element, findable at a glance, with a gliding
       highlight.
+- [ ] From a sofa, the selected item, its name and its next controller action
+      are easy to pick out. Check the first and last cards after changing pages.
 - [ ] The screen assembles with a staggered entrance; `enter()` restarts it.
 - [ ] Focus moves, opens, closes and refusals each have a cue; focus sounds
       are panned.
@@ -180,6 +182,8 @@ Before a screen is done:
 - [ ] Overlays use glass, dim the scene behind and have their own hints.
 - [ ] `reduced_motion` is honoured.
 - [ ] Text cannot overflow its space.
+- [ ] In Large Text, the longest entry ends above the next panel or chart,
+      and a status label leaves the selected item's name readable.
 - [ ] A hint row shows what every used button does.
 - [ ] `draw()` changes no state; all motion is driven by `dt` in `update()`.
 - [ ] The design's `tour()` shows its best states, and the snapshots look

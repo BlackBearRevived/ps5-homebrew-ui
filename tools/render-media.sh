@@ -3,7 +3,7 @@
 # Copyright (C) 2026 BlackBearReloaded
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# usage: tools/render-media.sh [pictures|clips|all]
+# usage: tools/render-media.sh [pictures|clips|all] [design ids for pictures]
 #
 # Everything under docs/media is produced by the app itself, running its tour
 # on the PC (see tools/host-snapshots.sh):
@@ -17,24 +17,35 @@
 set -euo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 what=${1:-all}
+if (( $# > 0 )); then shift; fi
+if (( $# > 0 )) && [[ $what != pictures ]]; then
+    echo "Design IDs are only supported for pictures" >&2
+    exit 2
+fi
 media="$root/docs/media"
 work="$root/build/media"
 mkdir -p "$media/designs" "$media/themes" "$work"
 
 if [[ $what == pictures || $what == all ]]; then
     rm -rf "$work/pictures"
-    bash "$root/tools/host-snapshots.sh" "$work/pictures" all >/dev/null
-    python3 - "$work/pictures" "$media" <<'PY'
+    for design in "${@:-all}"; do
+        bash "$root/tools/host-snapshots.sh" "$work/pictures" "$design" >/dev/null
+    done
+    python3 - "$work/pictures" "$media" "$@" <<'PY'
 import sys
 from pathlib import Path
 from PIL import Image
 
 source, media = Path(sys.argv[1]), Path(sys.argv[2])
-for old in list((media / "designs").glob("*.jpg")) + list((media / "themes").glob("*.jpg")):
-    old.unlink()
+designs = sys.argv[3:]
+if not designs or "all" in designs:
+    for old in list((media / "designs").glob("*.jpg")) + list((media / "themes").glob("*.jpg")):
+        old.unlink()
 count = 0
 for path in sorted(source.glob("[0-9][0-9]-*.png")):
     name = path.stem[3:]                      # drop the "NN-" order prefix
+    if name.startswith("components-matrix-"):
+        continue
     if name.startswith("themes-") and name != "themes-dialog":
         target = media / "themes" / (name[len("themes-"):] + ".jpg")
     else:

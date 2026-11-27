@@ -2851,40 +2851,40 @@ class Inventory final : public app::Concept
             switch (verdict())
             {
             case Verdict::set_down:
-                add(ui::Button::cross, "Set down here");
+                add(ui::Button::confirm, "Set down here");
                 break;
             case Verdict::swap:
-                add(ui::Button::cross, "Swap the two");
+                add(ui::Button::confirm, "Swap the two");
                 break;
             case Verdict::merge:
-                add(ui::Button::cross, "Add to this stack");
+                add(ui::Button::confirm, "Add to this stack");
                 break;
             case Verdict::equip:
-                add(ui::Button::cross, "Equip");
+                add(ui::Button::confirm, "Equip");
                 break;
             case Verdict::wrong_slot:
-                add(ui::Button::cross, "Does not belong here", true);
+                add(ui::Button::confirm, "Does not belong here", true);
                 break;
             case Verdict::wrong_tab:
-                add(ui::Button::cross, "Not in this view", true);
+                add(ui::Button::confirm, "Not in this view", true);
                 break;
             case Verdict::no_room:
-                add(ui::Button::cross, "The bag is full", true);
+                add(ui::Button::confirm, "The bag is full", true);
                 break;
             case Verdict::stack_full:
-                add(ui::Button::cross, "Stack is full", true);
+                add(ui::Button::confirm, "Stack is full", true);
                 break;
             case Verdict::nothing:
                 break;
             }
-            add(ui::Button::circle, "Put it back");
+            add(ui::Button::back, "Put it back");
             return count;
         }
         const int item = stack_at(focus_);
         if (item < 0)
             return 0;
         const ItemDef &def = def_of(stack(item));
-        add(ui::Button::cross, "Lift and carry");
+        add(ui::Button::confirm, "Lift and carry");
         if (focus_.worn)
         {
             add(ui::Button::triangle, "Take off");
@@ -3152,7 +3152,7 @@ class Inventory final : public app::Concept
         if (menu > 0.5f)
         {
             list.push_opacity((menu - 0.5f) * 2.0f);
-            const ui::Hint hints[] = {{ui::Button::cross, "Sort"}, {ui::Button::circle, "Close"}};
+            const ui::Hint hints[] = {{ui::Button::confirm, "Sort"}, {ui::Button::back, "Close"}};
             ui::draw_hints(list, fonts, style, hints, 2, 1824, true);
             list.pop_opacity();
             return;
@@ -3163,12 +3163,12 @@ class Inventory final : public app::Concept
         if (held_ >= 0)
         {
             const Verdict what = verdict();
-            hints[count++] = {ui::Button::cross, is_refusal(what)         ? "Not here"
-                                                 : what == Verdict::equip ? "Equip"
-                                                 : what == Verdict::swap  ? "Swap"
-                                                 : what == Verdict::merge ? "Stack"
-                                                                          : "Set down"};
-            hints[count++] = {ui::Button::circle, "Put back"};
+            hints[count++] = {ui::Button::confirm, is_refusal(what)         ? "Not here"
+                                                   : what == Verdict::equip ? "Equip"
+                                                   : what == Verdict::swap  ? "Swap"
+                                                   : what == Verdict::merge ? "Stack"
+                                                                            : "Set down"};
+            hints[count++] = {ui::Button::back, "Put back"};
             hints[count++] = {ui::Button::l2, "Category", ui::Button::r2};
         }
         else
@@ -3177,7 +3177,7 @@ class Inventory final : public app::Concept
             if (item >= 0)
             {
                 const ItemDef &def = def_of(stack(item));
-                hints[count++] = {ui::Button::cross, "Lift"};
+                hints[count++] = {ui::Button::confirm, "Lift"};
                 if (focus_.worn)
                     hints[count++] = {ui::Button::triangle, "Take off"};
                 else if (def.wear != Wear::none)

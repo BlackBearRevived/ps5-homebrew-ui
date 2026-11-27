@@ -803,7 +803,7 @@ class Paper final : public app::Concept
         rise = reduced ? 0.0f : 14.0f * (1.0f - in);
         list.push_opacity(in);
         list.push_transform(1.0f, 0, 0, 0, -rise);
-        const ui::GlyphStyle glyphs = ui::GlyphStyle::dark();
+        const ui::GlyphStyle glyphs = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         const float chip_cy = kChipY + kChipH * 0.5f;
         ui::draw_button(list, fonts, glyphs, ui::Button::l2, kMargin, chip_cy, kShoulder);
         const Rect last = chip_rect(kFilters - 1);
@@ -1091,8 +1091,8 @@ class Paper final : public app::Concept
             float x = note.cx() - (before_w + after_w + glyph_w + 2 * gap) * 0.5f;
             ui::text(list, fonts.regular, before, x, line, 26, kInkMuted);
             x += before_w + gap;
-            ui::draw_button(list, fonts, ui::GlyphStyle::light(), ui::Button::triangle, x, line - 9,
-                            36);
+            ui::draw_button(list, fonts, ui::GlyphStyle::light(context_.settings.swap_confirm),
+                            ui::Button::triangle, x, line - 9, 36);
             x += glyph_w + gap;
             ui::text(list, fonts.regular, after, x, line, 26, kInkMuted);
         }
@@ -1318,12 +1318,12 @@ class Paper final : public app::Concept
     void draw_hints(gfx::DrawList &list) const
     {
         const ui::Fonts &fonts = context_.fonts;
-        const ui::GlyphStyle style = ui::GlyphStyle::dark();
+        const ui::GlyphStyle style = ui::GlyphStyle::dark(context_.settings.swap_confirm);
         if (dialog_open_)
         {
             const ui::Hint hints[] = {{ui::Button::dpad, "Actions"},
-                                      {ui::Button::cross, "Choose"},
-                                      {ui::Button::circle, "Back"}};
+                                      {ui::Button::confirm, "Choose"},
+                                      {ui::Button::back, "Back"}};
             list.push_opacity(dialog_.value);
             ui::draw_hints(list, fonts, style, hints, 3, kRight, true);
             list.pop_opacity();
@@ -1336,7 +1336,7 @@ class Paper final : public app::Concept
             const ui::Hint hints[] = {{ui::Button::l2, "Filter", ui::Button::r2},
                                       {ui::Button::square, "Sort"},
                                       {ui::Button::triangle, "Favorite"},
-                                      {ui::Button::cross, "Details"}};
+                                      {ui::Button::confirm, "Details"}};
             list.push_opacity(in * (1.0f - empty_.value));
             ui::draw_hints(list, fonts, style, hints, 4, kRight, true);
             list.pop_opacity();

@@ -600,6 +600,12 @@ Event MediaControls::handle(const InputFrame &input, Feedback &feedback)
     }
 
     const float x = focus_rect(g).cx();
+    if (style.tracks_action != Action::count && input.is_pressed(style.tracks_action))
+    {
+        command_ = MediaCommand::tracks;
+        play_cue(feedback, style, style.sounds.activate, x);
+        return Event::activated;
+    }
     const auto leave = [&](Direction edge)
     {
         if (style.exits.allows(edge))

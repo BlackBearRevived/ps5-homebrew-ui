@@ -53,6 +53,47 @@ TEST_F(ComponentsList, FocusSkipsHeaders)
     EXPECT_EQ(list_view_.focus(), 1);
 }
 
+TEST_F(ComponentsList, RestoreSkipsHeadersAndHandlesSectionOnlyLists)
+{
+    list_view_.set_focus(0);
+    EXPECT_EQ(list_view_.focus(), 1);
+    ListItem header;
+    header.header = true;
+    ListItem row;
+    row.title = "Title";
+    list_view_.set_items({row, header});
+    list_view_.set_focus(1);
+    EXPECT_EQ(list_view_.focus(), 0);
+    list_view_.set_items({header, header});
+    EXPECT_EQ(list_view_.focus(), -1);
+    EXPECT_EQ(send(press(Action::confirm)), Event::none);
+    EXPECT_EQ(send(press(Action::back)), Event::cancelled);
+}
+
+TEST_F(ComponentsList, DeepRestoreDrawsTheFocusBeforeTheEntranceAndUpdatesTheLayout)
+{
+    list_view_.set_items(std::vector<ListItem>(1001));
+    list_view_.set_focus(1000);
+    list_view_.enter();
+    std::vector<int> drawn;
+    list_view_.content = [&](auto &, auto &, auto &, int index, float) { drawn.push_back(index); };
+    auto target = canvas();
+    list_view_.draw(target);
+    EXPECT_EQ(drawn, std::vector<int>({1000}));
+
+    list_view_.style.row_height = 120.0f;
+    list_view_.update(1.0f);
+    const auto focused = list_view_.row_rect(1000);
+    EXPECT_FLOAT_EQ(focused.y - list_view_.row_rect(999).y, 126.0f);
+    EXPECT_GE(focused.y, 100.0f);
+    EXPECT_LE(focused.y + focused.h, 300.0f);
+    drawn.clear();
+    list_view_.draw(target);
+    ASSERT_FALSE(drawn.empty());
+    EXPECT_GE(drawn.front(), 998);
+    EXPECT_EQ(drawn.back(), 1000);
+}
+
 TEST_F(ComponentsList, MovesAndPlaysTheMoveCue)
 {
     EXPECT_EQ(send(nav(Direction::down)), Event::moved);

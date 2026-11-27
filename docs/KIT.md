@@ -11,7 +11,7 @@ and commented; read them when you need exact signatures.
 | Frame composition and frosted glass | `gfx/renderer.hpp` |
 | Fonts and text helpers | `ui/fonts.hpp`, `gfx/font.hpp` |
 | Controller glyphs and hint rows | `ui/glyphs.hpp` |
-| Standard widgets in thirty themes | `ui/theme.hpp`, `ui/widgets.hpp` ([THEMES.md](THEMES.md)) |
+| Standard widgets in the built-in themes | `ui/theme.hpp`, `ui/widgets.hpp` ([THEMES.md](THEMES.md)) |
 | Whole components: lists, grids, dialogs, forms, indicators | `ui/components.hpp` ([COMPONENTS.md](COMPONENTS.md)) |
 | Sounds and rumble a screen asks for | `ui/feedback.hpp` |
 | Hard-edged bitmap text | `ui/pixel_font.hpp` |
@@ -103,7 +103,7 @@ fonts.regular.font->wrap(text, 24, width);    // lines
 ui::upper("Continue playing");                // ASCII capitals for tracked labels
 ```
 
-`context.fonts` holds six faces:
+`context.fonts` holds seven faces:
 
 | Member | Face | Use |
 | --- | --- | --- |
@@ -113,11 +113,12 @@ ui::upper("Continue playing");                // ASCII capitals for tracked labe
 | `mono` | DejaVu Sans Mono | Changing numbers, code, terminals |
 | `pixel` | Press Start 2P | An 8 x 8 bitmap face; use sizes that are multiples of 8 (or 4) so its pixels stay square |
 | `hand` | Patrick Hand | Handwriting, for sketched or playful screens |
+| `serif` | DejaVu Serif | Editorial headings for Field Journal |
 
 Text is positioned by its **baseline**. Fonts are baked signed-distance
 fields: any size is sharp, and one atlas per face is all the memory they use.
-The atlases sit on texture units of their own (up to `gfx::kFontSlots`, six), so text never interrupts
-a run of shapes: a screen full of mixed text and shapes is one draw call.
+The first six atlases use dedicated texture units and stay in the shape batch.
+Extra faces use the ordinary texture unit and may start a new draw call.
 The glyph set is printable ASCII plus `· × © ° – — • … ← ↑ → ↓ ✓` (and, in
 DejaVu Sans Mono, `█ ● ▲ ▶ ▼ ◀`); a face that lacks a symbol simply skips it,
 and curly quotes are not baked at all. Check `font->has_glyph(codepoint)` before

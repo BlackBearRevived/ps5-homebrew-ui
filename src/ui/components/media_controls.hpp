@@ -30,6 +30,7 @@ enum class MediaCommand : std::uint8_t
     repeat,   // changed: read repeat()
     volume,   // changed: read volume()
     mute,     // changed: read muted()
+    tracks,   // activated: open a CaptionTrackPicker
 };
 
 // The things the focus can be on.
@@ -73,6 +74,7 @@ struct MediaChapter
 
 struct MediaControlsStyle : ComponentStyle
 {
+    Action tracks_action = Action::count; // optional shortcut to the audio and caption picker
     MediaLayout layout = MediaLayout::full;
     MediaButtons buttons = MediaButtons::surface;
     // ---- geometry ----
