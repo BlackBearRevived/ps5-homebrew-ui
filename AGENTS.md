@@ -11,7 +11,7 @@ A C++20 UI library for PS5 homebrew using OpenGL 4.6. Homebrew UI Lab is the
 native app that demonstrates its themes, widgets and complete screens.
 
 <!-- BEGIN:counts -->
-Right now: **25 designs**, **33 themes**, **104 components**.
+Right now: **26 designs**, **34 themes**, **106 components**.
 <!-- END:counts -->
 
 It has four levels. Enter at the highest one that does the job:

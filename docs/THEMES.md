@@ -148,6 +148,7 @@ asset is used, and the names of those projects belong to their owners.
 | 31 | [Cinema](#cinema) | Artwork-led entertainment | Warm white controls and deep scrims over full-width artwork |
 | 32 | [Field Journal](#field-journal) | Printed reference | Warm stock, serif headings and ochre dividers |
 | 33 | [Broadcast](#broadcast) | Live production | Navy plates, tabular figures and amber live indicators |
+| 34 | [Screenprint](#screenprint) | Two-ink poster | Vermilion ink, warm paper and offset midnight shadows |
 
 <a id="acrylic"></a>
 
@@ -575,6 +576,18 @@ asset is used, and the names of those projects belong to their owners.
 <tr>
 <td width="50%" valign="top"><img src="media/themes/broadcast.jpg" alt="Broadcast"></td>
 <td width="50%" valign="top"><img src="media/themes/broadcast.webp" alt="Broadcast in motion"></td>
+</tr>
+</table>
+
+<a id="screenprint"></a>
+
+### 34 &middot; Screenprint
+
+*Two-ink poster.* Vermilion ink, warm paper and offset midnight shadows. Theme id `screenprint`.
+
+<table>
+<tr>
+<td width="100%" valign="top"><img src="media/themes/screenprint.jpg" alt="Screenprint"></td>
 </tr>
 </table>
 <!-- END:themes -->

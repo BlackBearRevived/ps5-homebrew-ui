@@ -24,6 +24,15 @@ TEST_F(HomeTest, SelectedThemeSurvivesHandoffBackAndRelaunch)
     const auto current = [&]()
     { return std::string_view(shell.concept_at(shell.current()).info().id); };
     EXPECT_EQ(current(), "home");
+    EXPECT_EQ(shell.current(), 0u);
+    shell.update(press(Action::page_next), 0.016f);
+    EXPECT_EQ(current(), "aurora");
+    shell.update(press(Action::page_prev), 0.016f);
+    EXPECT_EQ(current(), "home");
+    shell.update(press(Action::page_prev), 0.016f);
+    EXPECT_EQ(current(), "chapters");
+    shell.update(press(Action::page_next), 0.016f);
+    EXPECT_EQ(current(), "home");
     shell.update(press(Action::jump_next), 0.016f);
     EXPECT_EQ(shell.settings().theme_id, ui::themes()[1].id);
     shell.update(press(Action::confirm), 0.016f);
@@ -75,11 +84,31 @@ TEST_F(HomeTest, OlderSavesUseAcrylicAndPreserveGalleryAndAccessibilityPreferenc
     Settings read;
     ASSERT_TRUE(decode_settings(legacy, &read));
     EXPECT_TRUE(read.large_text);
-    EXPECT_EQ(read.concept_index, 18);
+    EXPECT_EQ(read.concept_index, 19);
     EXPECT_EQ(read.theme_id, "acrylic");
     auto truncated = encode_settings(settings_);
     truncated.pop_back();
     EXPECT_FALSE(decode_settings(truncated, &read));
+}
+
+TEST_F(HomeTest, VersionThreeBookmarksFollowTheirDesignAcrossTheReorder)
+{
+    for (int old_index = 0; old_index < 26; ++old_index)
+    {
+        Settings saved;
+        saved.concept_index = old_index;
+        saved.theme_id = "screenprint";
+        auto legacy = encode_settings(saved);
+        legacy[0] = 3;
+        Settings migrated;
+        ASSERT_TRUE(decode_settings(legacy, &migrated));
+        const int expected = old_index < 24 ? old_index + 1 : old_index == 24 ? 0 : 25;
+        EXPECT_EQ(migrated.concept_index, expected);
+        EXPECT_EQ(migrated.theme_id, saved.theme_id);
+        Settings reopened;
+        ASSERT_TRUE(decode_settings(encode_settings(migrated), &reopened));
+        EXPECT_EQ(reopened.concept_index, expected);
+    }
 }
 
 TEST_F(HomeTest, LandingParticlesMoveAtIdleAndStayStillWithReducedMotion)

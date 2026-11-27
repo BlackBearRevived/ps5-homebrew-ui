@@ -194,13 +194,7 @@ dist/PPSA99999/
   sce_sys/snd0.at9
 ```
 
-The app folder is the only build output; see
-[The app folder and the release ZIP](RELEASE_ZIP.md).
-
-`runtime/libc.prx` is a generated, ignored file included in the application.
-Tagged GitHub Releases publish a ZIP of the directory-style application and its
-`SHA256SUMS`
-([The app folder and the release ZIP](RELEASE_ZIP.md)). Extract
-the ZIP before uploading its `<TITLE_ID>/` folder to `/data/homebrew`.
-
-Continue with [Deployment](DEPLOYMENT.md).
+Use `make pkg` to build both the ZIP and the verified PS5 PKG. CI also
+publishes both formats and their checksums. The ZIP contains the title folder
+for FTP deployment. The PKG is for a compatible homebrew package installer.
+See [showcase ZIP and PS5 package](RELEASE_ZIP.md).

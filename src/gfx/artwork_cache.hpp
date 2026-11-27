@@ -78,6 +78,8 @@ class ArtworkCache
     // Highest priority first. Changing the path for an ID invalidates it.
     // Jobs outside the window are cancelled, including completions in flight.
     void select(std::span<const ArtworkRequest> requests);
+    // Mark only a failed request for another attempt on the next select().
+    void retry_unavailable(ArtworkId id);
     void pump(std::size_t uploads = 1);
     Artwork get(ArtworkId id) const;
     std::size_t bytes() const

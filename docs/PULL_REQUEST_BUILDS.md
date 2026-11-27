@@ -32,9 +32,9 @@ Two details are deliberate:
    **Actions**).
 2. Download the artifact named `ps5-homebrew-ui-PR<number>-<commit>` from the run's
    **Artifacts** list. GitHub requires a signed-in account for this.
-3. Unpack it: it holds `PPSA99050.zip` (the app folder) and `SHA256SUMS`. Check the ZIP
-   with `sha256sum -c SHA256SUMS`, then install as described in
-   [Deployment](platform/DEPLOYMENT.md).
+3. Unpack the artifact. Verify the folder ZIP with `sha256sum -c SHA256SUMS`
+   or the installable PKG with `sha256sum -c PPSA99050.pkg.sha256`.
+   See [release packaging](platform/RELEASE_ZIP.md) for both install paths.
 
 A first-time contributor's pull request does not build until a maintainer approves the
 workflow run. That is GitHub's default for public repositories and is worth keeping: the

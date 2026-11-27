@@ -16,35 +16,63 @@ on a PC (`tools/render-media.sh`), with the same code that runs on the console.
 <!-- BEGIN:designs -->
 | # | Design | What it is | Sound set | Source |
 | --- | --- | --- | --- | --- |
-| 01 | [Aurora Shelf](#aurora) | A console home screen: hero panel, cover shelves, frosted details | glass | [`aurora.cpp`](../src/concepts/aurora.cpp) |
-| 02 | [Paper Library](#paper) | A game shelf of paper cards that travel when sorted, filtered or picked up | paper | [`paper.cpp`](../src/concepts/paper.cpp) |
-| 03 | [Neon Arcade](#neon) | A synthwave racer's main menu: neon sign, gliding tube, live previews | glass | [`neon.cpp`](../src/concepts/neon.cpp) |
-| 04 | [Editorial](#editorial) | A magazine's weekly selection: big type on paper, and an article behind every row | paper | [`editorial.cpp`](../src/concepts/editorial.cpp) |
-| 05 | [Cover Wheel](#carousel) | A carousel with weight: scrub it, let it coast, open a cover | glass | [`carousel.cpp`](../src/concepts/carousel.cpp) |
-| 06 | [Radial Dial](#radial) | An in-game item wheel: aim with the stick, equip with one press | paper | [`radial.cpp`](../src/concepts/radial.cpp) |
-| 07 | [Field HUD](#hud) | An in-game HUD over a moving world, and the pause menu behind Options | paper | [`hud.cpp`](../src/concepts/hud.cpp) |
-| 08 | [Pulse Dashboard](#dashboard) | A bento grid of live data tiles that expand into detail views | glass | [`dashboard.cpp`](../src/concepts/dashboard.cpp) |
-| 09 | [Now Playing](#player) | A music player: breathing artwork, a visualizer, a scrubber and a glass queue | glass | [`player.cpp`](../src/concepts/player.cpp) |
-| 10 | [First Run](#keyboard) | A setup wizard: avatar, a name typed on a controller keyboard, a warm welcome | paper | [`keyboard.cpp`](../src/concepts/keyboard.cpp) |
-| 11 | [Constellation](#constellation) | A skill tree as a star map: free 2D focus, a gliding camera, progression | paper | [`constellation.cpp`](../src/concepts/constellation.cpp) |
-| 12 | [Phosphor](#terminal) | A monochrome CRT terminal: character grid, glow, typed text | paper | [`terminal.cpp`](../src/concepts/terminal.cpp) |
-| 13 | [Storefront](#store) | A shop window: featured banner, product pages, a cart and a checkout | glass | [`store.cpp`](../src/concepts/store.cpp) |
-| 14 | [Trophy Room](#trophies) | An achievements cabinet: metal medals, counting numbers, an unlock with ceremony | paper | [`trophies.cpp`](../src/concepts/trophies.cpp) |
-| 15 | [File Browser](#files) | A file manager: aligned columns, folders that keep your place, visible results | paper | [`files.cpp`](../src/concepts/files.cpp) |
-| 16 | [Satchel](#inventory) | An inventory you handle: lift, carry, swap, stack and equip, with a comparing tooltip | paper | [`inventory.cpp`](../src/concepts/inventory.cpp) |
-| 17 | [Launch Sequence](#boot) | Before the menu: studio splash, title, profiles and an honest loading screen | glass | [`boot.cpp`](../src/concepts/boot.cpp) |
-| 18 | [Control Room](#settings) | A settings screen with real controls: sliders, switches, steppers, a dialog | glass | [`settings.cpp`](../src/concepts/settings.cpp) |
-| 19 | [Theme Lab](#themes) | One screen across the built-in themes: L2 and R2 restyle every widget | glass | [`themes.cpp`](../src/concepts/themes.cpp) |
-| 20 | [Component Library](#components) | Reusable lists, grids, dialogs, forms and indicators, restyled by the built-in themes | glass | [`components.cpp`](../src/concepts/components.cpp) |
-| 21 | [Toolbox](#toolbox) | The kit on one screen: shapes, type, motion, glyphs and every sound | glass | [`toolbox.cpp`](../src/concepts/toolbox.cpp) |
-| 22 | [Cinema Library](#library) | A large artwork-led library with reversible details | glass | [`library.cpp`](../src/concepts/library.cpp) |
-| 23 | [Transfer Center](#transfers) | Live progress and recovery in the Broadcast theme | glass | [`transfers.cpp`](../src/concepts/transfers.cpp) |
-| 24 | [Field Journal](#journal) | An illustrated field reference with long-form typography | glass | [`journal.cpp`](../src/concepts/journal.cpp) |
-| 25 | [Homebrew UI Lab](#home) | A playable theme and widget library for PS5 homebrew | glass | [`home.cpp`](../src/concepts/home.cpp) |
+| 01 | [Homebrew UI Lab](#home) | A playable theme and widget library for PS5 homebrew | glass | [`home.cpp`](../src/concepts/home.cpp) |
+| 02 | [Aurora Shelf](#aurora) | A console home screen: hero panel, cover shelves, frosted details | glass | [`aurora.cpp`](../src/concepts/aurora.cpp) |
+| 03 | [Paper Library](#paper) | A game shelf of paper cards that travel when sorted, filtered or picked up | paper | [`paper.cpp`](../src/concepts/paper.cpp) |
+| 04 | [Neon Arcade](#neon) | A synthwave racer's main menu: neon sign, gliding tube, live previews | glass | [`neon.cpp`](../src/concepts/neon.cpp) |
+| 05 | [Editorial](#editorial) | A magazine's weekly selection: big type on paper, and an article behind every row | paper | [`editorial.cpp`](../src/concepts/editorial.cpp) |
+| 06 | [Cover Wheel](#carousel) | A carousel with weight: scrub it, let it coast, open a cover | glass | [`carousel.cpp`](../src/concepts/carousel.cpp) |
+| 07 | [Radial Dial](#radial) | An in-game item wheel: aim with the stick, equip with one press | paper | [`radial.cpp`](../src/concepts/radial.cpp) |
+| 08 | [Field HUD](#hud) | An in-game HUD over a moving world, and the pause menu behind Options | paper | [`hud.cpp`](../src/concepts/hud.cpp) |
+| 09 | [Pulse Dashboard](#dashboard) | A bento grid of live data tiles that expand into detail views | glass | [`dashboard.cpp`](../src/concepts/dashboard.cpp) |
+| 10 | [Now Playing](#player) | A music player: breathing artwork, a visualizer, a scrubber and a glass queue | glass | [`player.cpp`](../src/concepts/player.cpp) |
+| 11 | [First Run](#keyboard) | A setup wizard: avatar, a name typed on a controller keyboard, a warm welcome | paper | [`keyboard.cpp`](../src/concepts/keyboard.cpp) |
+| 12 | [Constellation](#constellation) | A skill tree as a star map: free 2D focus, a gliding camera, progression | paper | [`constellation.cpp`](../src/concepts/constellation.cpp) |
+| 13 | [Phosphor](#terminal) | A monochrome CRT terminal: character grid, glow, typed text | paper | [`terminal.cpp`](../src/concepts/terminal.cpp) |
+| 14 | [Storefront](#store) | A shop window: featured banner, product pages, a cart and a checkout | glass | [`store.cpp`](../src/concepts/store.cpp) |
+| 15 | [Trophy Room](#trophies) | An achievements cabinet: metal medals, counting numbers, an unlock with ceremony | paper | [`trophies.cpp`](../src/concepts/trophies.cpp) |
+| 16 | [File Browser](#files) | A file manager: aligned columns, folders that keep your place, visible results | paper | [`files.cpp`](../src/concepts/files.cpp) |
+| 17 | [Satchel](#inventory) | An inventory you handle: lift, carry, swap, stack and equip, with a comparing tooltip | paper | [`inventory.cpp`](../src/concepts/inventory.cpp) |
+| 18 | [Launch Sequence](#boot) | Before the menu: studio splash, title, profiles and an honest loading screen | glass | [`boot.cpp`](../src/concepts/boot.cpp) |
+| 19 | [Control Room](#settings) | A settings screen with real controls: sliders, switches, steppers, a dialog | glass | [`settings.cpp`](../src/concepts/settings.cpp) |
+| 20 | [Theme Lab](#themes) | One screen across the built-in themes: L2 and R2 restyle every widget | glass | [`themes.cpp`](../src/concepts/themes.cpp) |
+| 21 | [Component Library](#components) | Reusable lists, grids, dialogs, forms and indicators, restyled by the built-in themes | glass | [`components.cpp`](../src/concepts/components.cpp) |
+| 22 | [Toolbox](#toolbox) | The kit on one screen: shapes, type, motion, glyphs and every sound | glass | [`toolbox.cpp`](../src/concepts/toolbox.cpp) |
+| 23 | [Cinema Library](#library) | A large artwork-led library with reversible details | glass | [`library.cpp`](../src/concepts/library.cpp) |
+| 24 | [Transfer Center](#transfers) | Live progress and recovery in the Broadcast theme | glass | [`transfers.cpp`](../src/concepts/transfers.cpp) |
+| 25 | [Field Journal](#journal) | An illustrated field reference with long-form typography | glass | [`journal.cpp`](../src/concepts/journal.cpp) |
+| 26 | [Night Signal](#chapters) | A playable coastal chapter select in two inks | paper | [`chapters.cpp`](../src/concepts/chapters.cpp) |
+
+<a id="home"></a>
+
+## 01 &middot; Homebrew UI Lab
+
+A playable theme and widget library for PS5 homebrew.
+
+<img src="media/designs/home.webp" width="640" alt="Homebrew UI Lab in motion">
+
+**What it demonstrates**
+
+- An indigo particle field with three depths of motion and a still Reduced Motion composition
+- A playable settings panel drawn from the selected theme's real widget tokens
+- Large Text reflows the launch actions above the preview
+- A single developer reference page with the repository address, examples and agent guide
+
+Source: [`src/concepts/home.cpp`](../src/concepts/home.cpp) &middot; tests: [`tests/unit/home_test.cpp`](../tests/unit/home_test.cpp) &middot; sound set: `glass`
+
+<table>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/home.jpg" alt="Homebrew UI Lab: home"></td>
+<td width="50%" valign="top"><img src="media/designs/home-guide.jpg" alt="Homebrew UI Lab: home-guide"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/home-preview.jpg" alt="Homebrew UI Lab: home-preview"></td>
+</tr>
+</table>
 
 <a id="aurora"></a>
 
-## 01 &middot; Aurora Shelf
+## 02 &middot; Aurora Shelf
 
 A console home screen: hero panel, cover shelves, frosted details.
 
@@ -76,7 +104,7 @@ Source: [`src/concepts/aurora.cpp`](../src/concepts/aurora.cpp) &middot; tests: 
 
 <a id="paper"></a>
 
-## 02 &middot; Paper Library
+## 03 &middot; Paper Library
 
 A game shelf of paper cards that travel when sorted, filtered or picked up.
 
@@ -111,7 +139,7 @@ Source: [`src/concepts/paper.cpp`](../src/concepts/paper.cpp) &middot; tests: [`
 
 <a id="neon"></a>
 
-## 03 &middot; Neon Arcade
+## 04 &middot; Neon Arcade
 
 A synthwave racer's main menu: neon sign, gliding tube, live previews.
 
@@ -145,7 +173,7 @@ Source: [`src/concepts/neon.cpp`](../src/concepts/neon.cpp) &middot; tests: [`te
 
 <a id="editorial"></a>
 
-## 04 &middot; Editorial
+## 05 &middot; Editorial
 
 A magazine's weekly selection: big type on paper, and an article behind every row.
 
@@ -179,7 +207,7 @@ Source: [`src/concepts/editorial.cpp`](../src/concepts/editorial.cpp) &middot; t
 
 <a id="carousel"></a>
 
-## 05 &middot; Cover Wheel
+## 06 &middot; Cover Wheel
 
 A carousel with weight: scrub it, let it coast, open a cover.
 
@@ -212,7 +240,7 @@ Source: [`src/concepts/carousel.cpp`](../src/concepts/carousel.cpp) &middot; tes
 
 <a id="radial"></a>
 
-## 06 &middot; Radial Dial
+## 07 &middot; Radial Dial
 
 An in-game item wheel: aim with the stick, equip with one press.
 
@@ -246,7 +274,7 @@ Source: [`src/concepts/radial.cpp`](../src/concepts/radial.cpp) &middot; tests: 
 
 <a id="hud"></a>
 
-## 07 &middot; Field HUD
+## 08 &middot; Field HUD
 
 An in-game HUD over a moving world, and the pause menu behind Options.
 
@@ -280,7 +308,7 @@ Source: [`src/concepts/hud.cpp`](../src/concepts/hud.cpp) &middot; tests: [`test
 
 <a id="dashboard"></a>
 
-## 08 &middot; Pulse Dashboard
+## 09 &middot; Pulse Dashboard
 
 A bento grid of live data tiles that expand into detail views.
 
@@ -314,7 +342,7 @@ Source: [`src/concepts/dashboard.cpp`](../src/concepts/dashboard.cpp) &middot; t
 
 <a id="player"></a>
 
-## 09 &middot; Now Playing
+## 10 &middot; Now Playing
 
 A music player: breathing artwork, a visualizer, a scrubber and a glass queue.
 
@@ -348,7 +376,7 @@ Source: [`src/concepts/player.cpp`](../src/concepts/player.cpp) &middot; tests: 
 
 <a id="keyboard"></a>
 
-## 10 &middot; First Run
+## 11 &middot; First Run
 
 A setup wizard: avatar, a name typed on a controller keyboard, a warm welcome.
 
@@ -383,7 +411,7 @@ Source: [`src/concepts/keyboard.cpp`](../src/concepts/keyboard.cpp) &middot; tes
 
 <a id="constellation"></a>
 
-## 11 &middot; Constellation
+## 12 &middot; Constellation
 
 A skill tree as a star map: free 2D focus, a gliding camera, progression.
 
@@ -416,7 +444,7 @@ Source: [`src/concepts/constellation.cpp`](../src/concepts/constellation.cpp) &m
 
 <a id="terminal"></a>
 
-## 12 &middot; Phosphor
+## 13 &middot; Phosphor
 
 A monochrome CRT terminal: character grid, glow, typed text.
 
@@ -451,7 +479,7 @@ Source: [`src/concepts/terminal.cpp`](../src/concepts/terminal.cpp) &middot; tes
 
 <a id="store"></a>
 
-## 13 &middot; Storefront
+## 14 &middot; Storefront
 
 A shop window: featured banner, product pages, a cart and a checkout.
 
@@ -486,7 +514,7 @@ Source: [`src/concepts/store.cpp`](../src/concepts/store.cpp) &middot; tests: [`
 
 <a id="trophies"></a>
 
-## 14 &middot; Trophy Room
+## 15 &middot; Trophy Room
 
 An achievements cabinet: metal medals, counting numbers, an unlock with ceremony.
 
@@ -522,7 +550,7 @@ Source: [`src/concepts/trophies.cpp`](../src/concepts/trophies.cpp) &middot; tes
 
 <a id="files"></a>
 
-## 15 &middot; File Browser
+## 16 &middot; File Browser
 
 A file manager: aligned columns, folders that keep your place, visible results.
 
@@ -561,7 +589,7 @@ Source: [`src/concepts/files.cpp`](../src/concepts/files.cpp) &middot; tests: [`
 
 <a id="inventory"></a>
 
-## 16 &middot; Satchel
+## 17 &middot; Satchel
 
 An inventory you handle: lift, carry, swap, stack and equip, with a comparing tooltip.
 
@@ -595,7 +623,7 @@ Source: [`src/concepts/inventory.cpp`](../src/concepts/inventory.cpp) &middot; t
 
 <a id="boot"></a>
 
-## 17 &middot; Launch Sequence
+## 18 &middot; Launch Sequence
 
 Before the menu: studio splash, title, profiles and an honest loading screen.
 
@@ -629,7 +657,7 @@ Source: [`src/concepts/boot.cpp`](../src/concepts/boot.cpp) &middot; tests: [`te
 
 <a id="settings"></a>
 
-## 18 &middot; Control Room
+## 19 &middot; Control Room
 
 A settings screen with real controls: sliders, switches, steppers, a dialog.
 
@@ -663,7 +691,7 @@ Source: [`src/concepts/settings.cpp`](../src/concepts/settings.cpp) &middot; tes
 
 <a id="themes"></a>
 
-## 19 &middot; Theme Lab
+## 20 &middot; Theme Lab
 
 One screen across the built-in themes: L2 and R2 restyle every widget.
 
@@ -687,7 +715,7 @@ Source: [`src/concepts/themes.cpp`](../src/concepts/themes.cpp) &middot; tests: 
 
 <a id="components"></a>
 
-## 20 &middot; Component Library
+## 21 &middot; Component Library
 
 Reusable lists, grids, dialogs, forms and indicators, restyled by the built-in themes.
 
@@ -717,12 +745,24 @@ Source: [`src/concepts/components.cpp`](../src/concepts/components.cpp) &middot;
 <td width="50%" valign="top"><img src="media/designs/components-actions.jpg" alt="Component Library: components-actions"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-app-flows-activity.jpg" alt="Component Library: components-app-flows-activity"></td>
 <td width="50%" valign="top"><img src="media/designs/components-app-flows-detail.jpg" alt="Component Library: components-app-flows-detail"></td>
-<td width="50%" valign="top"><img src="media/designs/components-app-flows-filter.jpg" alt="Component Library: components-app-flows-filter"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-app-flows-filter.jpg" alt="Component Library: components-app-flows-filter"></td>
 <td width="50%" valign="top"><img src="media/designs/components-app-flows-transfer.jpg" alt="Component Library: components-app-flows-transfer"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-app-flows.jpg" alt="Component Library: components-app-flows"></td>
+<td width="50%" valign="top"><img src="media/designs/components-atlas-choice.jpg" alt="Component Library: components-atlas-choice"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/components-atlas-directory.jpg" alt="Component Library: components-atlas-directory"></td>
+<td width="50%" valign="top"><img src="media/designs/components-atlas-regional.jpg" alt="Component Library: components-atlas-regional"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/components-atlas-search.jpg" alt="Component Library: components-atlas-search"></td>
+<td width="50%" valign="top"><img src="media/designs/components-atlas.jpg" alt="Component Library: components-atlas"></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="media/designs/components-broadcast.jpg" alt="Component Library: components-broadcast"></td>
@@ -758,179 +798,183 @@ Source: [`src/concepts/components.cpp`](../src/concepts/components.cpp) &middot;
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-structure.jpg" alt="Component Library: components-brutal-structure"></td>
+<td width="50%" valign="top"><img src="media/designs/components-brutal-world-atlas.jpg" alt="Component Library: components-brutal-world-atlas"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-cinema.jpg" alt="Component Library: components-cinema"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-classic.jpg" alt="Component Library: components-classic"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-clay.jpg" alt="Component Library: components-clay"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-collections-hero.jpg" alt="Component Library: components-collections-hero"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-collections-paged.jpg" alt="Component Library: components-collections-paged"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-collections-posters.jpg" alt="Component Library: components-collections-posters"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-collections-wheel.jpg" alt="Component Library: components-collections-wheel"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-collections.jpg" alt="Component Library: components-collections"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-data-charts.jpg" alt="Component Library: components-data-charts"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-data-plain.jpg" alt="Component Library: components-data-plain"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-data-range.jpg" alt="Component Library: components-data-range"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-data.jpg" alt="Component Library: components-data"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-entry-flat.jpg" alt="Component Library: components-entry-flat"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-entry-numeric.jpg" alt="Component Library: components-entry-numeric"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-entry-pin.jpg" alt="Component Library: components-entry-pin"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-entry-prompt.jpg" alt="Component Library: components-entry-prompt"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-entry.jpg" alt="Component Library: components-entry"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-field-journal.jpg" alt="Component Library: components-field-journal"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-forms-compact.jpg" alt="Component Library: components-forms-compact"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-forms-help.jpg" alt="Component Library: components-forms-help"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-forms-panel.jpg" alt="Component Library: components-forms-panel"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-forms-wide.jpg" alt="Component Library: components-forms-wide"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-forms.jpg" alt="Component Library: components-forms"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-game-inventory.jpg" alt="Component Library: components-game-inventory"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-game-nodes.jpg" alt="Component Library: components-game-nodes"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-game-pause.jpg" alt="Component Library: components-game-pause"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-game-profiles.jpg" alt="Component Library: components-game-profiles"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-game.jpg" alt="Component Library: components-game"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-hazard.jpg" alt="Component Library: components-hazard"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-indicators-chunky.jpg" alt="Component Library: components-indicators-chunky"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-indicators-loaded.jpg" alt="Component Library: components-indicators-loaded"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-indicators-slim.jpg" alt="Component Library: components-indicators-slim"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-indicators-status.jpg" alt="Component Library: components-indicators-status"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-indicators.jpg" alt="Component Library: components-indicators"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-layout-guides.jpg" alt="Component Library: components-layout-guides"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-layout-modal.jpg" alt="Component Library: components-layout-modal"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-layout-panes.jpg" alt="Component Library: components-layout-panes"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-layout-stacked.jpg" alt="Component Library: components-layout-stacked"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-layout.jpg" alt="Component Library: components-layout"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-lists-bar.jpg" alt="Component Library: components-lists-bar"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-lists-fill.jpg" alt="Component Library: components-lists-fill"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-lists-glow.jpg" alt="Component Library: components-lists-glow"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-lists.jpg" alt="Component Library: components-lists"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-media-captions.jpg" alt="Component Library: components-media-captions"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-media-compact.jpg" alt="Component Library: components-media-compact"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-media-loading.jpg" alt="Component Library: components-media-loading"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-media-reader.jpg" alt="Component Library: components-media-reader"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-media-zoom.jpg" alt="Component Library: components-media-zoom"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-media.jpg" alt="Component Library: components-media"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-navigation-boxed.jpg" alt="Component Library: components-navigation-boxed"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-navigation-menu.jpg" alt="Component Library: components-navigation-menu"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-navigation-segmented.jpg" alt="Component Library: components-navigation-segmented"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-navigation-underline.jpg" alt="Component Library: components-navigation-underline"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-navigation.jpg" alt="Component Library: components-navigation"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications-accent.jpg" alt="Component Library: components-notifications-accent"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications-center.jpg" alt="Component Library: components-notifications-center"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications-compact.jpg" alt="Component Library: components-notifications-compact"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications-progress.jpg" alt="Component Library: components-notifications-progress"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications-queue.jpg" alt="Component Library: components-notifications-queue"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-notifications.jpg" alt="Component Library: components-notifications"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-overlays-bottom.jpg" alt="Component Library: components-overlays-bottom"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-overlays-compact.jpg" alt="Component Library: components-overlays-compact"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-overlays-sheet.jpg" alt="Component Library: components-overlays-sheet"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-overlays-toasts.jpg" alt="Component Library: components-overlays-toasts"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-overlays.jpg" alt="Component Library: components-overlays"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-paper.jpg" alt="Component Library: components-paper"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pickers-compact.jpg" alt="Component Library: components-pickers-compact"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pickers-hsv.jpg" alt="Component Library: components-pickers-hsv"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pickers-select.jpg" alt="Component Library: components-pickers-select"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pickers.jpg" alt="Component Library: components-pickers"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pico.jpg" alt="Component Library: components-pico"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-actions.jpg" alt="Component Library: components-pixel-actions"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-app-flows.jpg" alt="Component Library: components-pixel-app-flows"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-collections.jpg" alt="Component Library: components-pixel-collections"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-data.jpg" alt="Component Library: components-pixel-data"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-entry.jpg" alt="Component Library: components-pixel-entry"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-forms.jpg" alt="Component Library: components-pixel-forms"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-game.jpg" alt="Component Library: components-pixel-game"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-indicators.jpg" alt="Component Library: components-pixel-indicators"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-layout.jpg" alt="Component Library: components-pixel-layout"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-lists.jpg" alt="Component Library: components-pixel-lists"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-media.jpg" alt="Component Library: components-pixel-media"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-navigation.jpg" alt="Component Library: components-pixel-navigation"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-notifications.jpg" alt="Component Library: components-pixel-notifications"></td>
-<td width="50%" valign="top"><img src="media/designs/components-pixel-overlays.jpg" alt="Component Library: components-pixel-overlays"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-pixel-overlays.jpg" alt="Component Library: components-pixel-overlays"></td>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-pickers.jpg" alt="Component Library: components-pixel-pickers"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-pixel-structure.jpg" alt="Component Library: components-pixel-structure"></td>
+<td width="50%" valign="top"><img src="media/designs/components-pixel-world-atlas.jpg" alt="Component Library: components-pixel-world-atlas"></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-actions.jpg" alt="Component Library: components-sketch-actions"></td>
@@ -965,21 +1009,22 @@ Source: [`src/concepts/components.cpp`](../src/concepts/components.cpp) &middot;
 <td width="50%" valign="top"><img src="media/designs/components-sketch-structure.jpg" alt="Component Library: components-sketch-structure"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-sketch-world-atlas.jpg" alt="Component Library: components-sketch-world-atlas"></td>
 <td width="50%" valign="top"><img src="media/designs/components-structure-compact.jpg" alt="Component Library: components-structure-compact"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-structure-quick.jpg" alt="Component Library: components-structure-quick"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-structure-radial.jpg" alt="Component Library: components-structure-radial"></td>
-<td width="50%" valign="top"><img src="media/designs/components-structure-vertical.jpg" alt="Component Library: components-structure-vertical"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-structure-vertical.jpg" alt="Component Library: components-structure-vertical"></td>
 <td width="50%" valign="top"><img src="media/designs/components-structure.jpg" alt="Component Library: components-structure"></td>
 </tr>
 </table>
 
 <a id="toolbox"></a>
 
-## 21 &middot; Toolbox
+## 22 &middot; Toolbox
 
 The kit on one screen: shapes, type, motion, glyphs and every sound.
 
@@ -1007,12 +1052,16 @@ Source: [`src/concepts/toolbox.cpp`](../src/concepts/toolbox.cpp) &middot; tests
 
 <a id="library"></a>
 
-## 22 &middot; Cinema Library
+## 23 &middot; Cinema Library
 
 A large artwork-led library with reversible details.
 
+<img src="media/designs/library.webp" width="640" alt="Cinema Library in motion">
+
 **What it demonstrates**
 
+- A highlight enters the selected cover from the navigation edge
+- The activity pill measures completed cover uploads and returns to the same shelf
 - Stable IDs preserve focus across reordered and filtered shelves
 - The artwork cache decodes JPEG files off the render thread
 - The shared cover can reverse in flight when the player presses Back
@@ -1023,7 +1072,11 @@ Source: [`src/concepts/library.cpp`](../src/concepts/library.cpp) &middot; tests
 <table>
 <tr>
 <td width="50%" valign="top"><img src="media/designs/library.jpg" alt="Cinema Library: library"></td>
+<td width="50%" valign="top"><img src="media/designs/library-activity-collapsed.jpg" alt="Cinema Library: library-activity-collapsed"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/library-bright-detail.jpg" alt="Cinema Library: library-bright-detail"></td>
+<td width="50%" valign="top"><img src="media/designs/library-cover-activity.jpg" alt="Cinema Library: library-cover-activity"></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="media/designs/library-expanding.jpg" alt="Cinema Library: library-expanding"></td>
@@ -1031,6 +1084,10 @@ Source: [`src/concepts/library.cpp`](../src/concepts/library.cpp) &middot; tests
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="media/designs/library-filtered.jpg" alt="Cinema Library: library-filtered"></td>
+<td width="50%" valign="top"><img src="media/designs/library-focus-first.jpg" alt="Cinema Library: library-focus-first"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/library-focus-right.jpg" alt="Cinema Library: library-focus-right"></td>
 <td width="50%" valign="top"><img src="media/designs/library-missing-cover.jpg" alt="Cinema Library: library-missing-cover"></td>
 </tr>
 <tr>
@@ -1045,7 +1102,7 @@ Source: [`src/concepts/library.cpp`](../src/concepts/library.cpp) &middot; tests
 
 <a id="transfers"></a>
 
-## 23 &middot; Transfer Center
+## 24 &middot; Transfer Center
 
 Live progress and recovery in the Broadcast theme.
 
@@ -1077,7 +1134,7 @@ Source: [`src/concepts/transfers.cpp`](../src/concepts/transfers.cpp) &middot; t
 
 <a id="journal"></a>
 
-## 24 &middot; Field Journal
+## 25 &middot; Field Journal
 
 An illustrated field reference with long-form typography.
 
@@ -1100,30 +1157,33 @@ Source: [`src/concepts/journal.cpp`](../src/concepts/journal.cpp) &middot; tests
 </tr>
 </table>
 
-<a id="home"></a>
+<a id="chapters"></a>
 
-## 25 &middot; Homebrew UI Lab
+## 26 &middot; Night Signal
 
-A playable theme and widget library for PS5 homebrew.
+A playable coastal chapter select in two inks.
 
-<img src="media/designs/home.webp" width="640" alt="Homebrew UI Lab in motion">
+<img src="media/designs/chapters.webp" width="640" alt="Night Signal in motion">
 
 **What it demonstrates**
 
-- An indigo particle field with three depths of motion and a still Reduced Motion composition
-- A playable settings panel drawn from the selected theme's real widget tokens
-- Large Text reflows the launch actions above the preview
-- A single developer reference page with the repository address, examples and agent guide
+- Original two-ink coastal posters composed from native shapes
+- A slanted selection strip follows controller focus
+- Each chapter contains a playable radio relay
 
-Source: [`src/concepts/home.cpp`](../src/concepts/home.cpp) &middot; tests: [`tests/unit/home_test.cpp`](../tests/unit/home_test.cpp) &middot; sound set: `glass`
+Source: [`src/concepts/chapters.cpp`](../src/concepts/chapters.cpp) &middot; tests: [`tests/unit/concepts_test.cpp`](../tests/unit/concepts_test.cpp) &middot; sound set: `paper`
 
 <table>
 <tr>
-<td width="50%" valign="top"><img src="media/designs/home.jpg" alt="Homebrew UI Lab: home"></td>
-<td width="50%" valign="top"><img src="media/designs/home-guide.jpg" alt="Homebrew UI Lab: home-guide"></td>
+<td width="50%" valign="top"><img src="media/designs/chapters.jpg" alt="Night Signal: chapters"></td>
+<td width="50%" valign="top"><img src="media/designs/chapters-connected.jpg" alt="Night Signal: chapters-connected"></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><img src="media/designs/home-preview.jpg" alt="Homebrew UI Lab: home-preview"></td>
+<td width="50%" valign="top"><img src="media/designs/chapters-dial.jpg" alt="Night Signal: chapters-dial"></td>
+<td width="50%" valign="top"><img src="media/designs/chapters-ferry.jpg" alt="Night Signal: chapters-ferry"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/chapters-ridge.jpg" alt="Night Signal: chapters-ridge"></td>
 </tr>
 </table>
 <!-- END:designs -->

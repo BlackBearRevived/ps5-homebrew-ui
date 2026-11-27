@@ -4,6 +4,7 @@
 
 #include "concepts/components/page.hpp"
 
+#include "ui/components/activity_pill.hpp"
 #include "ui/components/artwork_detail.hpp"
 #include "ui/components/search_filter.hpp"
 #include "ui/components/shelf_browser.hpp"
@@ -20,6 +21,8 @@ namespace
 constexpr gfx::Rect kShelves{96, 300, 1728, 606};
 constexpr gfx::Rect kDetails{210, 295, 1500, 608};
 constexpr app::TourStep kTour[] = {
+    {0.4f, action_bit(Action::l3)},
+    {0.5f, action_bit(Action::back), Direction::none, "app-flows-activity"},
     {0.6f, action_bit(Action::confirm), Direction::none, "app-flows"},
     {0.55f, action_bit(Action::back), Direction::none, "app-flows-detail"},
     {0.4f, action_bit(Action::north)},
@@ -28,9 +31,8 @@ constexpr app::TourStep kTour[] = {
     {0.65f, action_bit(Action::west), Direction::none, "app-flows-transfer"},
 };
 constexpr ui::Hint kShelfHints[] = {
-    {ui::Button::dpad, "Browse"},
-    {ui::Button::confirm, "Details"},
-    {ui::Button::triangle, "Filter"},
+    {ui::Button::dpad, "Browse"},     {ui::Button::confirm, "Details"},
+    {ui::Button::triangle, "Filter"}, {ui::Button::left_stick, "Activity"},
     {ui::Button::square, "Variant"},
 };
 constexpr ui::Hint kTransferHints[] = {
@@ -49,6 +51,7 @@ class AppsPage final : public Page
         browser_.style.carousel.card.art_aspect = 16.0f / 10.0f;
         browser_.style.carousel.card.subtitle_size = 0;
         browser_.style.carousel.counter = false;
+        pill_.set_bounds({1080, 285, 720, 250});
         detail_.set_bounds(kDetails);
         detail_.artwork_uv = gfx::kCanvasUv;
         detail_.action = "Back to shelf";
@@ -66,8 +69,12 @@ class AppsPage final : public Page
                 if (action == ui::TransferAction::cancel)
                     jobs_.erase(it);
                 else
+                {
+                    if (action == ui::TransferAction::retry)
+                        it->detail = "Resuming the transfer.";
                     it->state = action == ui::TransferAction::pause ? ui::TransferState::paused
                                                                     : ui::TransferState::active;
+                }
                 break;
             }
             transfers_.set_jobs(jobs_);
@@ -94,19 +101,35 @@ class AppsPage final : public Page
             theme;
         browser_.style.reduced_motion = detail_.style.reduced_motion =
             search_.style.reduced_motion = transfers_.style.reduced_motion = reduced_motion;
+        pill_.style.theme = theme;
+        pill_.style.reduced_motion = reduced_motion;
         browser_.set_bounds(kShelves);
     }
 
     void enter() override
     {
         detail_open_ = false;
+        pill_.dismiss();
+        browser_.set_active(true);
         search_.dismiss();
         browser_.enter();
     }
 
     void update(const InputFrame &input, float dt, ui::Feedback &feedback) override
     {
-        if (search_.is_open())
+        if (!jobs_.empty())
+            pill_.set_job(jobs_.back());
+        if (!transfers_mode_ && !detail_open_ && !search_.is_open() && !jobs_.empty() &&
+            (pill_.expanded() || input.is_pressed(Action::l3)))
+        {
+            auto forwarded = input;
+            if (input.is_pressed(Action::l3))
+                forwarded.pressed |= action_bit(Action::north);
+            if (pill_.handle(forwarded, feedback) == ui::Event::activated)
+                transfers_.on_action(pill_.job().id, ui::TransferAction::retry);
+            browser_.set_active(!pill_.expanded());
+        }
+        else if (search_.is_open())
         {
             if (search_.handle(input, feedback) == ui::Event::activated)
             {
@@ -164,6 +187,7 @@ class AppsPage final : public Page
         detail_.update(dt);
         search_.update(dt);
         transfers_.update(dt);
+        pill_.update(dt);
     }
 
     void draw(ui::Canvas &canvas) const override
@@ -178,13 +202,15 @@ class AppsPage final : public Page
 
     void draw_modal(ui::Canvas &canvas) const override
     {
+        if (!jobs_.empty() && !transfers_mode_ && !detail_open_ && !search_.is_open())
+            pill_.draw(canvas);
         search_.draw(canvas);
         transfers_.draw_modal(canvas);
     }
 
     std::span<const ui::Hint> hints() const override
     {
-        if (detail_open_ || search_.is_open() || transfers_.confirming())
+        if (pill_.expanded() || detail_open_ || search_.is_open() || transfers_.confirming())
             return kModalHints;
         return transfers_mode_ ? std::span<const ui::Hint>{kTransferHints}
                                : std::span<const ui::Hint>{kShelfHints};
@@ -244,6 +270,7 @@ class AppsPage final : public Page
     ui::ArtworkDetailHeader detail_;
     ui::SearchFilterPanel search_;
     ui::TransferCenter transfers_;
+    ui::ActivityPill pill_;
     ui::SearchFilters applied_;
     ui::SearchFilters counted_;
     bool transfers_mode_ = false;

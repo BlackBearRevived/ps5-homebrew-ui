@@ -168,6 +168,7 @@ class Carousel
     tween::Spring active_amount_{1.0f, 0.0f, 1.0f};
     Pulse press_;
     Pulse refusal_;
+    float entry_light_ = 0.0f;
 };
 
 } // namespace hui::ui

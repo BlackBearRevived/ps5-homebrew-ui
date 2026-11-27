@@ -292,6 +292,14 @@ void draw_card(Canvas &canvas, const ComponentStyle &style, const CardLook &look
     else if (look.plate)
         paint.well(picture, picture_radius, well);
 
+    if (look.directional_light && !style.reduced_motion && state.entry_light != 0.0f)
+    {
+        const auto lit = theme.focus.with_alpha(0.36f * std::abs(state.entry_light));
+        const auto clear = theme.focus.with_alpha(0.0f);
+        list.gradient_rect_h(picture, picture_radius, state.entry_light < 0 ? lit : clear,
+                             state.entry_light < 0 ? clear : lit);
+    }
+
     // ---- text over the art ----
     const bool bar = item.progress >= 0.0f;
     const float bar_room = bar ? look.progress_height + 10.0f : 0.0f;

@@ -1,0 +1,194 @@
+#!/usr/bin/env python3
+# ps5-homebrew-ui - Bake Natural Earth map units into the offline country picker.
+# Copyright (C) 2026 BlackBearReloaded
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+"""Usage: python tools/bake-country-map.py ne_10m_admin_0_map_units.geojson
+Source: nvkelso/natural-earth-vector v5.1.2, geojson/ (public domain).
+Baking requires shapely 2.1.2, numpy and mapbox-earcut 2.0.0. Builds do not.
+"""
+
+import collections
+import hashlib
+import json
+import sys
+import unicodedata
+from pathlib import Path
+
+import mapbox_earcut
+import numpy as np
+from shapely.geometry import shape
+
+source = Path(sys.argv[1]).read_bytes()
+if (
+    hashlib.sha256(source).hexdigest()
+    != "57da82be755f4afccd8f3b14251bb2752f5df1395f47d2d86f817470c4a48862"
+):
+    sys.exit("Expected the Natural Earth v5.1.2 10m map units GeoJSON")
+groups = collections.defaultdict(list)
+for feature in json.loads(source)["features"]:
+    p = feature["properties"]
+    code = p["ISO_A2_EH"]
+    if p["ADMIN"] == "United States Minor Outlying Islands":
+        code = "UM"
+    if p["GU_A3"] == "NJM":
+        code = "SJ"
+    if code == "XD":
+        code = "-99"  # Keep non-catalogued land visible.
+    groups[code].append((p, shape(feature["geometry"])))
+
+# English display names for groups whose largest map unit is a subdivision.
+names = {
+    "AG": "Antigua and Barbuda",
+    "AU": "Australia",
+    "BA": "Bosnia and Herzegovina",
+    "BE": "Belgium",
+    "CC": "Cocos (Keeling) Islands",
+    "GB": "United Kingdom",
+    "GE": "Georgia",
+    "IQ": "Iraq",
+    "KZ": "Kazakhstan",
+    "PS": "Palestine",
+    "PT": "Portugal",
+    "RS": "Serbia",
+    "SO": "Somalia",
+    "TZ": "Tanzania",
+    "UM": "United States Minor Outlying Islands",
+    "US": "United States",
+    "SJ": "Svalbard and Jan Mayen",
+    "CI": "Côte d’Ivoire",
+    "CZ": "Czechia",
+    "TL": "Timor-Leste",
+    "CV": "Cabo Verde",
+}
+rows, points, indices, parts = [], [], [], []
+
+
+def literal(s):
+    return json.dumps(s, ensure_ascii=False)
+
+
+def values(items, width):
+    return "\n".join(
+        "    " + ", ".join(items[i : i + width]) + ","
+        for i in range(0, len(items), width)
+    )
+
+
+def fold(s):
+    return "".join(
+        c
+        for c in unicodedata.normalize("NFKD", s)
+        if c.isascii() and (c.isalnum() or c == " ")
+    ).lower()
+
+
+def coord(v):
+    return str(round(v * 100))
+
+
+for code, features in groups.items():
+    meta = max(features, key=lambda pair: pair[1].area)[0]
+    name = names.get(code, meta["NAME_EN"])
+    aliases = " ".join(
+        dict.fromkeys(
+            fold(s)
+            for s in (name, meta["ADMIN"], meta["NAME_EN"], meta["ADM0_A3"], code)
+        )
+    )
+    region = meta["SUBREGION"]
+    polygons = [
+        poly
+        for _, geom in features
+        for poly in (geom.geoms if geom.geom_type == "MultiPolygon" else [geom])
+    ]
+    first = len(parts)
+    largest = max(polygons, key=lambda poly: poly.area)
+    for poly in polygons:
+        if poly is not largest and poly.area < 0.09:
+            continue
+        poly = poly.simplify(0.26, preserve_topology=True)
+        rings = [
+            np.round(np.array(ring.coords)[:-1, :2], 2)
+            for ring in [poly.exterior, *poly.interiors]
+        ]
+        coords = np.concatenate(rings)
+        tris = mapbox_earcut.triangulate_float64(
+            coords, np.cumsum([len(r) for r in rings], dtype=np.uint32)
+        )
+        if not len(tris):
+            continue
+        start = len(indices)
+        indices.extend((tris + len(points)).tolist())
+        points.extend((coord(x), coord(-y)) for x, y in coords)
+        x0, y0, x1, y1 = poly.bounds
+        parts.append(
+            "{"
+            + ", ".join(
+                map(
+                    str,
+                    [start, len(tris), coord(x0), coord(-y1), coord(x1), coord(-y0)],
+                )
+            )
+            + "}"
+        )
+    rows.append(
+        (
+            name,
+            code,
+            region,
+            aliases,
+            coord(meta["LABEL_X"]),
+            coord(-meta["LABEL_Y"]),
+            meta["MAPCOLOR7"],
+            first,
+            len(parts) - first,
+        )
+    )
+
+assert len(groups) == 251 and len(points) < 65536
+rows.sort(key=lambda row: (row[1] == "-99", fold(row[0])))
+
+
+def record(r):
+    name, code, region, aliases, *rest = r
+    return (
+        "{"
+        + ", ".join(
+            [
+                literal(s)
+                for s in (
+                    code,
+                    name,
+                    unicodedata.normalize("NFKD", name.replace("\u2019", "'"))
+                    .encode("ascii", "ignore")
+                    .decode(),
+                    region,
+                    aliases,
+                )
+            ]
+            + list(map(str, rest))
+        )
+        + "}"
+    )
+
+
+target = Path(__file__).resolve().parents[1] / "src/ui/components/country_geometry.inc"
+target.write_text(
+    "// Generated by tools/bake-country-map.py from public-domain Natural Earth data.\n"
+    "constexpr float kXY[] = {\n"
+    + values([v for pair in points for v in pair], 16)
+    + "\n};\n"
+    "constexpr std::uint32_t kIndices[] = {\n"
+    + values(list(map(str, indices)), 16)
+    + "\n};\n"
+    "constexpr LandPart kParts[] = {\n" + values(parts, 2) + "\n};\n"
+    "constexpr Country kCountries[] = {\n"
+    + values(list(map(record, rows)), 1)
+    + "\n};\n",
+    encoding="utf-8",
+    newline="\n",
+)
+print(
+    f"{len(rows)-1} selectable locations, {len(indices)//3} triangles, {len(parts)} land parts"
+)

@@ -49,7 +49,7 @@ constexpr gallery::PageFactory kPages[] = {
     gallery::make_actions_page,   gallery::make_forms_page,       gallery::make_pickers_page,
     gallery::make_entry_page,     gallery::make_indicators_page,  gallery::make_data_page,
     gallery::make_media_page,     gallery::make_game_page,        gallery::make_layout_page,
-    gallery::make_apps_page,
+    gallery::make_apps_page,      gallery::make_atlas_page,
 };
 
 constexpr float kMargin = 96.0f;

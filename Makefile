@@ -31,6 +31,7 @@ HOST_CXX ?= clang++
 HOST_TEST_CXXFLAGS ?= -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror \
 	-ffunction-sections -fdata-sections
 HOST_TEST_LDFLAGS ?= -Wl,--gc-sections
+ASAN_OPTIONS ?= detect_leaks=1
 GTEST_ARGS ?=
 BUILD_JOBS ?= $(shell nproc 2>/dev/null || echo 2)
 USE_CCACHE ?= 1
@@ -48,7 +49,7 @@ RUNTIME_INPUTS := tools/rebuild-libc.sh tools/build-host-tools.sh tools/ninja-bu
 	$(wildcard tooling/native/runtime/*.txt)
 HOST_UNIT_TEST := build/tests/unit_tests
 
-.PHONY: all app build init doctor test test-deps test-unit test-integration libc deps opengl host-snapshots fonts pacbrew pacbrew-list assets-check format format-check tidy lint check deploy undeploy clean distclean help
+.PHONY: pkg all app build init doctor test test-deps test-unit test-integration libc deps opengl host-snapshots fonts pacbrew pacbrew-list assets-check format format-check tidy lint check deploy undeploy clean distclean help
 
 all: app
 build: app
@@ -70,7 +71,7 @@ test-deps:
 test-unit:
 	@bash tools/build-tests.sh
 	@printf '%s\n' '==> [test-unit] Running host-native GoogleTest application tests'
-	@ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=tests/unit/lsan.supp \
+	@ASAN_OPTIONS="$(ASAN_OPTIONS)" LSAN_OPTIONS=suppressions=tests/unit/lsan.supp \
 		UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 \
 		$(HOST_UNIT_TEST) --gtest_brief=1 $(GTEST_ARGS)
 
@@ -115,6 +116,9 @@ $(RUNTIME): $(RUNTIME_INPUTS)
 app: $(RUNTIME)
 	@printf '%s\n' '==> [app] Compiling, linking, signing, and assembling the app folder'
 	@bash tools/build.sh Folder
+
+pkg: app
+	@bash tools/build-pkg.sh
 
 deploy:
 	@printf '%s\n' '==> [deploy] Building and publishing the app folder over FTP'
@@ -162,6 +166,7 @@ distclean: clean
 help:
 	@printf '%s\n' \
 	  'make                 Generate libc.prx and build the app folder' \
+	  'make pkg             Build the app folder, ZIP, verified PKG and checksums' \
 	  'make opengl          Fetch/verify the ps5-opengl SDK and write its link group' \
 	  'make host-snapshots  Run the tour on the PC and write PNGs to build/snapshots' \
 	  'make fonts           Rebake the SDF font atlases in assets/fonts' \

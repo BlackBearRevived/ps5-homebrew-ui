@@ -217,33 +217,28 @@ class ToolTests(unittest.TestCase):
             self.assertIn("DEPLOY_FORMAT", refused.stderr)
             self.assertFalse(built.exists())
 
-    def test_automation_builds_the_zip_only(self):
+    def test_automation_packages_and_attests_both_downloads(self):
         workflow = (ROOT / ".github/workflows/tooling.yml").read_text(encoding="utf-8")
-        self.assertNotIn("ffpfsc", workflow.lower())
-        self.assertNotIn("mkpfs", workflow.lower())
-        self.assertIn("run: make app", workflow)
-        self.assertIn('sha256sum "$TITLE_ID.zip" > SHA256SUMS', workflow)
-        self.assertIn('assets=("release/$FOLDER_ZIP" "release/$CHECKSUM")', workflow)
-        # The ZIP is attested (signed provenance) once final, before the upload.
-        attest = (
-            "uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6"
-            " # v4.2.2"
-        )
-        self.assertEqual(workflow.count(attest), 1)
-        checked = workflow.index("- name: Check every ZIP entry is stored as 0777\n")
-        upload = workflow.index("- name: Upload build\n")
-        self.assertLess(checked, workflow.index(attest))
-        self.assertLess(workflow.index(attest), upload)
-        self.assertIn("subject-path: dist/${{ env.TITLE_ID }}.zip\n", workflow)
-        self.assertIn(
-            "if: github.event_name != 'pull_request' && !github.event.repository.private\n",
-            workflow,
-        )
-        needed = ("contents: read", "id-token: write", "attestations: write")
-        for permission in needed:
-            self.assertIn(f"      {permission}\n", workflow)
+        packager = (ROOT / "tools/build-pkg.sh").read_text(encoding="utf-8")
+        build, rest = workflow.split("\n  attest:\n")
+        attest, release = rest.split("\n  release:\n")
+        self.assertLess(build.index("run: make app"), build.index("bash tools/build-pkg.sh"))
+        self.assertLess(build.index("bash tools/build-pkg.sh"), build.index("- name: Upload build"))
+        self.assertIn("pip install --no-index --no-deps --require-hashes", packager)
+        self.assertIn('verify "dist/$title.pkg"', packager)
+        self.assertIn('sha256sum "$title.zip" > SHA256SUMS', packager)
+        for suffix in (".zip", ".pkg", ".pkg.sha256"):
+            self.assertIn("dist/${{ env.TITLE_ID }}" + suffix, build)
+        for suffix in (".zip", ".pkg"):
+            self.assertIn("package/${{ needs.build.outputs.title-id }}" + suffix, attest)
+        for job in (attest, release):
+            self.assertIn('sha256sum -c --strict "$TITLE_ID.pkg.sha256"', job)
+        for permission in ("id-token: write", "attestations: write"):
+            self.assertIn(permission, attest)
+            self.assertNotIn(permission, build + release)
+        self.assertIn("github.event_name != 'pull_request'", attest)
 
-        # No image is built: no target, no build mode, no script branch, no tooling.
+        # Retired filesystem image tools stay out of the build.
         gone = ("ffpkg", "ffpfsc", "exfat", "ufs2tool", "mkpfs")
         for name in ("Makefile", "tools/build.sh", "build.ps1",
                      ".github/workflows/tooling.yml"):
@@ -267,10 +262,10 @@ class ToolTests(unittest.TestCase):
         self.assertNotIn("--clobber", workflow)
         self.assertNotIn("delete-asset", workflow)
         self.assertNotIn("gh release edit", workflow)
-        # One upload, to a release that has no ZIP yet; one warning otherwise.
         self.assertEqual(workflow.count("gh release upload"), 1)
-        self.assertIn("--json assets --jq '.assets[].name'", workflow)
-        self.assertIn("::warning title=Release files not from this run::", workflow)
+        self.assertLess(workflow.index('endswith(".zip")'), workflow.index("gh release upload"))
+        self.assertIn("github.event_name == 'push' && github.ref_type == 'tag'", workflow)
+        self.assertIn("--verify-tag", workflow)
 
     def test_pull_request_builds_are_named_and_labelled(self):
         workflow = (ROOT / ".github/workflows/tooling.yml").read_text(encoding="utf-8")
@@ -281,7 +276,7 @@ class ToolTests(unittest.TestCase):
         self.assertIn('echo "BUILD_LABEL=PR $PR_NUMBER, $short" >> "$GITHUB_ENV"', workflow)
         self.assertIn("name: ${{ steps.label.outputs.artifact }}", workflow)
         # The release job still finds a tag's build under its commit.
-        self.assertIn('--name "ps5-homebrew-ui-$GITHUB_SHA"', workflow)
+        self.assertIn('--name "$ARTIFACT"', workflow)
         self.assertIn('echo "artifact=ps5-homebrew-ui-$GITHUB_SHA" >> "$GITHUB_OUTPUT"', workflow)
         # A contributor's code is never built with write access or secrets.
         self.assertNotIn("pull_request_target:", workflow)

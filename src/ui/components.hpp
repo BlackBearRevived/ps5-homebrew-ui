@@ -8,6 +8,7 @@
 #pragma once
 
 #include "ui/components/accordion.hpp"
+#include "ui/components/activity_pill.hpp"
 #include "ui/components/action_glyph.hpp"
 #include "ui/components/artwork_detail.hpp"
 #include "ui/components/badge.hpp"
@@ -26,6 +27,7 @@
 #include "ui/components/color_picker.hpp"
 #include "ui/components/component.hpp"
 #include "ui/components/counter.hpp"
+#include "ui/components/country_picker.hpp"
 #include "ui/components/data_common.hpp"
 #include "ui/components/detail_list.hpp"
 #include "ui/components/dialog.hpp"

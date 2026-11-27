@@ -13,7 +13,7 @@ namespace hui
 
 namespace
 {
-constexpr std::uint8_t kVersion = 3;
+constexpr std::uint8_t kVersion = 4;
 } // namespace
 
 std::string encode_settings(const Settings &settings)
@@ -58,6 +58,15 @@ bool decode_settings(std::string_view data, Settings *settings)
     s.resolution = std::clamp<int>(r.get<std::uint8_t>(), 0, Settings::kResolutionCount - 1);
     s.hint_size = std::clamp<int>(r.get<std::uint8_t>(), 0, 2);
     s.concept_index = r.get<std::uint8_t>();
+    if (version < 4)
+    {
+        // Home moved from slot 24 to slot 0. Later designs keep their index.
+        constexpr int old_home = 24;
+        if (s.concept_index == old_home)
+            s.concept_index = 0;
+        else if (s.concept_index < old_home)
+            ++s.concept_index;
+    }
     if (version >= 2)
     {
         s.large_text = r.get_bool();

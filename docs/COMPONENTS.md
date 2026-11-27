@@ -120,7 +120,7 @@ Rectangles come from the layout helpers (`ui::Row`, `ui::Column`,
 | [Navigation](#navigation) | `TabBar`, `SideNav`, `Breadcrumb`, `PageDots`, `Menu` | [components/navigation.md](components/navigation.md) |
 | [Structure](#structure) | `RadialMenu`, `Wizard`, `Accordion`, `TreeView`, `JumpBar` | [components/structure.md](components/structure.md) |
 | [Overlays](#overlays) | `Dialog`, `Sheet`, `ToastStack`, `Tooltip` | [components/overlays.md](components/overlays.md) |
-| [Notifications](#notifications) | `NotificationStack`, `NotificationCenter`, `TransferCenter`, `NotificationBell` | [components/notifications.md](components/notifications.md) |
+| [Notifications](#notifications) | `NotificationStack`, `NotificationCenter`, `TransferCenter`, `NotificationBell`, `ActivityPill` | [components/notifications.md](components/notifications.md) |
 | [Actions](#actions) | `PushButton`, `IconButton`, `ButtonGroup`, `SplitButton`, `HoldButton`, `QuickAction`, `QuickActionBar`, `Banner`, `CoachMark` | [components/actions.md](components/actions.md) |
 | [Forms](#forms) | `Form`, `Stepper`, `ChoicePicker`, `TextField` | [components/forms.md](components/forms.md) |
 | [Pickers](#pickers) | `Select`, `CheckGroup`, `RadioGroup`, `TagSelect`, `ColorPicker`, `WheelPicker`, `DatePicker`, `TimePicker`, `Slider`, `RangeSlider` | [components/pickers.md](components/pickers.md) |
@@ -130,6 +130,7 @@ Rectangles come from the layout helpers (`ui::Row`, `ui::Column`,
 | [Media](#media) | `TextView`, `ImageViewer`, `MediaControls`, `CaptionTrackPicker`, `LoadingScreen` | [components/media.md](components/media.md) |
 | [Game](#game) | `PauseMenu`, `UnlockPopup`, `ProfilePicker`, `InventoryGrid`, `HealthBar`, `AmmoCounter`, `ObjectiveTracker`, `MinimapFrame`, `NodeMap` | [components/game.md](components/game.md) |
 | [Layout](#layout) | `FocusGroup`, `Row`, `Column`, `GridLayout`, `Wrap`, `SpringLayout`, `SplitView`, `ScrollArea`, `Panel`, `Divider`, `SectionHeader`, `Spacer`, `Transition` | [components/layout.md](components/layout.md) |
+| [World Atlas](#atlas) | `CountryPicker` | [components/atlas.md](components/atlas.md) |
 
 <a id="lists"></a>
 
@@ -242,7 +243,7 @@ Rectangles come from the layout helpers (`ui::Row`, `ui::Column`,
 
 ### Notifications
 
-`ui::NotificationStack`, `ui::NotificationCenter`, `ui::TransferCenter`, `ui::NotificationBell` &middot; [knobs, slots, events and cues](components/notifications.md)
+`ui::NotificationStack`, `ui::NotificationCenter`, `ui::TransferCenter`, `ui::NotificationBell`, `ui::ActivityPill` &middot; [knobs, slots, events and cues](components/notifications.md)
 
 <img src="media/designs/components-notifications.webp" width="640" alt="Notifications in motion">
 
@@ -454,51 +455,75 @@ Rectangles come from the layout helpers (`ui::Row`, `ui::Column`,
 </tr>
 </table>
 
+<a id="atlas"></a>
+
+### World Atlas
+
+`ui::CountryPicker` &middot; [knobs, slots, events and cues](components/atlas.md)
+
+<table>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/components-atlas-choice.jpg" alt="World Atlas: components-atlas-choice"></td>
+<td width="50%" valign="top"><img src="media/designs/components-atlas-directory.jpg" alt="World Atlas: components-atlas-directory"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/components-atlas-regional.jpg" alt="World Atlas: components-atlas-regional"></td>
+<td width="50%" valign="top"><img src="media/designs/components-atlas-search.jpg" alt="World Atlas: components-atlas-search"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/components-atlas.jpg" alt="World Atlas: components-atlas"></td>
+</tr>
+</table>
+
 ### The same components in other themes
 
 <table>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-app-flows-activity.jpg" alt="components-app-flows-activity"></td>
 <td width="50%" valign="top"><img src="media/designs/components-app-flows-detail.jpg" alt="components-app-flows-detail"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-app-flows-filter.jpg" alt="components-app-flows-filter"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-app-flows-transfer.jpg" alt="components-app-flows-transfer"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-app-flows.jpg" alt="components-app-flows"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-broadcast.jpg" alt="components-broadcast"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-actions.jpg" alt="components-brutal-actions"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-app-flows.jpg" alt="components-brutal-app-flows"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-collections.jpg" alt="components-brutal-collections"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-data.jpg" alt="components-brutal-data"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-entry.jpg" alt="components-brutal-entry"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-forms.jpg" alt="components-brutal-forms"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-game.jpg" alt="components-brutal-game"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-indicators.jpg" alt="components-brutal-indicators"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-layout.jpg" alt="components-brutal-layout"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-lists.jpg" alt="components-brutal-lists"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-media.jpg" alt="components-brutal-media"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-navigation.jpg" alt="components-brutal-navigation"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-notifications.jpg" alt="components-brutal-notifications"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-overlays.jpg" alt="components-brutal-overlays"></td>
-<td width="50%" valign="top"><img src="media/designs/components-brutal-pickers.jpg" alt="components-brutal-pickers"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-brutal-pickers.jpg" alt="components-brutal-pickers"></td>
 <td width="50%" valign="top"><img src="media/designs/components-brutal-structure.jpg" alt="components-brutal-structure"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/components-brutal-world-atlas.jpg" alt="components-brutal-world-atlas"></td>
 <td width="50%" valign="top"><img src="media/designs/components-cinema.jpg" alt="components-cinema"></td>
 </tr>
 <tr>
@@ -546,36 +571,40 @@ Rectangles come from the layout helpers (`ui::Row`, `ui::Column`,
 <td width="50%" valign="top"><img src="media/designs/components-pixel-structure.jpg" alt="components-pixel-structure"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-pixel-world-atlas.jpg" alt="components-pixel-world-atlas"></td>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-actions.jpg" alt="components-sketch-actions"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-app-flows.jpg" alt="components-sketch-app-flows"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-collections.jpg" alt="components-sketch-collections"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-data.jpg" alt="components-sketch-data"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-entry.jpg" alt="components-sketch-entry"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-forms.jpg" alt="components-sketch-forms"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-game.jpg" alt="components-sketch-game"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-indicators.jpg" alt="components-sketch-indicators"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-layout.jpg" alt="components-sketch-layout"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-lists.jpg" alt="components-sketch-lists"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-media.jpg" alt="components-sketch-media"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-navigation.jpg" alt="components-sketch-navigation"></td>
-</tr>
-<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-notifications.jpg" alt="components-sketch-notifications"></td>
-<td width="50%" valign="top"><img src="media/designs/components-sketch-overlays.jpg" alt="components-sketch-overlays"></td>
 </tr>
 <tr>
+<td width="50%" valign="top"><img src="media/designs/components-sketch-overlays.jpg" alt="components-sketch-overlays"></td>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-pickers.jpg" alt="components-sketch-pickers"></td>
+</tr>
+<tr>
 <td width="50%" valign="top"><img src="media/designs/components-sketch-structure.jpg" alt="components-sketch-structure"></td>
+<td width="50%" valign="top"><img src="media/designs/components-sketch-world-atlas.jpg" alt="components-sketch-world-atlas"></td>
 </tr>
 </table>
 <!-- END:components -->

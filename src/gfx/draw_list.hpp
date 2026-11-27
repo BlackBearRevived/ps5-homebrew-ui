@@ -7,6 +7,7 @@
 #include "gfx/font.hpp"
 
 #include <cstdint>
+#include <span>
 #include <string_view>
 #include <vector>
 
@@ -171,6 +172,9 @@ class DrawList
     // Filled simple polygon (convex or concave) from interleaved x, y pairs.
     // Edges are not anti-aliased by the shader: keep polygons small or thin.
     void polygon(const float *xy, int count, Color fill);
+    // Pre-triangulated geometry, with interleaved x/y pairs. Invalid batches are ignored.
+    void indexed_triangles(std::span<const float> xy, std::span<const std::uint32_t> indices,
+                           Color fill);
 
     // ---- text ----
     // font_texture is the GL texture holding font's atlas. tracking adds

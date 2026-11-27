@@ -28,6 +28,7 @@ int wrapped(int slot, int count)
 
 void Carousel::set_items(std::vector<CardItem> items)
 {
+    entry_light_ = 0.0f;
     items_ = std::move(items);
     focus_ = std::clamp(focus_, 0, std::max(static_cast<int>(items_.size()) - 1, 0));
     retarget(true);
@@ -44,6 +45,7 @@ void Carousel::set_focus(int index, bool snap)
     if (items_.empty())
         return;
     focus_ = std::clamp(index, 0, static_cast<int>(items_.size()) - 1);
+    entry_light_ = 0.0f;
     slot_ = nearest_slot(focus_);
     retarget(snap);
 }
@@ -226,6 +228,7 @@ Event Carousel::handle(const InputFrame &input, Feedback &feedback)
             return refuse(feedback, style, input, refusal_, resting_x());
         }
         const int page_before = focus_ / at.per_page;
+        entry_light_ = -static_cast<float>(direction);
         focus_ = next;
         slot_ = ring ? slot_ + direction : focus_;
         retarget(false);
@@ -256,6 +259,7 @@ Event Carousel::handle(const InputFrame &input, Feedback &feedback)
 void Carousel::update(float dt)
 {
     age_ += dt;
+    entry_light_ = std::copysign(std::max(0.0f, std::abs(entry_light_) - dt * 2.8f), entry_light_);
     // Every frame, so a change of style (mode, sizes, theme) simply takes
     // effect: the row glides to where it now belongs.
     retarget(false);
@@ -351,6 +355,7 @@ void Carousel::draw(Canvas &canvas) const
         const bool held = nearby > 0.5f;
         CardState state;
         state.focus = nearby * active;
+        state.entry_light = index == focus_ && active_ ? entry_light_ : 0.0f;
         // The wheel keeps its shape when the focus is elsewhere; a shelf lets go.
         state.emphasis = centered ? nearby : nearby * active;
         state.press = held ? press_.value : 0.0f;

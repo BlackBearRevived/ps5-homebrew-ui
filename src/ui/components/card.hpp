@@ -85,19 +85,21 @@ struct CardLook
     bool glow = false;                 // light in the item's accent colour around it
     gfx::Color glow_color{0, 0, 0, 0}; // alpha 0: the item's accent, else the theme's focus
     float dim = 0.0f;                  // 0..1: how far cards without the focus fade
+    bool directional_light = false;    // light enters from the last navigation edge
 };
 
 // The animated state of one card, eased by its owner.
 struct CardState
 {
-    float focus = 0.0f;     // 0..1
-    float press = 0.0f;     // 0..1
-    float selected = -1.0f; // 0..1 for an animated check; negative reads item.selected
-    float emphasis = -1.0f; // 0..1: how much of focus_scale applies; negative: same as focus
-    float text = 1.0f;      // opacity of the title and subtitle: a shelf fades the words of
-                            // an item its edge cuts, since half a word is worse than none
-    bool marks = true;      // draw the ring and the glow; false when the owner draws one
-                            // gliding indicator for all its cards
+    float focus = 0.0f;       // 0..1
+    float press = 0.0f;       // 0..1
+    float selected = -1.0f;   // 0..1 for an animated check; negative reads item.selected
+    float emphasis = -1.0f;   // 0..1: how much of focus_scale applies; negative: same as focus
+    float text = 1.0f;        // opacity of the title and subtitle: a shelf fades the words of
+                              // an item its edge cuts, since half a word is worse than none
+    bool marks = true;        // draw the ring and the glow; false when the owner draws one
+                              // gliding indicator for all its cards
+    float entry_light = 0.0f; // signed strength: negative lights the left edge
 };
 
 // Draws the artwork of a card instead of its texture: art is where, radius

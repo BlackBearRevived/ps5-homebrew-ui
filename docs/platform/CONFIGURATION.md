@@ -49,15 +49,10 @@ The release workflow checks the tag against `contentVersion` and accepts
 the padded spelling used by older tags. For ordinary development, keep
 `masterVersion` at `01.00` and increment `contentVersion` for each release.
 Change `masterVersion` only when intentionally changing the compatible release
-baseline. Each tagged GitHub Release contains a ZIP of the directory-style
-application and its `SHA256SUMS`.
-
-A release is made by pushing the version tag and in no other way: the
-workflow builds, attests, and publishes the ZIP and `SHA256SUMS`, and files
-are not attached by hand. If the tag has no release yet, the workflow creates
-it; if a release exists without a ZIP (notes written in advance, or a draft),
-it adds the two files and leaves the title and notes alone; if a release
-already has a ZIP, nothing is replaced and the run ends with a warning.
+baseline. A matching version tag triggers publication of the ZIP, PKG
+and their checksums after verification. If a prepared release has no ZIP yet,
+CI attaches the files and preserves the release notes. Previously published
+downloads keep their checksums.
 
 The loader-visible SDK and FSELF constants are internal build-format values,
 not application versions. They remain fixed to the cross-firmware-validated

@@ -161,3 +161,10 @@ cover art inside the app is rendered at start-up from invented titles; no real
 product's name, artwork or trademark is used.
 
 No proprietary runtime module, encryption key, or game file is included.
+
+## Natural Earth
+
+The offline country picker uses generalized geometry and label anchors derived
+from Natural Earth 1:10m Admin 0 Map Units, version 5.1.2. Natural Earth makes
+these data available in the public domain. The library ships the baked map
+and uses no tile service. [Source dataset](https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_10m_admin_0_map_units.geojson) · [Natural Earth terms of use](https://www.naturalearthdata.com/about/terms-of-use/)

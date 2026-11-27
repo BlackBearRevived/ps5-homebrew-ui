@@ -954,6 +954,34 @@ Theme field_journal()
     return t;
 }
 
+Theme screenprint()
+{
+    Theme t = web_light("screenprint", "Screenprint", "Two-ink poster",
+                        "Vermilion ink, warm paper and offset midnight shadows");
+    t.page = rgb(0xf1dfb7);
+    t.backdrop = plain(0xf1dfb7);
+    t.surface = rgb(0xffedc8);
+    t.surface_high = rgb(0xe5c995);
+    t.text = t.outline = t.on_secondary = rgb(0x182039);
+    t.text_muted = rgb(0x574634);
+    t.primary = rgb(0xa52b31);
+    t.on_primary = rgb(0xfff4dc);
+    t.accent = rgb(0x9b2933);
+    t.focus = rgb(0x173e72);
+    t.shadow = rgb(0x192138);
+    t.style = SurfaceStyle::hard;
+    t.radius = t.radius_card = 2;
+    t.border = 3;
+    t.shadow_offset = 5;
+    t.heading = FontRole::display;
+    t.label = FontRole::semibold;
+    t.omega = 25;
+    t.damping = 0.86f;
+    t.sounds = audio::SoundSet::paper;
+    t.pill_switches = false;
+    return t;
+}
+
 Theme broadcast()
 {
     Theme t = web_dark("broadcast", "Broadcast", "Live production",
@@ -1057,6 +1085,7 @@ std::span<const Theme> themes()
             cinema(),
             field_journal(),
             broadcast(),
+            screenprint(),
         };
         for (Theme &theme : result)
         {

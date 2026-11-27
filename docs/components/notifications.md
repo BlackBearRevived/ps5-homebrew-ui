@@ -546,3 +546,20 @@ main action directly. The hint row says which.
 | Cards, top right, focus | `card` | `top_right` | Triangle gives the stack the focus |
 | Compact, bottom centre, shortcut | `compact`, 720 wide | `bottom_center` | `shortcut = Action::north` |
 | Accent, bottom right, two at a time | `accent`, 620 wide, hugging buttons, no time bar, `max_visible` 2 | `bottom_right` | Triangle gives the stack the focus |
+
+## ActivityPill
+
+A compact view of one background job. Supply a stable `TransferJob::id`, a title,
+a state, measured progress from 0 to 1, and a short detail or failure reason with
+`set_job(job)`. The compact pill anchors to the top right of its bounds. Set the
+bounds large enough for its expanded text, progress bar and Retry action.
+
+Triangle expands the pill. While `expanded()` is true, route input exclusively
+to its `handle` method and preserve the underlying selection. A failed job
+returns `Event::activated` on Confirm so the host can retry the same ID. Feed
+back the service's result. A routine progress update preserves focus, Back
+collapses the pill, and a different job ID resets it. Call `update(dt)` before
+drawing. Customize `style.active_label` and `style.completed_label` for the task.
+
+Cinema Library uses this for real artwork uploads. App flows demonstrates the
+same component with its example transfer queue.

@@ -149,6 +149,7 @@ COMPONENT_GROUPS = [
     ("media", "Media"),
     ("game", "Game"),
     ("layout", "Layout"),
+    ("atlas", "World Atlas"),
 ]
 
 

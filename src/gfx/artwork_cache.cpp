@@ -106,6 +106,13 @@ void ArtworkCache::release_entry(const Entry &entry)
     bytes_ -= entry.bytes;
 }
 
+void ArtworkCache::retry_unavailable(ArtworkId id)
+{
+    const auto entry = entries_.find(id);
+    if (entry != entries_.end() && entry->second.artwork.status == ArtworkStatus::unavailable)
+        entry->second.artwork.status = ArtworkStatus::missing;
+}
+
 void ArtworkCache::select(std::span<const ArtworkRequest> requests)
 {
     if (!started_ && !requests.empty())

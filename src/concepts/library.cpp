@@ -4,6 +4,7 @@
 
 #include "concepts/concepts.hpp"
 
+#include "ui/components/activity_pill.hpp"
 #include "ui/components/artwork_detail.hpp"
 #include "ui/components/search_filter.hpp"
 #include "ui/components/shelf_browser.hpp"
@@ -51,6 +52,8 @@ constexpr const char *kDescriptions[] = {
     "Navigate an expedition across snow, white sky, and the last hours of sun.",
 };
 constexpr const char *kTechniques[] = {
+    "A highlight enters the selected cover from the navigation edge",
+    "The activity pill measures completed cover uploads and returns to the same shelf",
     "Stable IDs preserve focus across reordered and filtered shelves",
     "The artwork cache decodes JPEG files off the render thread",
     "The shared cover can reverse in flight when the player presses Back",
@@ -101,6 +104,7 @@ class Library final : public app::Concept
         shelves_.style.carousel.card.focus_scale = 1.022f;
         shelves_.style.carousel.card.title_size = 27.0f;
         shelves_.style.carousel.card.glow = true;
+        shelves_.style.carousel.card.directional_light = true;
         shelves_.style.carousel.card.subtitle_size = 0.0f;
         shelves_.style.carousel.counter = true;
         shelves_.style.carousel.entrance_step = 0.0f;
@@ -135,6 +139,8 @@ class Library final : public app::Concept
     void enter() override
     {
         artwork_dirty_ = true; // Home shares the cache and selects its own artwork.
+        activity_.dismiss();
+        activity_visible_ = false;
         shelves_.enter();
         shelves_.set_active(true);
         hero_.set_active(false);
@@ -152,7 +158,18 @@ class Library final : public app::Concept
             theme_.strong_focus != context_.settings.strong_focus)
             restyle();
 
-        if (filters_.is_open())
+        if (activity_.expanded())
+        {
+            if (activity_.handle(input, feedback) == ui::Event::activated && context_.artwork)
+            {
+                for (auto id = activity_first_; id < activity_first_ + 3; ++id)
+                    context_.artwork->retry_unavailable(id);
+                artwork_dirty_ = true;
+                activity_job_.state = ui::TransferState::active;
+            }
+            shelves_.set_active(!activity_.expanded());
+        }
+        else if (filters_.is_open())
         {
             if (filters_.handle(input, feedback) == ui::Event::activated)
                 apply(filters_.draft());
@@ -178,6 +195,24 @@ class Library final : public app::Concept
             }
             else if (hero_.handle(input, feedback) == ui::Event::activated)
                 played_ = true;
+        }
+        else if (input.is_pressed(Action::north) && !transition_.running())
+        {
+            if (!activity_visible_ && shelves_.selection())
+            {
+                const auto id = shelves_.selection()->item;
+                activity_first_ = std::min<ui::ShelfId>(id, kItemCount - 2);
+                activity_job_ = {id, "Library cover set", ui::TransferState::active, 0.f,
+                                 "Preparing cover artwork."};
+                activity_visible_ = true;
+                artwork_dirty_ = true;
+                activity_.set_job(activity_job_);
+            }
+            if (activity_visible_)
+            {
+                activity_.handle(input, feedback);
+                shelves_.set_active(!activity_.expanded());
+            }
         }
         else if (input.is_pressed(Action::menu))
         {
@@ -228,6 +263,8 @@ class Library final : public app::Concept
                 transition_.set_bounds(source, kHero);
         }
         update_artwork();
+        update_activity();
+        activity_.update(dt);
         const auto current = shelves_.selection();
         const ui::ShelfId item = current ? current->item : 0;
         if (item != preview_id_)
@@ -307,20 +344,34 @@ class Library final : public app::Concept
         }
 
         ui::Canvas above{frame.overlay, context_.fonts};
+        if (activity_visible_ && !filters_.is_open() && !hero_cell_)
+            activity_.draw(above);
         filters_.draw(above);
+        ui::HintLayout layout;
+        layout.size *= theme_.text_scale;
+        layout.text_size *= theme_.text_scale;
         const ui::GlyphStyle glyphs = ui::GlyphStyle::dark(context_.settings.swap_confirm);
-        if (transition_.expanded() || filters_.is_open())
+        if (activity_.expanded())
+        {
+            const ui::Hint hints[] = {
+                {ui::Button::confirm,
+                 activity_job_.state == ui::TransferState::failed ? "Retry" : "Close"},
+                {ui::Button::back, "Back to shelf"}};
+            ui::draw_hints(above.list, above.fonts, glyphs, hints, 2, 1824, true, layout);
+        }
+        else if (transition_.expanded() || filters_.is_open())
         {
             const ui::Hint hints[] = {{ui::Button::confirm, "Choose"}, {ui::Button::back, "Back"}};
-            ui::draw_hints(above.list, above.fonts, glyphs, hints, 2, 1824, true);
+            ui::draw_hints(above.list, above.fonts, glyphs, hints, 2, 1824, true, layout);
         }
         else
         {
             const ui::Hint hints[] = {{ui::Button::confirm, "Details"},
                                       {ui::Button::options, "Search"},
                                       {ui::Button::square, "Favorites"},
-                                      {ui::Button::r2, "Resume"}};
-            ui::draw_hints(above.list, above.fonts, glyphs, hints, 4, 1824, true);
+                                      {ui::Button::r2, "Resume"},
+                                      {ui::Button::triangle, "Cover activity"}};
+            ui::draw_hints(above.list, above.fonts, glyphs, hints, 5, 1824, true, layout);
         }
     }
 
@@ -380,6 +431,11 @@ class Library final : public app::Concept
             style->theme = theme_;
             style->reduced_motion = reduced_;
         }
+        activity_.style.theme = theme_;
+        activity_.style.reduced_motion = reduced_;
+        activity_.style.active_label = "Loading covers";
+        activity_.style.completed_label = "Covers ready";
+        activity_.set_bounds({1100, 142, 690, 250});
         shelves_.set_bounds(kShelves);
         hero_.action = "Select preview";
     }
@@ -453,6 +509,9 @@ class Library final : public app::Concept
                                 { requested_.push_back(cell); });
             std::vector<gfx::ArtworkRequest> requests;
             requests.reserve(requested_.size() + 1);
+            if (activity_visible_ && activity_job_.state == ui::TransferState::active)
+                for (auto id = activity_first_; id < activity_first_ + 3; ++id)
+                    requests.push_back({id, artwork_path(id)});
             if (hero_cell_)
                 requests.push_back({detail_id, artwork_path(detail_id)});
             for (const ui::ShelfSelection &cell : requested_)
@@ -472,6 +531,33 @@ class Library final : public app::Concept
         hero_.artwork = cache->get(detail_id);
     }
 
+    void update_activity()
+    {
+        if (!activity_visible_ || activity_job_.state != ui::TransferState::active)
+            return;
+        int ready = 0;
+        for (auto id = activity_first_; id < activity_first_ + 3; ++id)
+        {
+            const auto status = context_.artwork ? context_.artwork->get(id).status
+                                                 : gfx::ArtworkStatus::unavailable;
+            if (status == gfx::ArtworkStatus::unavailable)
+            {
+                activity_job_.state = ui::TransferState::failed;
+                activity_job_.detail = std::string(kTitles[art_index(id)]) + " cover unavailable.";
+                break;
+            }
+            ready += status == gfx::ArtworkStatus::ready;
+        }
+        activity_job_.progress = static_cast<float>(ready) / 3.f;
+        if (activity_job_.state != ui::TransferState::failed)
+        {
+            activity_job_.detail = std::to_string(ready) + " of 3 covers loaded";
+            if (ready == 3)
+                activity_job_.state = ui::TransferState::completed;
+        }
+        activity_.set_job(activity_job_);
+    }
+
     std::string fit_preview_title(ui::Canvas &canvas) const
     {
         return canvas.fonts.display.font->fit(preview_.title, 68.0f, 1050.0f);
@@ -479,6 +565,9 @@ class Library final : public app::Concept
 
     void build_tour()
     {
+        tour_.push_back({0.4f, 0, Direction::right});
+        tour_.push_back({0.10f, 0, Direction::left, "focus-right"});
+        tour_.push_back({0.10f, 0, Direction::none, "focus-first"});
         for (int i = 0; i < 18; ++i)
         {
             app::TourStep step{0.11f, 0, Direction::right};
@@ -501,12 +590,19 @@ class Library final : public app::Concept
                          {1.1f, action_bit(Action::back), Direction::none, "missing-cover"},
                          {0.9f, action_bit(Action::menu)},
                          {0.6f, action_bit(Action::back), Direction::none, "search"},
+                         {0.7f, action_bit(Action::north)},
+                         {0.7f, action_bit(Action::back), Direction::none, "cover-activity"},
+                         {0.7f, 0, Direction::none, "activity-collapsed"},
                      });
     }
 
     app::Context &context_;
     ui::Theme theme_{};
     ui::ShelfBrowser shelves_;
+    ui::ActivityPill activity_;
+    ui::TransferJob activity_job_;
+    ui::ShelfId activity_first_ = 1;
+    bool activity_visible_ = false;
     ui::ArtworkDetailHeader preview_;
     ui::ArtworkDetailHeader hero_;
     ui::SearchFilterPanel filters_;

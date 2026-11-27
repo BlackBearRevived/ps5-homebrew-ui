@@ -19,7 +19,7 @@ info panel and choose **Home** to return.
 <img src="docs/media/switcher.webp" width="860" alt="L1 and R1 cycling through every design in the app">
 
 <!-- BEGIN:counts -->
-**25 designs** &middot; **33 themes** &middot; **104 reusable components**
+**26 designs** &middot; **34 themes** &middot; **106 reusable components**
 <!-- END:counts -->
 &middot; **67 sound effects** in two sets &middot; **one OpenGL 4.6 shader** behind all of it
 
@@ -57,7 +57,34 @@ documentation to learn the craft, enough working code to copy from.
 | **Components** | A library of reusable pieces that own their focus, motion and sound: lists, grids, carousels, tabs, menus, dialogs, sheets, toasts, forms, progress, badges, counters and more. Each is restyled by any theme, tuned through a style struct and extended through slots. |
 | **Designs** | Complete screens, each in one file: a home screen, a library, a storefront, a HUD with a pause menu, a radial menu, an on-screen keyboard, a settings screen that really works, and more. |
 | **A tour** | The app can drive itself. The same scripted run renders every picture in these docs on a PC, runs the unit tests, and validates a build on the console. |
-| **A PS5 build** | Native build and packaging based on [PS5 Native App Boilerplate 1.000.000](https://github.com/BlackBearRevived/ps5-native-app-boilerplate/releases/tag/1.000.000), with [PS5 OpenGL SDK 1.0.3](https://github.com/BlackBearRevived/ps5-opengl/releases/tag/v1.0.3). |
+| **A PS5 build** | Native build and packaging based on [PS5 Native App Boilerplate `7d3b975`](https://github.com/BlackBearRevived/ps5-native-app-boilerplate/tree/7d3b97577f7d2e05c150e01300f3d399f5a647c7), with [PS5 OpenGL SDK 1.0.3](https://github.com/BlackBearRevived/ps5-opengl/releases/tag/v1.0.3). |
+
+## Widget and interaction gallery
+
+These screenshots come from the app's built-in tour. Select a picture to open its design or widget guide.
+
+<table>
+<tr>
+<td width="50%" valign="top"><a href="docs/components/atlas.md"><img src="docs/media/designs/components-atlas.jpg" alt="Brazil highlighted on the world map, with its country code and region beside it"></a><br><b>World Atlas</b><br><sub>Move the D-pad or left stick toward a country, then press Cross to select it.</sub></td>
+<td width="50%" valign="top"><a href="docs/components/atlas.md"><img src="docs/media/designs/components-atlas-regional.jpg" alt="A ring and nameplate mark Saint Helena between South America and Africa"></a><br><b>Regional zoom</b><br><sub>Press Square to zoom in. Small islands keep a marker large enough to see from the sofa.</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><a href="docs/components/atlas.md"><img src="docs/media/designs/components-atlas-directory.jpg" alt="Saint Helena highlighted in the alphabetical country directory"></a><br><b>Country directory</b><br><sub>Browse all 250 countries and territories in an alphabetical list.</sub></td>
+<td width="50%" valign="top"><a href="docs/components/atlas.md"><img src="docs/media/designs/components-atlas-search.jpg" alt="Find a country screen with an on-screen keyboard and a name or code field"></a><br><b>Country search</b><br><sub>Use the controller keyboard to find a country by name or two-letter code.</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#library"><img src="docs/media/designs/library-focus-first.jpg" alt="The Cinema Library shelf with Salt Meridian in focus"></a><br><b>Cinema Library focus lighting</b><br><sub>Moving left brings the highlight back onto the first cover.</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#library"><img src="docs/media/designs/library-focus-right.jpg" alt="Focus travelling from Salt Meridian toward The Tidal Line on the same shelf"></a><br><b>Moving to the next cover</b><br><sub>The lit edge shows which way focus is travelling as the outline slides between covers.</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><a href="docs/components/notifications.md#activitypill"><img src="docs/media/designs/library-activity-collapsed.jpg" alt="A compact Action needed pill above the Cinema Library shelves"></a><br><b>Activity pill</b><br><sub>A missing cover gets a small status pill while the shelf stays in view.</sub></td>
+<td width="50%" valign="top"><a href="docs/components/notifications.md#activitypill"><img src="docs/media/designs/library-cover-activity.jpg" alt="The expanded pill names the unavailable Cedar House cover and offers Retry"></a><br><b>Expanded activity pill</b><br><sub>Open the pill to see which cover needs attention and retry it in place.</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><a href="docs/THEMES.md#screenprint"><img src="docs/media/designs/chapters-ferry.jpg" alt="A red sun behind a navy ferry on warm paper beside the selected Last Ferry chapter"></a><br><b>Screenprint</b><br><sub>Night Signal uses the theme's two inks for both the chapter list and its illustrated posters.</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#chapters"><img src="docs/media/designs/chapters-dial.jpg" alt="The Last Ferry poster beside a six-channel radio dial in Night Signal"></a><br><b>Night Signal</b><br><sub>Play the selected chapter by tuning the radio to the requested channel and transmitting.</sub></td>
+</tr>
+</table>
 
 ## The designs
 
@@ -68,55 +95,56 @@ its clip, its techniques and its source.
 <!-- BEGIN:designs -->
 <table>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#aurora"><img src="docs/media/designs/aurora.jpg" alt="Aurora Shelf"></a><br><b>01 &middot; Aurora Shelf</b><br><sub>A console home screen: hero panel, cover shelves, frosted details</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#paper"><img src="docs/media/designs/paper.jpg" alt="Paper Library"></a><br><b>02 &middot; Paper Library</b><br><sub>A game shelf of paper cards that travel when sorted, filtered or picked up</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#home"><img src="docs/media/designs/home.jpg" alt="Homebrew UI Lab"></a><br><b>01 &middot; Homebrew UI Lab</b><br><sub>A playable theme and widget library for PS5 homebrew</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#aurora"><img src="docs/media/designs/aurora.jpg" alt="Aurora Shelf"></a><br><b>02 &middot; Aurora Shelf</b><br><sub>A console home screen: hero panel, cover shelves, frosted details</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#neon"><img src="docs/media/designs/neon.jpg" alt="Neon Arcade"></a><br><b>03 &middot; Neon Arcade</b><br><sub>A synthwave racer's main menu: neon sign, gliding tube, live previews</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#editorial"><img src="docs/media/designs/editorial.jpg" alt="Editorial"></a><br><b>04 &middot; Editorial</b><br><sub>A magazine's weekly selection: big type on paper, and an article behind every row</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#paper"><img src="docs/media/designs/paper.jpg" alt="Paper Library"></a><br><b>03 &middot; Paper Library</b><br><sub>A game shelf of paper cards that travel when sorted, filtered or picked up</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#neon"><img src="docs/media/designs/neon.jpg" alt="Neon Arcade"></a><br><b>04 &middot; Neon Arcade</b><br><sub>A synthwave racer's main menu: neon sign, gliding tube, live previews</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#carousel"><img src="docs/media/designs/carousel.jpg" alt="Cover Wheel"></a><br><b>05 &middot; Cover Wheel</b><br><sub>A carousel with weight: scrub it, let it coast, open a cover</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#radial"><img src="docs/media/designs/radial.jpg" alt="Radial Dial"></a><br><b>06 &middot; Radial Dial</b><br><sub>An in-game item wheel: aim with the stick, equip with one press</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#editorial"><img src="docs/media/designs/editorial.jpg" alt="Editorial"></a><br><b>05 &middot; Editorial</b><br><sub>A magazine's weekly selection: big type on paper, and an article behind every row</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#carousel"><img src="docs/media/designs/carousel.jpg" alt="Cover Wheel"></a><br><b>06 &middot; Cover Wheel</b><br><sub>A carousel with weight: scrub it, let it coast, open a cover</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#hud"><img src="docs/media/designs/hud.jpg" alt="Field HUD"></a><br><b>07 &middot; Field HUD</b><br><sub>An in-game HUD over a moving world, and the pause menu behind Options</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#dashboard"><img src="docs/media/designs/dashboard.jpg" alt="Pulse Dashboard"></a><br><b>08 &middot; Pulse Dashboard</b><br><sub>A bento grid of live data tiles that expand into detail views</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#radial"><img src="docs/media/designs/radial.jpg" alt="Radial Dial"></a><br><b>07 &middot; Radial Dial</b><br><sub>An in-game item wheel: aim with the stick, equip with one press</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#hud"><img src="docs/media/designs/hud.jpg" alt="Field HUD"></a><br><b>08 &middot; Field HUD</b><br><sub>An in-game HUD over a moving world, and the pause menu behind Options</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#player"><img src="docs/media/designs/player.jpg" alt="Now Playing"></a><br><b>09 &middot; Now Playing</b><br><sub>A music player: breathing artwork, a visualizer, a scrubber and a glass queue</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#keyboard"><img src="docs/media/designs/keyboard.jpg" alt="First Run"></a><br><b>10 &middot; First Run</b><br><sub>A setup wizard: avatar, a name typed on a controller keyboard, a warm welcome</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#dashboard"><img src="docs/media/designs/dashboard.jpg" alt="Pulse Dashboard"></a><br><b>09 &middot; Pulse Dashboard</b><br><sub>A bento grid of live data tiles that expand into detail views</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#player"><img src="docs/media/designs/player.jpg" alt="Now Playing"></a><br><b>10 &middot; Now Playing</b><br><sub>A music player: breathing artwork, a visualizer, a scrubber and a glass queue</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#constellation"><img src="docs/media/designs/constellation.jpg" alt="Constellation"></a><br><b>11 &middot; Constellation</b><br><sub>A skill tree as a star map: free 2D focus, a gliding camera, progression</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#terminal"><img src="docs/media/designs/terminal.jpg" alt="Phosphor"></a><br><b>12 &middot; Phosphor</b><br><sub>A monochrome CRT terminal: character grid, glow, typed text</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#keyboard"><img src="docs/media/designs/keyboard.jpg" alt="First Run"></a><br><b>11 &middot; First Run</b><br><sub>A setup wizard: avatar, a name typed on a controller keyboard, a warm welcome</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#constellation"><img src="docs/media/designs/constellation.jpg" alt="Constellation"></a><br><b>12 &middot; Constellation</b><br><sub>A skill tree as a star map: free 2D focus, a gliding camera, progression</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#store"><img src="docs/media/designs/store.jpg" alt="Storefront"></a><br><b>13 &middot; Storefront</b><br><sub>A shop window: featured banner, product pages, a cart and a checkout</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#trophies"><img src="docs/media/designs/trophies.jpg" alt="Trophy Room"></a><br><b>14 &middot; Trophy Room</b><br><sub>An achievements cabinet: metal medals, counting numbers, an unlock with ceremony</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#terminal"><img src="docs/media/designs/terminal.jpg" alt="Phosphor"></a><br><b>13 &middot; Phosphor</b><br><sub>A monochrome CRT terminal: character grid, glow, typed text</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#store"><img src="docs/media/designs/store.jpg" alt="Storefront"></a><br><b>14 &middot; Storefront</b><br><sub>A shop window: featured banner, product pages, a cart and a checkout</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#files"><img src="docs/media/designs/files.jpg" alt="File Browser"></a><br><b>15 &middot; File Browser</b><br><sub>A file manager: aligned columns, folders that keep your place, visible results</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#inventory"><img src="docs/media/designs/inventory.jpg" alt="Satchel"></a><br><b>16 &middot; Satchel</b><br><sub>An inventory you handle: lift, carry, swap, stack and equip, with a comparing tooltip</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#trophies"><img src="docs/media/designs/trophies.jpg" alt="Trophy Room"></a><br><b>15 &middot; Trophy Room</b><br><sub>An achievements cabinet: metal medals, counting numbers, an unlock with ceremony</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#files"><img src="docs/media/designs/files.jpg" alt="File Browser"></a><br><b>16 &middot; File Browser</b><br><sub>A file manager: aligned columns, folders that keep your place, visible results</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#boot"><img src="docs/media/designs/boot.jpg" alt="Launch Sequence"></a><br><b>17 &middot; Launch Sequence</b><br><sub>Before the menu: studio splash, title, profiles and an honest loading screen</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#settings"><img src="docs/media/designs/settings.jpg" alt="Control Room"></a><br><b>18 &middot; Control Room</b><br><sub>A settings screen with real controls: sliders, switches, steppers, a dialog</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#inventory"><img src="docs/media/designs/inventory.jpg" alt="Satchel"></a><br><b>17 &middot; Satchel</b><br><sub>An inventory you handle: lift, carry, swap, stack and equip, with a comparing tooltip</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#boot"><img src="docs/media/designs/boot.jpg" alt="Launch Sequence"></a><br><b>18 &middot; Launch Sequence</b><br><sub>Before the menu: studio splash, title, profiles and an honest loading screen</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#themes"><img src="docs/media/designs/themes.jpg" alt="Theme Lab"></a><br><b>19 &middot; Theme Lab</b><br><sub>One screen across the built-in themes: L2 and R2 restyle every widget</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#components"><img src="docs/media/designs/components.jpg" alt="Component Library"></a><br><b>20 &middot; Component Library</b><br><sub>Reusable lists, grids, dialogs, forms and indicators, restyled by the built-in themes</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#settings"><img src="docs/media/designs/settings.jpg" alt="Control Room"></a><br><b>19 &middot; Control Room</b><br><sub>A settings screen with real controls: sliders, switches, steppers, a dialog</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#themes"><img src="docs/media/designs/themes.jpg" alt="Theme Lab"></a><br><b>20 &middot; Theme Lab</b><br><sub>One screen across the built-in themes: L2 and R2 restyle every widget</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#toolbox"><img src="docs/media/designs/toolbox.jpg" alt="Toolbox"></a><br><b>21 &middot; Toolbox</b><br><sub>The kit on one screen: shapes, type, motion, glyphs and every sound</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#library"><img src="docs/media/designs/library.jpg" alt="Cinema Library"></a><br><b>22 &middot; Cinema Library</b><br><sub>A large artwork-led library with reversible details</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#components"><img src="docs/media/designs/components.jpg" alt="Component Library"></a><br><b>21 &middot; Component Library</b><br><sub>Reusable lists, grids, dialogs, forms and indicators, restyled by the built-in themes</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#toolbox"><img src="docs/media/designs/toolbox.jpg" alt="Toolbox"></a><br><b>22 &middot; Toolbox</b><br><sub>The kit on one screen: shapes, type, motion, glyphs and every sound</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#transfers"><img src="docs/media/designs/transfers.jpg" alt="Transfer Center"></a><br><b>23 &middot; Transfer Center</b><br><sub>Live progress and recovery in the Broadcast theme</sub></td>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#journal"><img src="docs/media/designs/journal.jpg" alt="Field Journal"></a><br><b>24 &middot; Field Journal</b><br><sub>An illustrated field reference with long-form typography</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#library"><img src="docs/media/designs/library.jpg" alt="Cinema Library"></a><br><b>23 &middot; Cinema Library</b><br><sub>A large artwork-led library with reversible details</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#transfers"><img src="docs/media/designs/transfers.jpg" alt="Transfer Center"></a><br><b>24 &middot; Transfer Center</b><br><sub>Live progress and recovery in the Broadcast theme</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><a href="docs/DESIGNS.md#home"><img src="docs/media/designs/home.jpg" alt="Homebrew UI Lab"></a><br><b>25 &middot; Homebrew UI Lab</b><br><sub>A playable theme and widget library for PS5 homebrew</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#journal"><img src="docs/media/designs/journal.jpg" alt="Field Journal"></a><br><b>25 &middot; Field Journal</b><br><sub>An illustrated field reference with long-form typography</sub></td>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#chapters"><img src="docs/media/designs/chapters.jpg" alt="Night Signal"></a><br><b>26 &middot; Night Signal</b><br><sub>A playable coastal chapter select in two inks</sub></td>
 </tr>
 </table>
 <!-- END:designs -->
@@ -185,6 +213,9 @@ app, open **Theme Lab** and press **L2** / **R2**.
 <td width="33%" valign="top"><a href="docs/THEMES.md#field-journal"><img src="docs/media/themes/field-journal.jpg" alt="Field Journal"></a><br><b>32 &middot; Field Journal</b><br><sub>Printed reference</sub></td>
 <td width="33%" valign="top"><a href="docs/THEMES.md#broadcast"><img src="docs/media/themes/broadcast.jpg" alt="Broadcast"></a><br><b>33 &middot; Broadcast</b><br><sub>Live production</sub></td>
 </tr>
+<tr>
+<td width="33%" valign="top"><a href="docs/THEMES.md#screenprint"><img src="docs/media/themes/screenprint.jpg" alt="Screenprint"></a><br><b>34 &middot; Screenprint</b><br><sub>Two-ink poster</sub></td>
+</tr>
 </table>
 <!-- END:themes -->
 
@@ -205,6 +236,10 @@ unzip PPSA99050.zip
 Copy the extracted `PPSA99050` folder to `/data/homebrew/` on a PS5 configured
 for native homebrew and launch **Homebrew UI Lab**.
 
+For a package installer, use `PPSA99050.pkg` and verify it with
+`sha256sum -c PPSA99050.pkg.sha256`. The [Build workflow](https://github.com/BlackBearRevived/ps5-homebrew-ui/actions/workflows/tooling.yml)
+provides both formats for each new build.
+
 ### Build from source
 
 Build on Linux or WSL. See [host requirements](docs/platform/GETTING_STARTED.md)
@@ -213,6 +248,7 @@ for the compiler, Ninja, Make, Python, and optional host preview dependencies.
 ```bash
 make deps              # one-time: toolchain pieces and the OpenGL SDK, pinned and verified
 make                   # build the PS5 app folder in dist/
+make pkg                # build the ZIP and verified PS5 PKG with their checksums
 make host-snapshots    # run every design on this PC and write PNGs to build/snapshots
 make test              # unit tests (sanitizers on) and tooling tests
 ```

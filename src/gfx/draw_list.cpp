@@ -83,6 +83,15 @@ void DrawList::polygon(const float *xy, int count, Color fill)
     triangulate(xy, count, index_scratch_);
     if (index_scratch_.empty())
         return;
+    indexed_triangles({xy, static_cast<std::size_t>(count) * 2}, index_scratch_, fill);
+}
+
+void DrawList::indexed_triangles(std::span<const float> xy, std::span<const std::uint32_t> indices,
+                                 Color fill)
+{
+    if (indices.empty() || indices.size() % 3 != 0 ||
+        std::ranges::any_of(indices, [size = xy.size() / 2](auto i) { return i >= size; }))
+        return;
     const bool clipped = !clips_.empty();
     const Rect clip = clipped ? clips_.back() : Rect{};
     if (runs_.empty() || !runs_.back().mesh || !same_clip(runs_.back(), clipped, clip))
@@ -94,10 +103,10 @@ void DrawList::polygon(const float *xy, int count, Color fill)
         run.clip = clip;
         runs_.push_back(run);
     }
-    for (std::uint32_t index : index_scratch_)
+    for (std::uint32_t index : indices)
         mesh_.push_back({apply_x(xy[2 * index]), apply_y(xy[2 * index + 1]), fill.r, fill.g, fill.b,
                          fill.a * opacity_});
-    runs_.back().count += static_cast<std::uint32_t>(index_scratch_.size());
+    runs_.back().count += static_cast<std::uint32_t>(indices.size());
 }
 
 Rect DrawList::apply(const Rect &r) const

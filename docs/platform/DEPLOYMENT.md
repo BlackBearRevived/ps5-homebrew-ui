@@ -1,7 +1,7 @@
 # Deployment
 
 This project creates a directory-style homebrew application. Tagged releases
-provide the complete directory as a ZIP archive. Its Makefile can update the
+provide the complete directory as a ZIP archive and a separate installable homebrew PKG. Its Makefile can update the
 directory below `/data/homebrew` over FTP. It does not configure the console,
 start payloads, register titles, launch applications, or create a signed
 retail package.
@@ -49,7 +49,7 @@ Select a non-default port with a Make variable:
 make deploy PS5_HOST=192.168.1.100 FTP_PORT=2121
 ```
 
-The folder is the only form this project builds and deploys. Do not keep a
+FTP deployment uses the folder. Do not keep a
 folder and an image with the same title ID in scan paths at the same time: an
 image left by an older version must be deleted first.
 
@@ -135,7 +135,7 @@ result is `/data/homebrew/<TITLE_ID>/eboot.bin` with its `sce_sys/`,
 
 Do not upload the ZIP file itself and do not extract only its contents directly
 into `/data/homebrew`. ShadowMountPlus consumes the extracted title folder, not
-the ZIP container. Releases carry the ZIP only; if a `<TITLE_ID>.ffpkg` or
+the ZIP container. The companion PKG can be installed through a package installer. If a `<TITLE_ID>.ffpkg` or
 `<TITLE_ID>.ffpfsc` image from an older version is still on the console,
 delete it: a folder and an image with the same title ID must not both be in
 scan paths.
