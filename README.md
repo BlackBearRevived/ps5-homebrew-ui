@@ -8,7 +8,8 @@
 
 A small rendering, motion and sound kit, a themeable widget set, and one
 native app that holds a gallery of complete, working UI designs.
-Homebrew UI Lab opens with a playable settings preview. Press **L2** or **R2**
+Homebrew UI Lab opens with a playable settings preview against a drifting indigo
+particle field. Reduced Motion holds the background still. Press **L2** or **R2**
 to try a theme, **Square** to adjust the preview, or **Browse themes** to open
 Theme Lab with that look. **Widget library** opens the Component Library.
 The **Developer guide** shows the repository address and points to the examples and `AGENTS.md`.

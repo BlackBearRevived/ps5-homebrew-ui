@@ -8,6 +8,7 @@
 #include "ui/theme.hpp"
 
 #include <filesystem>
+#include <vector>
 
 namespace
 {
@@ -79,5 +80,27 @@ TEST_F(HomeTest, OlderSavesUseAcrylicAndPreserveGalleryAndAccessibilityPreferenc
     auto truncated = encode_settings(settings_);
     truncated.pop_back();
     EXPECT_FALSE(decode_settings(truncated, &read));
+}
+
+TEST_F(HomeTest, LandingParticlesMoveAtIdleAndStayStillWithReducedMotion)
+{
+    const auto home = concepts::make_home(context_);
+    home->enter();
+    const auto positions = [&]()
+    {
+        app::Frame frame;
+        home->draw(frame);
+        std::vector<float> x;
+        for (const auto &instance : frame.scene.instances())
+            x.push_back(instance.rect[0]);
+        return x;
+    };
+    const auto initial = positions();
+    send(*home, idle(), 1.f);
+    EXPECT_NE(positions(), initial);
+    settings_.reduced_motion = true;
+    const auto still = positions();
+    send(*home, idle(), 1.f);
+    EXPECT_EQ(positions(), still);
 }
 } // namespace

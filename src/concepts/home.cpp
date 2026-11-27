@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdio>
 
 namespace hui::concepts
@@ -17,12 +18,15 @@ namespace
 {
 using gfx::Color;
 using gfx::Rect;
-const Color kWhite = Color::rgb(0xf7f8ff);
-const Color kQuiet = Color::rgb(0xd7ddeb);
-const Color kNight = Color::rgb(0x101523);
+const Color kWhite = Color::rgb(0xf4efe6);
+const Color kQuiet = Color::rgb(0xd7d3e0);
+const Color kNight = Color::rgb(0x0e0f24);
+const Color kViolet = Color::rgb(0x42358f);
+const Color kGold = Color::rgb(0xffd166);
 constexpr gfx::ArtworkId kLaunchArtwork = 0x484f4d45;
 constexpr const char *kPresets[] = {"Original", "Cinema", "Cool"};
 constexpr const char *kTechniques[] = {
+    "An indigo particle field with three depths of motion and a still Reduced Motion composition",
     "A playable settings panel drawn from the selected theme's real widget tokens",
     "Large Text reflows the launch actions above the preview",
     "A single developer reference page with the repository address, examples and agent guide",
@@ -119,6 +123,7 @@ class Home final : public app::Concept
         else
             update_actions(input, feedback);
         animate(brightness_motion_, brightness_ / 10.f, dt);
+        animate(preset_motion_, static_cast<float>(preset_), dt);
         animate(sound_motion_, sound_ ? 1.f : 0.f, dt);
         for (int i = 0; i < 3; ++i)
             animate(action_focus_[i], !editing_ && i == action_ ? 1.f : 0.f, dt);
@@ -127,22 +132,7 @@ class Home final : public app::Concept
     void draw(app::Frame &frame) const override
     {
         const ui::Theme theme = ui::with_legibility(ui::themes()[theme_], context_.settings);
-        frame.backdrop = theme.backdrop;
-        frame.backdrop.time = context_.settings.reduced_motion ? 0.f : age_;
-        auto &scene = frame.scene;
-        const gfx::Artwork art =
-            context_.artwork ? context_.artwork->get(kLaunchArtwork) : gfx::Artwork{};
-        if (art.texture)
-        {
-            const Color grade[] = {kWhite, Color::rgb(0xffcfac), Color::rgb(0xb8deff)};
-            scene.image(art.texture, {0, 0, 1920, 1080}, gfx::kFullUv,
-                        gfx::mix(grade[preset_], theme.primary, 0.13f)
-                            .with_alpha(0.53f + brightness_motion_.value * 0.46f));
-        }
-        scene.gradient_rect_h({0, 0, 1920, 1080}, 0, kNight.with_alpha(0.96f),
-                              kNight.with_alpha(0.12f));
-        scene.gradient_rect({0, 0, 1920, 1080}, 0, kNight.with_alpha(0.f),
-                            kNight.with_alpha(0.86f));
+        draw_sky(frame, theme);
         if (builder_)
         {
             draw_builder(frame.overlay);
@@ -151,7 +141,7 @@ class Home final : public app::Concept
         const bool large = context_.settings.large_text;
         const auto &fonts = context_.fonts;
         auto &list = frame.overlay;
-        ui::text(list, fonts.display, "Homebrew UI Lab", 104, large ? 205 : 363, large ? 108 : 86,
+        ui::text(list, fonts.display, "Homebrew UI Lab", 104, large ? 205 : 345, large ? 108 : 98,
                  kWhite);
         if (large)
             ui::text(list, fonts.regular, "A theme and widget library for PS5 homebrew.", 108, 278,
@@ -170,7 +160,7 @@ class Home final : public app::Concept
             const float lift = context_.settings.reduced_motion ? 0.f : action_focus_[i].value;
             const Rect button = large ? Rect{108.f + i * 574.f, 338 - 6 * lift, 550, 82}
                                       : Rect{108 + 9 * lift, 548.f + i * 95.f, 552, 72};
-            action_button(list, button, labels[i], !editing_ && action_ == i);
+            action_button(list, button, i, labels[i], !editing_ && action_ == i);
         }
         frame.glass = theme.style == ui::SurfaceStyle::glass && !theme.solid_surfaces;
         const float arrival = context_.settings.reduced_motion
@@ -183,6 +173,51 @@ class Home final : public app::Concept
     }
 
   private:
+    void draw_sky(app::Frame &frame, const ui::Theme &theme) const
+    {
+        const float t = context_.settings.reduced_motion ? 0.f : age_;
+        const float light = 0.55f + 0.45f * brightness_motion_.value;
+        const Color grades[] = {kViolet, Color::rgb(0x87576f), Color::rgb(0x30568e)};
+        const Color haze = gfx::mix(grades[preset_], theme.primary, 0.12f);
+        frame.backdrop.mode = gfx::BackdropMode::gradient;
+        frame.backdrop.colors[0] = kNight;
+        frame.backdrop.colors[1] = Color::rgb(0x15142c);
+        frame.backdrop.colors[2] = haze;
+        frame.backdrop.params[0] = 0.72f + 0.035f * std::sin(t * 0.06f);
+        frame.backdrop.params[1] = 0.27f + 0.045f * std::sin(t * 0.045f);
+        frame.backdrop.params[2] = 1.35f * light;
+
+        auto &scene = frame.scene;
+        constexpr Rect screen{0, 0, 1920, 1080};
+        if (context_.artwork)
+        {
+            const auto art = context_.artwork->get(kLaunchArtwork);
+            if (art.texture)
+                scene.image(art.texture, screen, gfx::kFullUv, kWhite.with_alpha(0.29f * light));
+        }
+        // Wrap beyond the canvas so particles enter at its edge. Three depths
+        // travel at different speeds along the same broad current.
+        for (int i = 0; i < 156; ++i)
+        {
+            const int depth = i % 3;
+            const float phase = static_cast<float>((i * 53) % 157);
+            const float x = std::fmod(phase * 13.f + t * (7.f + depth * 5.f), 2016.f) - 48.f;
+            const float spread = static_cast<float>((i * 73) % 167) - 83.f;
+            const float ridge = 525.f - 0.19f * x + 100.f * std::sin(x * 0.0034f + t * 0.065f);
+            const float y =
+                ridge + spread * (1.25f + depth * 0.7f) + 18.f * std::sin(phase + t * 0.23f);
+            const float radius = 1.3f + depth * 0.95f;
+            const Color tint = (i % 5 == 0) ? kGold : Color::rgb(0xd4cdff);
+            const float alpha = light * (0.5f + 0.2f * std::sin(phase + t * 0.38f));
+            if (i % 9 == 0)
+                scene.glow({x - radius, y - radius, 2 * radius, 2 * radius}, radius, 12,
+                           tint.with_alpha(alpha * 0.3f));
+            scene.circle(x, y, radius, tint.with_alpha(alpha));
+        }
+        scene.gradient_rect_h(screen, 0, kNight.with_alpha(0.70f), kNight.with_alpha(0.f));
+        scene.gradient_rect(screen, 0, kNight.with_alpha(0.f), kNight.with_alpha(0.86f));
+    }
+
     void animate(tween::Spring &value, float target, float dt) const
     {
         if (context_.settings.reduced_motion)
@@ -261,16 +296,38 @@ class Home final : public app::Concept
         }
     }
 
-    void action_button(gfx::DrawList &list, Rect r, const char *label, bool focus) const
+    void action_button(gfx::DrawList &list, Rect r, int action, const char *label, bool focus) const
     {
         const bool large = context_.settings.large_text;
+        constexpr float corner = 22.f;
+        if (focus)
+            list.glow(r, corner, 18, kGold.with_alpha(0.24f));
         list.bordered_rect(
-            r, 12,
-            focus ? kWhite : kNight.with_alpha(context_.settings.reduce_transparency ? 1.f : 0.84f),
-            focus ? 3.f : 1.5f, focus ? kWhite : Color::rgb(0x8493ac));
-        const Color ink = focus ? kNight : kWhite;
+            r, corner,
+            focus ? kGold
+                  : Color::rgb(0x25233b, context_.settings.reduce_transparency ? 1.f : 0.92f),
+            focus ? 2.f : 1.5f, focus ? Color::rgb(0xffe9b1) : Color::rgb(0x777189));
+        const Color ink = focus ? Color::rgb(0x241a05) : kWhite;
+        const float x = r.x + 49, y = r.cy();
+        list.circle(x, y, 23, ink.with_alpha(0.10f));
+        if (action == 0) // Overlapping colour swatches.
+        {
+            for (int i = 0; i < 3; ++i)
+                list.rotated_rect({x - 13 + i * 7, y - 10, 12, 21}, 3, -0.22f,
+                                  ink.with_alpha(0.4f + i * 0.3f));
+        }
+        else if (action == 1)
+        {
+            for (int i = 0; i < 4; ++i)
+                list.rounded_rect({x - 10 + (i % 2) * 12, y - 10 + (i / 2) * 12, 9, 9}, 2, ink);
+        }
+        else // Open book.
+        {
+            list.rotated_rect({x - 13, y - 9, 12, 18}, 2, 0.12f, ink);
+            list.rotated_rect({x + 1, y - 9, 12, 18}, 2, -0.12f, ink);
+        }
         const float size = large ? 35.f : 31.f;
-        ui::text(list, context_.fonts.semibold, label, r.x + 29, r.cy() + size * 0.32f, size, ink);
+        ui::text(list, context_.fonts.semibold, label, r.x + 92, r.cy() + size * 0.32f, size, ink);
         if (focus)
         {
             list.line(r.x + r.w - 40, r.cy() - 7, r.x + r.w - 32, r.cy(), 3, ink);
@@ -305,7 +362,7 @@ class Home final : public app::Concept
             const Rect r{left + (large ? 386.f : 325.f), cy - 28, large ? 600.f : 455.f, 56};
             const ui::Look look{editing_ && control_ == i ? 1.f : 0.f};
             if (i == 0)
-                paint.button(r, kPresets[preset_], ui::ButtonKind::secondary, look);
+                paint.tabs(r, kPresets, preset_motion_.value, look);
             else if (i == 1)
             {
                 paint.slider({r.x, r.y, r.w - 105, r.h}, brightness_motion_.value, look);
@@ -375,6 +432,7 @@ class Home final : public app::Concept
     float age_ = 0;
     float theme_fade_ = 0;
     tween::Spring brightness_motion_, sound_motion_;
+    tween::Spring preset_motion_;
     std::array<tween::Spring, 3> action_focus_;
 };
 } // namespace

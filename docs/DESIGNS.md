@@ -1106,8 +1106,11 @@ Source: [`src/concepts/journal.cpp`](../src/concepts/journal.cpp) &middot; tests
 
 A playable theme and widget library for PS5 homebrew.
 
+<img src="media/designs/home.webp" width="640" alt="Homebrew UI Lab in motion">
+
 **What it demonstrates**
 
+- An indigo particle field with three depths of motion and a still Reduced Motion composition
 - A playable settings panel drawn from the selected theme's real widget tokens
 - Large Text reflows the launch actions above the preview
 - A single developer reference page with the repository address, examples and agent guide
