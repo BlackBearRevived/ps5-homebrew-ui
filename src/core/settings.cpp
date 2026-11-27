@@ -13,7 +13,7 @@ namespace hui
 
 namespace
 {
-constexpr std::uint8_t kVersion = 2;
+constexpr std::uint8_t kVersion = 3;
 } // namespace
 
 std::string encode_settings(const Settings &settings)
@@ -34,6 +34,9 @@ std::string encode_settings(const Settings &settings)
     w.put_bool(settings.large_text);
     w.put_bool(settings.reduce_transparency);
     w.put_bool(settings.strong_focus);
+    for (char c : settings.theme_id)
+        w.put(static_cast<std::uint8_t>(c));
+    w.put<std::uint8_t>(0);
     return w.data();
 }
 
@@ -41,7 +44,7 @@ bool decode_settings(std::string_view data, Settings *settings)
 {
     bytes::Reader r(data);
     const auto version = r.get<std::uint8_t>();
-    if (version != 1 && version != kVersion)
+    if (version < 1 || version > kVersion)
         return false;
     Settings s;
     s.music_volume = std::clamp<int>(r.get<std::uint8_t>(), 0, 10);
@@ -60,6 +63,12 @@ bool decode_settings(std::string_view data, Settings *settings)
         s.large_text = r.get_bool();
         s.reduce_transparency = r.get_bool();
         s.strong_focus = r.get_bool();
+    }
+    if (version >= 3)
+    {
+        s.theme_id.clear();
+        while (const auto c = r.get<std::uint8_t>())
+            s.theme_id.push_back(static_cast<char>(c));
     }
     if (!r.finished())
         return false;

@@ -19,6 +19,7 @@
 #include "concepts/concepts.hpp"
 
 #include "core/tween.hpp"
+#include "ui/components/overlay.hpp"
 #include "ui/glyphs.hpp"
 #include "ui/motion.hpp"
 #include "ui/theme.hpp"
@@ -76,10 +77,10 @@ constexpr Rect kRects[kItemCount] = {
     {508, 524, 88, 46},   // switch
     {1048, 524, 88, 46},  // switch
     {136, 604, 40, 40},   // check box
-    {366, 604, 40, 40},   // check box
+    {398, 604, 40, 40},   // check box
     {656, 604, 40, 40},   // radio
-    {800, 604, 40, 40},   // radio
-    {966, 604, 40, 40},   // radio
+    {816, 604, 40, 40},   // radio
+    {1002, 604, 40, 40},  // radio
     {300, 680, 720, 44},  // slider
     {136, 762, 470, 64},  // text field
     {1256, 668, 528, 56}, // list row
@@ -96,8 +97,12 @@ struct Row
     float x[5]; // left edge used to keep a column while moving up and down
 };
 constexpr Row kRows[] = {
-    {kPrimary, 3, {136, 396, 634}},          {kTabs, 3, {136, 716, 858}}, {kToggle0, 2, {136, 636}},
-    {kCheck0, 5, {136, 366, 656, 800, 966}}, {kSlider, 1, {136}},         {kField, 1, {136}},
+    {kPrimary, 3, {136, 396, 634}},
+    {kTabs, 3, {136, 716, 858}},
+    {kToggle0, 2, {136, 636}},
+    {kCheck0, 5, {136, 398, 656, 816, 1002}},
+    {kSlider, 1, {136}},
+    {kField, 1, {136}},
 };
 constexpr int kRowCount = static_cast<int>(std::size(kRows));
 constexpr int kColumnFirst = kRow0;
@@ -161,6 +166,11 @@ class Themes final : public app::Concept
     {
         age_ = 0.0f;
         dialog_ = false;
+        const auto themes = ui::themes();
+        const auto *selected = ui::find_theme(context_.settings.theme_id);
+        theme_ = selected && !context_.touring ? static_cast<int>(selected - themes.data()) : 0;
+        previous_theme_ = theme_;
+        switch_.running = false;
     }
 
     void update(const InputFrame &input, float dt, app::Feedback &feedback) override
@@ -174,6 +184,11 @@ class Themes final : public app::Concept
         {
             previous_theme_ = theme_;
             theme_ = (theme_ + (input.is_pressed(Action::jump_next) ? 1 : count - 1)) % count;
+            if (!context_.touring)
+            {
+                context_.settings.theme_id = ui::themes()[theme_].id;
+                context_.settings_changed = true;
+            }
             switch_.start(context_.settings.reduced_motion ? 0.16f : 0.42f);
             // The new theme announces itself in its own voice.
             play(feedback, audio::Cue::tab, 1.0f, 0.0f);
@@ -181,6 +196,11 @@ class Themes final : public app::Concept
         else if (dialog_)
         {
             update_dialog(input, feedback);
+        }
+        else if (input.is_pressed(Action::back))
+        {
+            context_.requested_design = "home";
+            play(feedback, audio::Cue::back, 1.0f, 0.0f);
         }
         else
         {
@@ -249,13 +269,14 @@ class Themes final : public app::Concept
         gfx::DrawList &list = frame.overlay;
         if (switch_.running)
         {
-            draw_theme(list, old, frame.glass_texture, 1.0f - tween::smoothstep(t * 2.0f), 0.0f);
-            draw_theme(list, now, frame.glass_texture, tween::smoothstep(t * 2.0f - 1.0f),
+            draw_theme(list, previous_theme_, old, frame.glass_texture,
+                       1.0f - tween::smoothstep(t * 2.0f), 0.0f);
+            draw_theme(list, theme_, now, frame.glass_texture, tween::smoothstep(t * 2.0f - 1.0f),
                        context_.settings.reduced_motion ? 0.0f : 18.0f * (1.0f - t));
         }
         else
         {
-            draw_theme(list, now, frame.glass_texture, 1.0f, 0.0f);
+            draw_theme(list, theme_, now, frame.glass_texture, 1.0f, 0.0f);
         }
     }
 
@@ -533,27 +554,27 @@ class Themes final : public app::Concept
         return {focus_amount_[item].value, press_[item].value, false};
     }
 
-    void draw_theme(gfx::DrawList &list, const ui::Theme &theme, std::uint32_t glass, float alpha,
-                    float slide) const
+    void draw_theme(gfx::DrawList &list, int index, const ui::Theme &theme, std::uint32_t glass,
+                    float alpha, float slide) const
     {
         if (alpha <= 0.01f)
             return;
         const ui::Fonts &fonts = context_.fonts;
         ui::Painter paint(list, fonts, theme, glass);
         const auto themes = ui::themes();
-        const int index = static_cast<int>(&theme - themes.data());
+        const float scale = theme.text_scale;
         const float in = tween::cubic_out(age_ / 0.45f);
         char text[64];
         list.push_opacity(alpha * in);
         list.push_transform(1.0f, 0, 0, 0, slide + 24.0f * (1.0f - in));
 
         // ---- header: which language this is ----
-        paint.label(theme.family, 96, 120, 21, paint.page_text_muted());
-        paint.heading(theme.name, 94, 190, 66, paint.page_text());
-        paint.body(theme.summary, 96, 232, 24, paint.page_text_muted());
+        paint.label(theme.family, 96, 108, 21 * scale, paint.page_text_muted());
+        paint.heading(theme.name, 94, 195, 66 * scale, paint.page_text());
+        paint.body(theme.summary, 96, 247, 24 * scale, paint.page_text_muted());
         std::snprintf(text, sizeof(text), "%02d / %02d", index + 1,
                       static_cast<int>(themes.size()));
-        paint.label(text, 1824, 124, 24, paint.page_text(), gfx::Align::right);
+        paint.label(text, 1824, 124, 24 * scale, paint.page_text(), gfx::Align::right);
         // A tick per theme; the current one is long and in the primary colour
         // (or its text colour, where the primary is too pale to see on the page).
         const auto luminance = [](Color c) { return 0.299f * c.r + 0.587f * c.g + 0.114f * c.b; };
@@ -583,42 +604,49 @@ class Themes final : public app::Concept
         paint.chip(kRects[kChip0], "New", value_[kChip0].value, look(kChip0));
         paint.chip(kRects[kChip1], "Co-op", value_[kChip1].value, look(kChip1));
 
-        paint.body("Notifications", 136, 556, 25, theme.text);
+        paint.body("Notifications", 136, 556, 25 * scale, theme.text);
         paint.toggle(kRects[kToggle0], value_[kToggle0].value, look(kToggle0));
-        paint.body("Auto-save", 636, 556, 25, theme.text);
+        paint.body("Auto-save", 636, 556, 25 * scale, theme.text);
         paint.toggle(kRects[kToggle1], value_[kToggle1].value, look(kToggle1));
 
         paint.checkbox(kRects[kCheck0], value_[kCheck0].value, look(kCheck0));
-        paint.body("Subtitles", 192, 633, 25, theme.text);
+        paint.body("Subtitles", 192, 633, 25 * scale, theme.text);
         paint.checkbox(kRects[kCheck1], value_[kCheck1].value, look(kCheck1));
-        paint.body("Hints", 422, 633, 25, theme.text);
+        paint.body("Hints", 454, 633, 25 * scale, theme.text);
         const char *levels[] = {"Easy", "Normal", "Hard"};
         for (int i = 0; i < 3; ++i)
         {
             paint.radio(kRects[kRadio0 + i], value_[kRadio0 + i].value, look(kRadio0 + i));
-            paint.body(levels[i], kRects[kRadio0 + i].x + 54, 633, 25, theme.text);
+            paint.body(levels[i], kRects[kRadio0 + i].x + 54, 633, 25 * scale, theme.text);
         }
 
-        paint.body("Volume", 136, 711, 25, theme.text);
+        paint.body("Volume", 136, 711, 25 * scale, theme.text);
         Rect slider = kRects[kSlider];
         slider.x += focus_ == kSlider ? nudge : 0.0f;
         paint.slider(slider, slider_value_.value, look(kSlider));
         std::snprintf(text, sizeof(text), "%d", slider_);
-        paint.label(text, 1136, 712, 26, theme.text, gfx::Align::right);
+        paint.label(text, 1136, 712, 26 * scale, theme.text, gfx::Align::right);
 
         const std::string typed(kDemoName, static_cast<std::size_t>(typed_));
         const bool caret = focus_ == kField && std::fmod(clock_, 1.0f) < 0.55f;
         paint.field(kRects[kField], typed.empty() ? "Name" : typed, caret, look(kField));
         std::snprintf(text, sizeof(text), "Downloading  %d%%",
                       static_cast<int>(tween::clamp01(progress_) * 100.0f));
-        paint.body(text, 656, 786, 22, theme.text_muted);
+        paint.body(text, 656, 786, 22 * scale, theme.text_muted);
         paint.progress({656, 800, 480, 24}, progress_);
         // Running text: how the theme reads, not only how its controls look.
-        list.rounded_rect({136, 858, 1000, 1.5f}, 0, theme.text_muted.with_alpha(0.25f));
-        paint.body("Body text carries a theme as much as its buttons do: size, weight and colour",
-                   136, 896, 22, theme.text_muted);
-        paint.body("decide how a screen reads from across the room.", 136, 926, 22,
-                   theme.text_muted);
+        list.rounded_rect({136, 841, 1000, 1.5f}, 0, theme.text_muted.with_alpha(0.25f));
+        float baseline = 875;
+        const float body_size = 24 * scale;
+        for (const auto &line : ui::wrap_body(
+                 paint,
+                 "Body text carries a theme as much as its buttons do: size, weight and colour "
+                 "decide how a screen reads from across the room.",
+                 body_size, 1000, 3))
+        {
+            paint.body(line, 136, baseline, body_size, theme.text_muted);
+            baseline += body_size * 1.22f;
+        }
 
         // ---- right panel: a card, a list, the dialog button ----
         paint.panel({1216, 280, 608, 678});
@@ -629,9 +657,15 @@ class Themes final : public app::Concept
                    theme.corner == ui::Corner::round ? std::min(theme.radius, 14.0f) : 0.0f);
         if (theme.border > 0.0f && theme.outline.a > 0.5f)
             paint.stroke(art, std::min(theme.radius, 14.0f), theme.border, theme.outline);
-        paint.heading(item.title, 1256, 566, 36);
+        ui::Canvas canvas{list, fonts};
+        float title_y = 562;
+        for (const auto &line : ui::wrap_heading(canvas, theme, item.title, 36 * scale, art.w, 2))
+        {
+            paint.heading(line, art.x, title_y, 36 * scale);
+            title_y += 42 * scale;
+        }
         std::snprintf(text, sizeof(text), "%s  \xC2\xB7  %d", item.genre, item.year);
-        paint.body(text, 1256, 604, 22, theme.text_muted);
+        paint.body(text, art.x, title_y, 22 * scale, theme.text_muted);
         const char *names[] = {"Difficulty", "Players", "Language"};
         const char *values[] = {"Normal", "2", "English"};
         for (int i = 0; i < 3; ++i)
@@ -647,10 +681,13 @@ class Themes final : public app::Concept
             {ui::Button::l2, "Theme", ui::Button::r2},
             {ui::Button::dpad, "Move"},
             {ui::Button::confirm, "Use"},
+            {ui::Button::back, dialog_ ? "Close" : "Home"},
         };
         ui::HintLayout layout;
-        layout.cy = 1012.0f;
-        ui::draw_hints(list, fonts, glyphs, hints, 3, 96, false, layout);
+        layout.cy = 1009.0f;
+        layout.size *= scale;
+        layout.text_size *= scale;
+        ui::draw_hints(list, fonts, glyphs, hints, 4, 96, false, layout);
 
         // ---- the dialog ----
         const float show = dialog_show_.value;
@@ -662,9 +699,19 @@ class Themes final : public app::Concept
             list.push_opacity(tween::clamp01(show));
             list.push_transform(0.94f + 0.06f * tween::clamp01(show), 960, 540, 0, 0);
             paint.panel({560, 350, 800, 380});
-            paint.heading("Leave without saving?", 610, 430, 40);
-            paint.body("Your progress in this session will be lost.", 610, 480, 25,
-                       theme.text_muted);
+            float modal_y = 430;
+            for (const auto &line :
+                 ui::wrap_heading(canvas, theme, "Leave without saving?", 40 * scale, 700, 2))
+            {
+                paint.heading(line, 610, modal_y, 40 * scale);
+                modal_y += 47 * scale;
+            }
+            for (const auto &line : ui::wrap_body(
+                     paint, "Your progress in this session will be lost.", 25 * scale, 700, 2))
+            {
+                paint.body(line, 610, modal_y, 25 * scale, theme.text_muted);
+                modal_y += 32 * scale;
+            }
             ui::Look cancel;
             cancel.focus = 1.0f - tween::clamp01(dialog_focus_value_.value);
             ui::Look leave;

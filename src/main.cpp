@@ -215,10 +215,10 @@ int main()
         [&](const gfx::ArtworkCache::Pixels &pixels) {
             return renderer.batch().create_texture(pixels.width, pixels.height, pixels.rgba.data());
         },
-        [](std::uint32_t handle) { glDeleteTextures(1, &handle); });
+        [](std::uint32_t handle) { glDeleteTextures(1, &handle); }, {.max_dimension = 1920});
     app::Shell shell(fonts, catalog, kDataRoot, renderer.glass_texture(), &artwork,
                      "/app0/assets/artwork");
-    const std::string version = read_content_version("/app0/sce_sys/param.json");
+    const std::string version = release_version(read_content_version("/app0/sce_sys/param.json"));
     shell.set_version(version);
     sys::log("[HUI] version %s designs=%zu", version.empty() ? "unknown" : version.c_str(),
              shell.concept_count());

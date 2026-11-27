@@ -11,11 +11,13 @@ namespace hui
 {
 
 // The "contentVersion" value (PlayStation NN.NNN.NNN, e.g. "01.000.000") from
-// param.json text, or "" when it is missing or malformed. Release tags use the
-// same string, so what the app shows matches the GitHub release.
+// param.json text, or "" when it is missing or malformed.
 std::string content_version(std::string_view param_json);
 
 // Reads param.json from path; "" when it cannot be read.
 std::string read_content_version(const std::string &path);
+
+// Formats a validated content version for display, e.g. "01.000.020" -> "1.000.020".
+std::string release_version(std::string version);
 
 } // namespace hui

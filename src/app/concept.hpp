@@ -68,6 +68,9 @@ struct Context
     bool settings_changed = false;
     gfx::ArtworkCache *artwork = nullptr;
     std::string_view artwork_root{};
+    std::string_view requested_design{}; // consumed by the shell after update()
+    std::string_view last_design{};      // last gallery destination, for Resume
+    bool touring = false;
 };
 
 // One frame of a design, back to front:

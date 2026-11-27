@@ -150,7 +150,8 @@ carry matching SPDX identifiers.
 `sce_sys/pic1.dds` (shown while it starts) are the project's own artwork,
 supplied by its owner; `background-source.png` and
 `launch-background-source.png` are the pictures the two backgrounds were made
-from. `sce_sys/snd0.at9`, the music the console plays while the title is
+from. The app uses a 1920 × 1080 JPEG of the same launch artwork at
+`assets/artwork/home.jpg`. `sce_sys/snd0.at9`, the music the console plays while the title is
 selected, is the owner's own track, encoded with
 [ps5-at9-converter](https://github.com/BlackBearRevived/ps5-at9-converter)
 (57.6 s, 192 kb/s, -28 LUFS, whole-track loop).

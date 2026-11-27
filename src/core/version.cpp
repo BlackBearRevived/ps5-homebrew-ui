@@ -41,4 +41,11 @@ std::string read_content_version(const std::string &path)
     return save::read_file(path, &text) ? content_version(text) : std::string();
 }
 
+std::string release_version(std::string version)
+{
+    if (version.starts_with('0'))
+        version.erase(0, 1);
+    return version;
+}
+
 } // namespace hui

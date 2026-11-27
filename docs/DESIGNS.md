@@ -40,6 +40,7 @@ on a PC (`tools/render-media.sh`), with the same code that runs on the console.
 | 22 | [Cinema Library](#library) | A large artwork-led library with reversible details | glass | [`library.cpp`](../src/concepts/library.cpp) |
 | 23 | [Transfer Center](#transfers) | Live progress and recovery in the Broadcast theme | glass | [`transfers.cpp`](../src/concepts/transfers.cpp) |
 | 24 | [Field Journal](#journal) | An illustrated field reference with long-form typography | glass | [`journal.cpp`](../src/concepts/journal.cpp) |
+| 25 | [Homebrew UI Lab](#home) | A playable theme and widget library for PS5 homebrew | glass | [`home.cpp`](../src/concepts/home.cpp) |
 
 <a id="aurora"></a>
 
@@ -1096,6 +1097,30 @@ Source: [`src/concepts/journal.cpp`](../src/concepts/journal.cpp) &middot; tests
 <tr>
 <td width="50%" valign="top"><img src="media/designs/journal-observatory.jpg" alt="Field Journal: journal-observatory"></td>
 <td width="50%" valign="top"><img src="media/designs/journal-tide-station.jpg" alt="Field Journal: journal-tide-station"></td>
+</tr>
+</table>
+
+<a id="home"></a>
+
+## 25 &middot; Homebrew UI Lab
+
+A playable theme and widget library for PS5 homebrew.
+
+**What it demonstrates**
+
+- A playable settings panel drawn from the selected theme's real widget tokens
+- Large Text reflows the launch actions above the preview
+- A single developer reference page with the repository address, examples and agent guide
+
+Source: [`src/concepts/home.cpp`](../src/concepts/home.cpp) &middot; tests: [`tests/unit/home_test.cpp`](../tests/unit/home_test.cpp) &middot; sound set: `glass`
+
+<table>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/home.jpg" alt="Homebrew UI Lab: home"></td>
+<td width="50%" valign="top"><img src="media/designs/home-guide.jpg" alt="Homebrew UI Lab: home-guide"></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><img src="media/designs/home-preview.jpg" alt="Homebrew UI Lab: home-preview"></td>
 </tr>
 </table>
 <!-- END:designs -->

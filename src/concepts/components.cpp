@@ -95,6 +95,14 @@ class Components final : public app::Concept
     void enter() override
     {
         age_ = 0.0f;
+        if (context_.requested_design == "components")
+        {
+            const ui::Theme *selected = ui::find_theme(context_.settings.theme_id);
+            theme_ = selected ? static_cast<int>(selected - ui::themes().data()) : 0;
+            next_theme_ = theme_;
+            theme_switch_.running = false;
+            restyle();
+        }
         page().enter();
     }
 

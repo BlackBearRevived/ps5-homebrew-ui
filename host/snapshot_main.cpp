@@ -271,7 +271,7 @@ int main(int argc, char **argv)
         [&](const hui::gfx::ArtworkCache::Pixels &pixels) {
             return renderer.batch().create_texture(pixels.width, pixels.height, pixels.rgba.data());
         },
-        [](std::uint32_t handle) { glDeleteTextures(1, &handle); });
+        [](std::uint32_t handle) { glDeleteTextures(1, &handle); }, {.max_dimension = 1920});
     hui::app::Shell shell(fonts, catalog, data_root, renderer.glass_texture(), &artwork,
                           artwork_root);
     shell.set_version("host");
@@ -432,7 +432,8 @@ int main(int argc, char **argv)
         }
         // Give the real artwork worker the same opportunity to decode as on
         // the console. A simulated second can otherwise pass in milliseconds.
-        if (std::string_view(shell.concept_at(shell.current()).info().id) == "library")
+        const std::string_view design_id = shell.concept_at(shell.current()).info().id;
+        if (design_id == "library" || design_id == "home")
             std::this_thread::sleep_until(frame_start + std::chrono::milliseconds(16));
     }
     std::fprintf(stderr, "tour: %ld frames simulated\n", frames);

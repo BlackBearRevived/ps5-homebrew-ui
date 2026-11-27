@@ -82,7 +82,7 @@ class Shell
         return *concepts_[index];
     }
     // animate = false switches at once (and still restarts the entrance).
-    void show(std::size_t index, bool animate);
+    void show(std::size_t index, bool animate, bool touring = false);
     void set_info_open(bool open);
     // Drops the switcher banner at once (the tour keeps it out of pictures).
     void hide_banner()
@@ -96,6 +96,7 @@ class Shell
     }
 
   private:
+    std::size_t design_index(std::string_view id) const;
     void record(Frame &frame, const Concept &design, float opacity, float dx, float scale);
     void draw_chrome();
     void save_settings();

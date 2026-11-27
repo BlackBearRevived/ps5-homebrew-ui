@@ -25,6 +25,14 @@ TEST(Version, RejectsMissingOrMalformed)
     EXPECT_EQ(hui::content_version(R"({"contentVersion": )"), "");
 }
 
+TEST(Version, DisplaysOnlyTheFirstFieldWithoutPadding)
+{
+    EXPECT_EQ(hui::release_version("01.000.020"), "1.000.020");
+    EXPECT_EQ(hui::release_version("12.001.020"), "12.001.020");
+    EXPECT_EQ(hui::release_version("00.001.020"), "0.001.020");
+    EXPECT_EQ(hui::release_version(""), "");
+}
+
 TEST(Version, TheRepositoryParamJsonHasOne)
 {
     const std::string version =

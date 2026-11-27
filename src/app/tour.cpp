@@ -70,8 +70,8 @@ void Tour::begin_concept()
 {
     // show() does nothing for the design already on screen, so leave first.
     if (shell_.current() == index_ && shell_.concept_count() > 1)
-        shell_.show((index_ + 1) % shell_.concept_count(), false);
-    shell_.show(index_, false);
+        shell_.show((index_ + 1) % shell_.concept_count(), false, true);
+    shell_.show(index_, false, true);
     shell_.hide_banner();
     step_ = 0;
     clock_ = 0.0f;

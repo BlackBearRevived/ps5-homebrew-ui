@@ -119,6 +119,7 @@ class Painter
     static gfx::Color on(gfx::Color background);
 
   private:
+    gfx::Color action_ink(gfx::Color fallback) const;
     gfx::DrawList &list_;
     const Fonts &fonts_;
     const Theme &theme_;

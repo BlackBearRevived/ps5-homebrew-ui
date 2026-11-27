@@ -8,12 +8,17 @@
 
 A small rendering, motion and sound kit, a themeable widget set, and one
 native app that holds a gallery of complete, working UI designs.
-Press **L1** / **R1** to switch between them.
+Homebrew UI Lab opens with a playable settings preview. Press **L2** or **R2**
+to try a theme, **Square** to adjust the preview, or **Browse themes** to open
+Theme Lab with that look. **Widget library** opens the Component Library.
+The **Developer guide** shows the repository address and points to the examples and `AGENTS.md`.
+Press **L1** or **R1** to browse all designs. From any design, open the touchpad
+info panel and choose **Home** to return.
 
 <img src="docs/media/switcher.webp" width="860" alt="L1 and R1 cycling through every design in the app">
 
 <!-- BEGIN:counts -->
-**24 designs** &middot; **33 themes** &middot; **104 reusable components**
+**25 designs** &middot; **33 themes** &middot; **104 reusable components**
 <!-- END:counts -->
 &middot; **67 sound effects** in two sets &middot; **one OpenGL 4.6 shader** behind all of it
 
@@ -108,6 +113,9 @@ its clip, its techniques and its source.
 <tr>
 <td width="50%" valign="top"><a href="docs/DESIGNS.md#transfers"><img src="docs/media/designs/transfers.jpg" alt="Transfer Center"></a><br><b>23 &middot; Transfer Center</b><br><sub>Live progress and recovery in the Broadcast theme</sub></td>
 <td width="50%" valign="top"><a href="docs/DESIGNS.md#journal"><img src="docs/media/designs/journal.jpg" alt="Field Journal"></a><br><b>24 &middot; Field Journal</b><br><sub>An illustrated field reference with long-form typography</sub></td>
+</tr>
+<tr>
+<td width="50%" valign="top"><a href="docs/DESIGNS.md#home"><img src="docs/media/designs/home.jpg" alt="Homebrew UI Lab"></a><br><b>25 &middot; Homebrew UI Lab</b><br><sub>A playable theme and widget library for PS5 homebrew</sub></td>
 </tr>
 </table>
 <!-- END:designs -->

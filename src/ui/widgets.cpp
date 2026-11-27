@@ -61,8 +61,9 @@ Painter::Painter(gfx::DrawList &list, const Fonts &fonts, const Theme &theme,
 
 gfx::Color Painter::on(gfx::Color background)
 {
-    const float luminance = 0.299f * background.r + 0.587f * background.g + 0.114f * background.b;
-    return luminance > 0.58f ? Color::rgb(0x000000) : Color::rgb(0xffffff);
+    // The contrast ratios for white and black against a solid colour multiply
+    // to 21. White wins when its ratio exceeds their geometric mean.
+    return text_contrast(kWhite, background) >= std::sqrt(21.0f) ? kWhite : Color::rgb(0x000000);
 }
 
 // A bitmap face looks right when each of its 8 rows covers a whole number
@@ -539,8 +540,14 @@ void Painter::panel(const gfx::Rect &r)
     surface(r, radius, theme_.surface, theme_.outline, 1.0f);
 }
 
+Color Painter::action_ink(Color fallback) const
+{
+    return theme_.action_text.a > 0.0f ? theme_.action_text : fallback;
+}
+
 void Painter::button(const gfx::Rect &r, std::string_view value, ButtonKind kind, const Look &look)
 {
+    const float em = 24.0f * theme_.text_scale;
     if (look.disabled)
         list_.push_opacity(0.4f);
     const float radius = control_radius(r);
@@ -579,16 +586,17 @@ void Painter::button(const gfx::Rect &r, std::string_view value, ButtonKind kind
     }
     else
     {
-        // A ghost has no body; pressing dims it instead.
+        // Keep the label readable while the underline responds to a press.
         ink = theme_.style == SurfaceStyle::bevel || theme_.style == SurfaceStyle::pixel
                   ? theme_.text
                   : (theme_.style == SurfaceStyle::sketch ? theme_.on_primary : theme_.primary);
-        ink = ink.with_alpha(1.0f - 0.35f * look.press);
-        const float w = label_width(value, 24);
+        const Color underline = ink;
+        ink = action_ink(ink);
+        const float w = label_width(value, em);
         list_.rounded_rect({r.cx() - w * 0.5f, r.y + r.h - 13.0f, w, 2.0f}, 0.0f,
-                           ink.with_alpha(0.45f));
+                           underline.with_alpha(0.45f + 0.55f * look.press));
     }
-    label(value, content.cx(), baseline_for(content.cy(), 24), 24, ink, gfx::Align::center);
+    label(value, content.cx(), baseline_for(content.cy(), em), em, ink, gfx::Align::center);
     focus_ring(r, radius, look.focus);
     if (look.disabled)
         list_.pop_opacity();
@@ -806,6 +814,7 @@ void Painter::progress(const gfx::Rect &r, float value)
 void Painter::tabs(const gfx::Rect &r, std::span<const char *const> labels, float active,
                    const Look &look)
 {
+    const float em = 22.0f * theme_.text_scale;
     const int count = static_cast<int>(labels.size());
     if (count == 0)
         return;
@@ -828,10 +837,11 @@ void Painter::tabs(const gfx::Rect &r, std::span<const char *const> labels, floa
                 theme_.outline, 1.0f, 0.0f);
         for (int i = 0; i < count; ++i)
         {
-            const Color ink =
-                i == nearest ? (tinted ? theme_.on_primary : theme_.primary) : theme_.text_muted;
+            const Color ink = i == nearest
+                                  ? (tinted ? theme_.on_primary : action_ink(theme_.primary))
+                                  : theme_.text_muted;
             label(labels[static_cast<std::size_t>(i)], r.x + (static_cast<float>(i) + 0.5f) * seg,
-                  baseline_for(r.cy(), 22), 22, ink, gfx::Align::center);
+                  baseline_for(r.cy(), em), em, ink, gfx::Align::center);
         }
     }
     else if (boxed)
@@ -844,8 +854,8 @@ void Painter::tabs(const gfx::Rect &r, std::span<const char *const> labels, floa
             const bool tint = selected && theme_.style != SurfaceStyle::bevel;
             const Rect content = surface(tab, radius, tint ? theme_.accent : theme_.secondary,
                                          theme_.outline, selected ? 0.0f : 1.0f);
-            label(labels[static_cast<std::size_t>(i)], content.cx(), baseline_for(content.cy(), 22),
-                  22, tint ? on(theme_.accent) : theme_.on_secondary, gfx::Align::center);
+            label(labels[static_cast<std::size_t>(i)], content.cx(), baseline_for(content.cy(), em),
+                  em, tint ? on(theme_.accent) : theme_.on_secondary, gfx::Align::center);
         }
     }
     else
@@ -862,8 +872,8 @@ void Painter::tabs(const gfx::Rect &r, std::span<const char *const> labels, floa
         list_.rounded_rect(under, theme_.radius > 4.0f ? bar * 0.5f : 0.0f, active_ink);
         for (int i = 0; i < count; ++i)
             label(labels[static_cast<std::size_t>(i)], r.x + (static_cast<float>(i) + 0.5f) * seg,
-                  baseline_for(r.cy() - 4.0f, 22), 22,
-                  i == nearest ? (stroke_only(theme_.style) ? theme_.text : active_ink)
+                  baseline_for(r.cy() - 4.0f, em), em,
+                  i == nearest ? (stroke_only(theme_.style) ? theme_.text : action_ink(active_ink))
                                : theme_.text_muted,
                   gfx::Align::center);
     }
@@ -899,6 +909,7 @@ void Painter::field(const gfx::Rect &r, std::string_view value, bool caret, cons
 
 void Painter::chip(const gfx::Rect &r, std::string_view value, float selected, const Look &look)
 {
+    const float em = 19.0f * theme_.text_scale;
     selected = tween::clamp01(selected);
     const float radius = theme_.pill_chips ? r.h * 0.5f : control_radius(r);
     const bool strokes = stroke_only(theme_.style);
@@ -918,9 +929,10 @@ void Painter::chip(const gfx::Rect &r, std::string_view value, float selected, c
         stroke(r, radius, theme_.style == SurfaceStyle::hard ? theme_.border - 1.0f : theme_.border,
                strokes ? gfx::mix(theme_.outline, theme_.accent, selected) : theme_.outline);
     }
-    const Color ink = strokes ? gfx::mix(theme_.text_muted, theme_.accent, selected)
-                              : gfx::mix(theme_.text, on(theme_.accent), selected);
-    label(value, r.cx(), baseline_for(r.cy(), 19), 19, ink, gfx::Align::center);
+    const Color base = gfx::mix(theme_.page, theme_.surface, theme_.surface.a);
+    const Color face = gfx::mix(base, body_color, body_color.a);
+    const Color ink = (strokes || selected <= 0.01f) ? theme_.text : on(face);
+    label(value, r.cx(), baseline_for(r.cy(), em), em, ink, gfx::Align::center);
     focus_ring(r, radius, look.focus);
 }
 
@@ -947,8 +959,10 @@ void Painter::row(const gfx::Rect &r, std::string_view value, std::string_view d
     list_.rounded_rect({r.x + 16.0f, r.y + r.h - 1.0f, r.w - 32.0f, 1.5f}, 0,
                        theme_.text_muted.with_alpha(0.22f * (1.0f - selected)));
     const Color ink = strokes ? theme_.text : gfx::mix(theme_.text, theme_.on_primary, selected);
-    body(value, r.x + 22.0f, baseline_for(r.cy(), 23), 23, ink);
-    body(detail, r.x + r.w - 22.0f, baseline_for(r.cy(), 21), 21,
+    const float em = 23.0f * theme_.text_scale;
+    const float detail_em = 21.0f * theme_.text_scale;
+    body(value, r.x + 22.0f, baseline_for(r.cy(), em), em, ink);
+    body(detail, r.x + r.w - 22.0f, baseline_for(r.cy(), detail_em), detail_em,
          strokes ? theme_.text_muted : gfx::mix(theme_.text_muted, theme_.on_primary, selected),
          gfx::Align::right);
     focus_ring(r, radius, look.focus);

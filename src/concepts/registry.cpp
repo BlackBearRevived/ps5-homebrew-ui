@@ -18,6 +18,7 @@ std::span<const ConceptFactory> concept_registry()
         concepts::make_inventory, concepts::make_boot,          concepts::make_settings,
         concepts::make_themes,    concepts::make_components,    concepts::make_toolbox,
         concepts::make_library,   concepts::make_transfers,     concepts::make_journal,
+        concepts::make_home,
     };
     return kFactories;
 }

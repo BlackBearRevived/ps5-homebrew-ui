@@ -37,16 +37,16 @@ It derives the 16-character content suffix from the app name unless
 
 This project does not use Semantic Versioning. `contentVersion` is the only
 release number and must use the PS5 `NN.NNN.NNN` format, for example
-`01.002.003`. Use that exact value for the Git tag and GitHub Release name—do
-not add a `v` prefix:
+`01.000.020`. The app, new release tags and GitHub Release names display the
+first field without its leading zero, for example `1.000.020`.
 
 ```bash
-git tag 01.002.003
-git push origin 01.002.003
+git tag 1.000.020
+git push origin 1.000.020
 ```
 
-The release workflow rejects a tag that differs from
-`sce_sys/param.json`'s `contentVersion`. For ordinary development, keep
+The release workflow checks the tag against `contentVersion` and accepts
+the padded spelling used by older tags. For ordinary development, keep
 `masterVersion` at `01.00` and increment `contentVersion` for each release.
 Change `masterVersion` only when intentionally changing the compatible release
 baseline. Each tagged GitHub Release contains a ZIP of the directory-style

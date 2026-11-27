@@ -55,11 +55,19 @@ Shell::Shell(const ui::Fonts &fonts, const demo::Catalog &catalog, std::string d
         concepts_.push_back(factory(context_));
     if (!concepts_.empty())
     {
-        current_ = static_cast<std::size_t>(settings_.concept_index) % concepts_.size();
+        if (static_cast<std::size_t>(settings_.concept_index) < concepts_.size())
+            context_.last_design = concepts_[settings_.concept_index]->info().id;
+        current_ = design_index("home");
         previous_ = current_;
         concepts_[current_]->enter();
     }
-    banner_ = kBannerSeconds;
+}
+
+std::size_t Shell::design_index(std::string_view id) const
+{
+    const auto it =
+        std::ranges::find_if(concepts_, [id](const auto &c) { return c->info().id == id; });
+    return static_cast<std::size_t>(it - concepts_.begin());
 }
 
 audio::SoundSet Shell::sound_set() const
@@ -88,7 +96,7 @@ void Shell::save_settings()
         sys::log("[HUI] settings save failed: %s", error.c_str());
 }
 
-void Shell::show(std::size_t index, bool animate)
+void Shell::show(std::size_t index, bool animate, bool touring)
 {
     if (concepts_.empty())
         return;
@@ -97,14 +105,22 @@ void Shell::show(std::size_t index, bool animate)
         return;
     previous_ = current_;
     current_ = index;
+    context_.touring = touring;
     concepts_[current_]->enter();
     banner_ = kBannerSeconds;
+    const std::string_view id = concepts_[current_]->info().id;
+    if (id == "home")
+        hide_banner();
     if (animate)
         transition_.start(settings_.reduced_motion ? 0.2f : kTransitionSeconds);
     else
         transition_.running = false;
-    settings_.concept_index = static_cast<int>(current_);
-    save_delay_ = 1.5f;
+    if (id != "home" && !touring)
+    {
+        context_.last_design = id;
+        settings_.concept_index = static_cast<int>(current_);
+        save_delay_ = 1.5f;
+    }
 }
 
 void Shell::set_info_open(bool open)
@@ -124,6 +140,7 @@ void Shell::update(const InputFrame &input, float dt)
     }
 
     const int count = static_cast<int>(concepts_.size());
+    const bool drawer_had_focus = info_open_;
     if (input.is_pressed(Action::page_next) || input.is_pressed(Action::page_prev))
     {
         direction_ = input.is_pressed(Action::page_next) ? 1 : -1;
@@ -141,6 +158,16 @@ void Shell::update(const InputFrame &input, float dt)
         info_open_ = false;
         feedback_.play(audio::Cue::modal_close);
     }
+    else if (info_open_ && input.is_pressed(Action::confirm))
+    {
+        info_open_ = false;
+        const auto home = design_index("home");
+        if (current_ == home)
+            concepts_[home]->enter();
+        else
+            show(home, true);
+        feedback_.play(audio::Cue::back);
+    }
 
     // The active design sees everything the shell does not use; nothing at
     // all while the info panel covers it.
@@ -148,12 +175,19 @@ void Shell::update(const InputFrame &input, float dt)
     forwarded.pressed &= ~kShellActions;
     forwarded.released &= ~kShellActions;
     forwarded.held &= ~kShellActions;
-    if (info_open_)
+    if (info_open_ || drawer_had_focus)
     {
         forwarded = InputFrame{};
         forwarded.connected = input.connected;
     }
     concepts_[current_]->update(forwarded, dt, feedback_);
+    if (!context_.requested_design.empty())
+    {
+        const auto index = design_index(context_.requested_design);
+        if (index < concepts_.size())
+            show(index, true);
+        context_.requested_design = {};
+    }
 
     if (context_.settings_changed)
     {
@@ -202,7 +236,7 @@ void Shell::rehearse()
 void Shell::draw_chrome()
 {
     const ConceptInfo &info = concepts_[current_]->info();
-    const ui::GlyphStyle glyphs = ui::GlyphStyle::dark();
+    const ui::GlyphStyle glyphs = ui::GlyphStyle::dark(settings_.swap_confirm);
     const Color white = Color::rgb(0xffffff);
     char text[96];
 
@@ -289,7 +323,7 @@ void Shell::draw_chrome()
         ui::text(chrome_, fonts_.mono, text, left, y, 21, white.with_alpha(0.6f));
 
         const ui::Hint hints[] = {
-            {ui::Button::l1, "Switch design", ui::Button::r1},
+            {ui::Button::confirm, "Home"},
             {ui::Button::touchpad, "Close"},
         };
         ui::HintLayout layout;

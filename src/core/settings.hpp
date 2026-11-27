@@ -31,8 +31,9 @@ struct Settings
     int resolution = 2;
     // How large on-screen controller hints are: 0 small, 1 medium, 2 large.
     int hint_size = 1;
-    // The design shown when the app opens (index into the concept list).
+    // Last gallery destination. Launch always opens Home.
     int concept_index = 0;
+    std::string theme_id = "acrylic";
 
     struct Resolution
     {

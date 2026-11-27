@@ -16,8 +16,8 @@ Before committing a change:
    keys, or credentials.
 5. Include the firmware and loader context for platform-specific behavioral
    claims.
-6. Name release tags with the exact `sce_sys/param.json` `contentVersion`
-   (`NN.NNN.NNN`, without a `v` prefix).
+6. Derive the release tag from `sce_sys/param.json` by dropping the leading
+   zero from the first field. For example, `01.000.020` becomes `1.000.020`.
 
 Every comment-capable project file must start with this header (adapt the
 comment syntax and the one-line description):

@@ -77,7 +77,7 @@ pick up every theme automatically.
 | Group | Tokens |
 | --- | --- |
 | Page | `backdrop`, `page`, `page_text`, `page_text_muted` |
-| Palette | `surface`, `surface_high`, `text`, `text_muted`, `primary`, `on_primary`, `secondary`, `on_secondary`, `accent`, `outline`, `focus`, `shadow`, `light` |
+| Palette | `surface`, `surface_high`, `text`, `text_muted`, `primary`, `on_primary`, `action_text`, `secondary`, `on_secondary`, `accent`, `outline`, `focus`, `shadow`, `light` |
 | Shape | `style`, `corner`, `radius`, `radius_card`, `border`, `button_border`, `pill_chips`, `pill_switches`, `shadow_offset`, `shadow_blur`, `focus_width`, `focus_gap`, `underline_fields` |
 | Type | `heading`, `label`, `caps`, `tracking` |
 | Motion and sound | `omega`, `damping`, `sounds`, `dark` |
@@ -547,7 +547,8 @@ asset is used, and the names of those projects belong to their owners.
 
 <table>
 <tr>
-<td width="100%" valign="top"><img src="media/themes/cinema.jpg" alt="Cinema"></td>
+<td width="50%" valign="top"><img src="media/themes/cinema.jpg" alt="Cinema"></td>
+<td width="50%" valign="top"><img src="media/themes/cinema.webp" alt="Cinema in motion"></td>
 </tr>
 </table>
 
@@ -559,7 +560,8 @@ asset is used, and the names of those projects belong to their owners.
 
 <table>
 <tr>
-<td width="100%" valign="top"><img src="media/themes/field-journal.jpg" alt="Field Journal"></td>
+<td width="50%" valign="top"><img src="media/themes/field-journal.jpg" alt="Field Journal"></td>
+<td width="50%" valign="top"><img src="media/themes/field-journal.webp" alt="Field Journal in motion"></td>
 </tr>
 </table>
 
@@ -571,7 +573,8 @@ asset is used, and the names of those projects belong to their owners.
 
 <table>
 <tr>
-<td width="100%" valign="top"><img src="media/themes/broadcast.jpg" alt="Broadcast"></td>
+<td width="50%" valign="top"><img src="media/themes/broadcast.jpg" alt="Broadcast"></td>
+<td width="50%" valign="top"><img src="media/themes/broadcast.webp" alt="Broadcast in motion"></td>
 </tr>
 </table>
 <!-- END:themes -->

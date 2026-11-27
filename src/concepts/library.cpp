@@ -134,6 +134,7 @@ class Library final : public app::Concept
 
     void enter() override
     {
+        artwork_dirty_ = true; // Home shares the cache and selects its own artwork.
         shelves_.enter();
         shelves_.set_active(true);
         hero_.set_active(false);

@@ -1062,6 +1062,15 @@ std::span<const Theme> themes()
         {
             const Color base = gfx::mix(theme.page, theme.surface, theme.surface.a);
             const Color primary = gfx::mix(base, theme.primary, theme.primary.a);
+            const Color action =
+                theme.style == SurfaceStyle::bevel || theme.style == SurfaceStyle::pixel
+                    ? theme.text
+                : theme.style == SurfaceStyle::sketch ? theme.on_primary
+                                                      : theme.primary;
+            theme.action_text = readable_ink(action, base, 5.0f);
+            theme.focus = readable_ink(theme.focus, base, 3.1f);
+            theme.on_secondary = readable_ink(theme.on_secondary,
+                                              gfx::mix(base, theme.secondary, theme.secondary.a));
             theme.on_primary = readable_ink(theme.on_primary, primary);
             theme.text_muted = readable_ink(theme.text_muted, base);
         }

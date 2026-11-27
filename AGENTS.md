@@ -7,11 +7,11 @@ guessing.
 
 ## What this is
 
-A reference for building console-grade user interfaces for PS5 homebrew with
-OpenGL 4.6, and one native app ("Homebrew UI Lab") that shows all of it.
+A C++20 UI library for PS5 homebrew using OpenGL 4.6. Homebrew UI Lab is the
+native app that demonstrates its themes, widgets and complete screens.
 
 <!-- BEGIN:counts -->
-Right now: **24 designs**, **33 themes**, **104 components**.
+Right now: **25 designs**, **33 themes**, **104 components**.
 <!-- END:counts -->
 
 It has four levels. Enter at the highest one that does the job:
@@ -26,7 +26,23 @@ It has four levels. Enter at the highest one that does the job:
 Everything on screen is drawn through OpenGL by the kit. Do not add another
 rendering path.
 
-## If the task is...
+## Using the library in another app
+
+1. Follow the host build, install and test commands in the [adoption guide](docs/ADOPTING.md#2-take-the-kit).
+   The [standalone C++ example](examples/consumer/main.cpp) draws a settings form,
+   opens a detail screen and checks that Back restores focus. Its
+   [CMake project](examples/consumer/CMakeLists.txt) runs that flow as the `consumer_flow` test.
+2. In the consuming app, use `find_package(PS5HomebrewUI 1.0 CONFIG REQUIRED)` and
+   link the app target to `hui::ui`. The installed fonts and audio are under
+   `PS5HomebrewUI_ASSET_DIR`. For a native PS5 build, use the PS5 toolchain and
+   OpenGL package settings in the adoption guide. Supply the platform logging
+   and clock hooks (`hui::sys::log` and `hui::sys::monotonic_us`) as the example does.
+3. Choose a [theme](docs/THEMES.md) and look up the control in the
+   [component index](docs/COMPONENT_INDEX.md). The [gallery pages](src/concepts/components)
+   show how to connect controller input, focus, updates and drawing. Keep the app's
+   own navigation and platform setup.
+
+## Working in this repository
 
 | Task | Do this |
 | --- | --- |
@@ -35,7 +51,6 @@ rendering path.
 | "Make it look like Y" | Pick or write a `ui::Theme` ([docs/THEMES.md](docs/THEMES.md)); assign it to `component.style.theme`. Then turn the component's own knobs. |
 | "Move the focus between things" | By hand, by edge exits, or with `ui::FocusGroup`: [docs/COMPONENTS.md](docs/COMPONENTS.md), [docs/components/layout.md](docs/components/layout.md). |
 | "Add a new component" | The checklist under *Adding things* below. |
-| "Use this in my own app" | [docs/ADOPTING.md](docs/ADOPTING.md): copy `src/gfx`, `src/ui`, `src/core`, `src/audio` and the assets. |
 | "Why is it slow / is it fast enough" | [docs/PERFORMANCE.md](docs/PERFORMANCE.md) (rules and numbers measured on a console). |
 | "Run it on the console" | [docs/CONSOLE_VALIDATION.md](docs/CONSOLE_VALIDATION.md) and *Console work* below. Ask the owner first. |
 
@@ -56,6 +71,7 @@ src/audio/, src/core/     mixer, cues, music; input, springs, settings, save fil
 src/concepts/             the designs; components/ holds the gallery's pages
 src/app/                  the shell (L1/R1 switch), the tour, the design interface
 src/platform/ps5/         display, controller, audio output, system services
+examples/consumer/        standalone app built against the installed CMake package
 host/                     PC renderer (Mesa): pictures, clips, manifest
 tests/unit/               GoogleTest suite, no OpenGL needed
 tools/                    build, snapshots, media, docs, console validation
