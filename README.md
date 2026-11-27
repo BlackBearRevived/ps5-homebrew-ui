@@ -31,6 +31,9 @@ info panel and choose **Home** to return.
 [Build a design](docs/BUILDING_A_DESIGN.md) &middot;
 [For AI agents](AGENTS.md)
 
+<a href="docs/components/atlas.md"><img src="docs/media/designs/components-atlas.jpg" width="860" alt="World Atlas with Brazil highlighted in gold and its country details beside the map"></a><br>
+<b>World Atlas</b> &middot; Choose among 250 countries and territories with the D-pad, entirely offline.
+
 </div>
 
 ## Why this exists
@@ -65,7 +68,7 @@ These screenshots come from the app's built-in tour. Select a picture to open it
 
 <table>
 <tr>
-<td width="50%" valign="top"><a href="docs/components/atlas.md"><img src="docs/media/designs/components-atlas.jpg" alt="Brazil highlighted on the world map, with its country code and region beside it"></a><br><b>World Atlas</b><br><sub>Move the D-pad or left stick toward a country, then press Cross to select it.</sub></td>
+<td width="50%" valign="top"><a href="docs/components/atlas.md"><img src="docs/media/designs/components-atlas-choice.jpg" alt="Saint Kitts and Nevis marked in the Caribbean and listed under Your Selection"></a><br><b>Choosing a country</b><br><sub>Move the D-pad or left stick to browse. Press Cross to confirm the country shown under Your Selection.</sub></td>
 <td width="50%" valign="top"><a href="docs/components/atlas.md"><img src="docs/media/designs/components-atlas-regional.jpg" alt="A ring and nameplate mark Saint Helena between South America and Africa"></a><br><b>Regional zoom</b><br><sub>Press Square to zoom in. Small islands keep a marker large enough to see from the sofa.</sub></td>
 </tr>
 <tr>
