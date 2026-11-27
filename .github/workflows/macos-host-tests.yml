@@ -36,14 +36,15 @@ jobs:
       - name: Configure the arm64 toolchain
         run: |
           test "$(uname -m)" = arm64
-          brew install llvm@18 ninja coreutils bash wget
+          brew install ninja coreutils bash wget
           echo "$(brew --prefix bash)/bin" >> "$GITHUB_PATH"
-          echo "$(brew --prefix llvm@18)/bin" >> "$GITHUB_PATH"
+          echo "HOST_CC=$(xcrun --find clang)" >> "$GITHUB_ENV"
+          echo "HOST_CXX=$(xcrun --find clang++)" >> "$GITHUB_ENV"
           echo "$(brew --prefix coreutils)/libexec/gnubin" >> "$GITHUB_PATH"
       - name: Run the showcase unit tests
         run: |
           set -e
-          clang++ --version
+          "$HOST_CXX" --version
           make test-unit
           link=$(ninja -f build/tests/build.ninja -t commands | tail -n 1)
           printf '%s\n' "$link"
